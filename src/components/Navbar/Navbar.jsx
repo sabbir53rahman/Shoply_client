@@ -85,9 +85,9 @@ const Navbar = () => {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">G</span>
+                <span className="text-white font-bold text-xl">S</span>
               </div>
-              <span className="text-2xl font-bold text-emerald-700">Grocy</span>
+              <span className="text-2xl font-bold text-emerald-700">Shoply</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -168,7 +168,7 @@ const Navbar = () => {
                         <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent align="end" className="bg-white w-56">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
@@ -223,14 +223,14 @@ const Navbar = () => {
                     <Menu className="w-6 h-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80">
+                <SheetContent side="right" className="bg-white w-80">
                   <SheetHeader>
                     <SheetTitle className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold">G</span>
+                        <span className="text-white font-bold">S</span>
                       </div>
                       <span className="text-xl font-bold text-emerald-700">
-                        Grocy
+                        Shoply
                       </span>
                     </SheetTitle>
                     <SheetDescription>
