@@ -18,6 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 import Image from "next/image";
+import juice from "@/assets/juice.jpg";
 
 // Import Swiper styles
 import "swiper/css";
@@ -40,7 +41,7 @@ const slides = [
     reviews: 2847,
     bgGradient: "from-cyan-400 via-blue-500 to-purple-600",
     bgOverlay: "from-cyan-50/90 via-blue-50/80 to-purple-50/90",
-    image: "/images/juice-banner.png",
+    image: juice,
     features: ["100% Organic", "No Preservatives", "Rich in Vitamins"],
   },
   {
@@ -57,7 +58,7 @@ const slides = [
     reviews: 1923,
     bgGradient: "from-green-400 via-emerald-500 to-teal-600",
     bgOverlay: "from-green-50/90 via-emerald-50/80 to-teal-50/90",
-    image: "/placeholder.svg?height=400&width=500",
+    image: juice,
     features: ["Pesticide Free", "Same Day Delivery", "Farm Fresh"],
   },
   {
@@ -74,7 +75,7 @@ const slides = [
     reviews: 3156,
     bgGradient: "from-orange-400 via-amber-500 to-yellow-600",
     bgOverlay: "from-orange-50/90 via-amber-50/80 to-yellow-50/90",
-    image: "/placeholder.svg?height=400&width=500",
+    image: juice,
     features: ["Handmade Daily", "Premium Ingredients", "Traditional Recipe"],
   },
 ];
