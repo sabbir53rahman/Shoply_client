@@ -1,11 +1,15 @@
 "use client";
-import React from "react";
 import { useSelector } from "react-redux";
-import TeacherDashboard from "@/components/pages/TeacherDashboard";
-import StudentDashboard from "@/components/pages/StudentDashboard";
+import AdminDashboard from "@/components/pages/AdminDashboard";
+import UserDashboard from "@/components/pages/UserDashboard";
 
 function Dashboard() {
-  const user = useSelector((state) => state.user.user);
+  // const user = useSelector((state) => state.user.user);
+  const user =   {
+    name: "Sabbir Hossain",
+    email: "sabbir@example.com",
+    role: "admin",
+  }
 
   if (!user) {
     return <div className="p-4">Loading user data...</div>;
@@ -13,10 +17,10 @@ function Dashboard() {
 
   return (
     <div>
-      {user.role === "teacher" ? (
-        <TeacherDashboard teacherId={user._id} />
+      {user.role === "admin" ? (
+        <AdminDashboard userId={user._id} />
       ) : (
-        <StudentDashboard studentId={user._id} />
+        <UserDashboard userId={user._id} />
       )}
     </div>
   );

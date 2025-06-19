@@ -36,18 +36,22 @@ import {
 
 const Navbar = () => {
   // Mock user state - replace with your actual auth logic
-  const [user, setUser] = useState(null); // Set to user object when logged in
+  // const [user, setUser] = useState(null); 
+  const user =   {
+    name: "Sabbir Hossain",
+    email: "sabbir@example.com",
+    role: "admin",
+  }
   const [cartCount, setCartCount] = useState(3);
   const [wishlistCount, setWishlistCount] = useState(5);
 
-  // Mock login/logout functions - replace with your actual auth logic
-  const handleLogin = () => {
-    setUser({
-      name: "John Doe",
-      email: "john@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    });
-  };
+  //   const handleLogin = () => {
+  //     setUser({
+  //       name: "John Doe",
+  //       email: "john@example.com",
+  //       avatar: "/placeholder.svg?height=40&width=40",
+  //     });
+  //   };
 
   const handleLogout = () => {
     setUser(null);
@@ -64,7 +68,7 @@ const Navbar = () => {
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-gray-900 text-white py-2 hidden lg:block">
+      <div className="bg-gray-900 text-white py-2 hidden lg:block z-50 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-6">
@@ -86,7 +90,7 @@ const Navbar = () => {
       </div>
 
       {/* Main Navbar */}
-      <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-white/20">
+      <nav className="bg-white opacity-80 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-white/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             {/* Logo */}
@@ -210,17 +214,21 @@ const Navbar = () => {
                   </DropdownMenu>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      onClick={handleLogin}
-                      className="text-gray-700 hover:text-emerald-600"
-                    >
-                      <User className="w-5 h-5 mr-2" />
-                      Login
-                    </Button>
-                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">
-                      Sign Up
-                    </Button>
+                    <Link href="/auth/login">
+                      <Button
+                        variant="ghost"
+                        // onClick={handleLogin}
+                        className="text-gray-700 hover:text-emerald-600"
+                      >
+                        <User className="w-5 h-5 mr-2" />
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/auth/signup">
+                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">
+                        Sign Up
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -366,17 +374,21 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider px-4">
                           Account
                         </h3>
-                        <Button
-                          onClick={handleLogin}
-                          className="w-full justify-start bg-gray-50 hover:bg-gray-100 text-gray-700"
-                          variant="ghost"
-                        >
-                          <User className="w-5 h-5 mr-3" />
-                          Login to Your Account
-                        </Button>
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                          Create New Account
-                        </Button>
+                        <Link href="/auth/login">
+                          <Button
+                            //   onClick={handleLogin}
+                            className="w-full justify-start bg-gray-50 hover:bg-gray-100 text-gray-700"
+                            variant="ghost"
+                          >
+                            <User className="w-5 h-5 mr-3" />
+                            Login to Your Account
+                          </Button>
+                        </Link>
+                        <Link href="/auth/signup">
+                          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                            Create New Account
+                          </Button>
+                        </Link>
                       </div>
                     )}
                   </div>
