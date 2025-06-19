@@ -14,6 +14,7 @@ import {
   addUser,
   fetchCurrentUser,
   loginUser,
+  logout,
 } from "@/redux/features/userSlice/userSlice";
 
 const auth = getAuth(app);
@@ -24,7 +25,7 @@ const useAuth = () => {
   const dispatch = useDispatch();
 
   // Function to create a user
-  const createUser = async (name, email, password, role) => {
+  const createUser = async ({name, email, password, role}) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -76,6 +77,7 @@ const useAuth = () => {
   const logOut = async () => {
     try {
       await signOut(auth);
+      dispatch(logout())
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error.message);
@@ -87,7 +89,7 @@ const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser?.email) {
         try {
-          await dispatch(fetchCurrentUser()).unwrap();
+          // await dispatch(fetchCurrentUser()).unwrap();
         } catch (error) {
           console.error("Error fetching user:", error);
         }

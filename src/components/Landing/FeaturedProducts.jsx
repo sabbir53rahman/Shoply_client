@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import ProductCard from "../Product/ProductTem";
+import { useGetPaginatedProductsQuery } from "@/redux/features/productSlice/productSlice";
 
 const featuredProducts = [
   {
@@ -59,6 +60,9 @@ const featuredProducts = [
 ];
 
 const FeaturedCollection = () => {
+  const {data } = useGetPaginatedProductsQuery(1)
+  console.log('paginated product',data?.products)
+
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,7 +79,7 @@ const FeaturedCollection = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
-          {featuredProducts.map((product) => (
+          {data?.products?.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

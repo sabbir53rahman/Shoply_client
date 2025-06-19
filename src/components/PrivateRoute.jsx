@@ -8,7 +8,7 @@ const PrivateRoute = ({ children }) => {
   const user = useSelector((state) => state.user.user);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-
+console.log(user)
   useEffect(() => {
     // If user is null or undefined, redirect to login
     if (!user) {
