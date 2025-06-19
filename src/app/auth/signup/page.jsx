@@ -5,13 +5,12 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, UserPlus, Mail, Lock, User, Users } from "lucide-react"
-import useAuth from "@/Firebase/useAuth"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@radix-ui/react-label"
+import useAuth from "@/Firebase/useAuth"
 
 export default function SignUp() {
   const router = useRouter()
@@ -39,7 +38,6 @@ export default function SignUp() {
 
     try {
       await createUser(formData.fullName, formData.email, formData.password, formData.role)
-      alert("Account created successfully!")
       router.push("/")
     } catch (err) {
       setError(err.message || "Failed to create user")
