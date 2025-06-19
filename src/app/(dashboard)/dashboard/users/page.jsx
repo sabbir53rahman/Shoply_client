@@ -264,7 +264,7 @@ export default function UsersManagement() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="bg-white max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>User Details - {user.name}</DialogTitle>
                             <DialogDescription>Manage user account and permissions</DialogDescription>

@@ -129,10 +129,10 @@ export default function OrderManagement() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] ">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="processing">Processing</SelectItem>
                 <SelectItem value="sent_to_courier">Sent to Courier</SelectItem>
@@ -181,7 +181,7 @@ export default function OrderManagement() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-white">
                           <DialogHeader>
                             <DialogTitle>Order Details - {order.id}</DialogTitle>
                             <DialogDescription>Manage this order and update its status</DialogDescription>

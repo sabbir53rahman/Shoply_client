@@ -136,7 +136,7 @@ export default function ReviewsManagement() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-white">
                           <DialogHeader>
                             <DialogTitle>Review Details</DialogTitle>
                             <DialogDescription>Full review information and moderation options</DialogDescription>
