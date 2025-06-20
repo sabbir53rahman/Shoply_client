@@ -37,6 +37,25 @@ export const productApi = apiSlice.injectEndpoints({
             },
             providesTags : ['product']
         }),
+        updateProduct : builder.mutation({
+            query : (info)=>{
+                return {
+                    url : `/products/${info?.id}`,
+                    method : "PATCH",
+                    body : info?.updatedData
+                };
+            },
+            providesTags : ['product']
+        }),
+        deleteProduct : builder.mutation({
+            query : (info)=>{
+                return {
+                    url : `/products/${info}`,
+                    method : "DELETE",
+                };
+            },
+            providesTags : ['product']
+        }),
     })
 })
 
@@ -45,4 +64,6 @@ export const {
     useGetPaginatedProductsQuery,
     useGetAllProductsQuery,
     useGetProductQuery,
+    useUpdateProductMutation,
+    useDeleteProductMutation
 } = productApi
