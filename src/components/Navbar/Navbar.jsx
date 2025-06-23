@@ -33,15 +33,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import useAuth from "@/Firebase/useAuth";
 
 const Navbar = () => {
   // Mock user state - replace with your actual auth logic
   // const [user, setUser] = useState(null); 
-  const user =   {
-    name: "Sabbir Hossain",
-    email: "sabbir@example.com",
-    role: "admin",
-  }
+  const {user,logOut} = useAuth(); 
+  console.log(user)
+  // const user =   {
+  //   name: "Sabbir Hossain",
+  //   email: "sabbir@example.com",
+  //   role: "admin",
+  // }
   const [cartCount, setCartCount] = useState(3);
   const [wishlistCount, setWishlistCount] = useState(5);
 
@@ -54,7 +57,7 @@ const Navbar = () => {
   //   };
 
   const handleLogout = () => {
-    setUser(null);
+    logOut()
   };
 
   const navigationLinks = [

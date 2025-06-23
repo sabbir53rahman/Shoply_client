@@ -9,6 +9,8 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, Leaf, ShoppingBag } from "lucide-r
 import Link from "next/link"
 import Image from "next/image"
 import vagetable from "@/assets/vagetable.jpg";
+import useAuth from "@/Firebase/useAuth"
+import { useRouter } from "next/navigation"
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +20,8 @@ const LoginPage = () => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const {signIn} = useAuth()
+  const router = useRouter()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -37,8 +41,25 @@ const LoginPage = () => {
     console.log("Login data:", formData)
     setIsLoading(false)
 
-    // Redirect to dashboard or home
-    alert("Login successful!")
+    signIn({ email : formData?.email, password : formData?.password})
+    .then(()=>{
+        Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "User login successfully.",
+        showConfirmButton: false,
+        timer: 1500
+        });
+        router.push('/')
+    }).catch(err =>{
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "You don't have account sign up first.",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    })
   }
 
   return (

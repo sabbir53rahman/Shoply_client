@@ -67,10 +67,10 @@ const ProductCard = ({ product }) => {
         {/* Product Image */}
         <div className="absolute inset-0 p-8">
           <Image
-            src={product.image || "/placeholder.svg?height=200&width=200"}
+            src={product?.image || "/placeholder.svg?height=200&width=200"}
             alt={product.name}
             fill
-            className="object-contain group-hover:scale-110 transition-transform duration-500"
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
         </div>
       </div>

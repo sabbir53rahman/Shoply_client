@@ -25,6 +25,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
+import PrivateRoute from "../PrivateRoute";
 
 const slides = [
   {
