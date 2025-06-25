@@ -1,91 +1,137 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Package, Upload } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Search, Edit, Trash2, Package, Upload } from "lucide-react";
+
+import {
+  useGetAllProductsQuery,
+  useDeleteProductMutation,
+  useUpdateProductMutation,
+} from "@/redux/features/productSlice/productSlice";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function ProductManagement({ onAddProduct }) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [editData, setEditData] = useState({
+    name: "",
+    category: "",
+    price: "",
+  });
 
-  const products = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro",
-      category: "Electronics",
-      price: "$1,299.99",
-      stock: 25,
-      rating: 4.8,
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Nike Air Max 90",
-      category: "Footwear",
-      price: "$149.50",
-      stock: 2,
-      rating: 4.6,
-      status: "active",
-    },
-    {
-      id: 3,
-      name: 'MacBook Pro 14"',
-      category: "Electronics",
-      price: "$2,399.99",
-      stock: 8,
-      rating: 4.9,
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Samsung Galaxy S24",
-      category: "Electronics",
-      price: "$899.99",
-      stock: 0,
-      rating: 4.5,
-      status: "out_of_stock",
-    },
-  ]
+  const { data: products = [], isLoading, isError } = useGetAllProductsQuery();
+  const [deleteProduct] = useDeleteProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
+
+  const handleEditOpen = (product) => {
+    setSelectedProduct(product);
+    setEditData({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = async () => {
+    if (selectedProduct) {
+      await updateProduct({ id: selectedProduct._id, updatedData: editData });
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (confirm) {
+      await deleteProduct(id);
+    }
+  };
 
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleBulkUpload = () => {
-    // Create a sample CSV content
-    const csvContent = `name,description,category,price,stock,tags
-iPhone 15 Pro,Latest iPhone with advanced camera,electronics,1299.99,25,"smartphone,apple,premium"
-Nike Air Max 90,Classic running shoes,footwear,149.50,50,"shoes,nike,running"
-MacBook Pro 14,Professional laptop for creators,electronics,2399.99,15,"laptop,apple,professional"`
+    if (!products.length) {
+      alert("No products found to export.");
+      return;
+    }
 
-    // Create and download the CSV file
-    const blob = new Blob([csvContent], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "product-template.csv"
-    a.click()
-    window.URL.revokeObjectURL(url)
-  }
+    const headers = ["name", "description", "category", "price", "stock", "tags"];
+    const rows = products.map((p) => [
+      p.name,
+      p.description || "",
+      p.category,
+      p.price,
+      p.stock || 0,
+      Array.isArray(p.tags) ? p.tags.join(",") : p.tags || "",
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "product-export.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
-          <p className="text-muted-foreground">Manage your product inventory and listings</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Product Management
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your product inventory and listings
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleBulkUpload}>
             <Upload className="w-4 h-4 mr-2" />
             Download CSV Template
           </Button>
-
           <Button onClick={onAddProduct}>
             <Plus className="w-4 h-4 mr-2" />
             Add Product
@@ -114,49 +160,97 @@ MacBook Pro 14,Professional laptop for creators,electronics,2399.99,15,"laptop,a
             </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.price}</TableCell>
-                  <TableCell>
-                    <Badge variant={product.stock < 5 ? "destructive" : "secondary"}>{product.stock} units</Badge>
-                  </TableCell>
-                  <TableCell>{product.rating}/5</TableCell>
-                  <TableCell>
-                    <Badge variant={product.status === "active" ? "default" : "secondary"}>
-                      {product.status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading products...</p>
+          ) : isError ? (
+            <p className="text-sm text-red-500">Failed to load products.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.map((product) => (
+                  <TableRow key={product._id}>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>${parseFloat(product.price).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={product.stock > 0 ? "default" : "secondary"}
+                      >
+                        {product.stock > 0 ? "active" : "out of stock"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditOpen(product)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-white">
+                            <DialogHeader>
+                              <DialogTitle>Edit Product</DialogTitle>
+                              <DialogDescription>
+                                Update product details
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-3">
+                              <Input
+                                name="name"
+                                value={editData.name}
+                                onChange={handleEditChange}
+                                placeholder="Name"
+                              />
+                              <Input
+                                name="category"
+                                value={editData.category}
+                                onChange={handleEditChange}
+                                placeholder="Category"
+                              />
+                              <Input
+                                name="price"
+                                value={editData.price}
+                                onChange={handleEditChange}
+                                placeholder="Price"
+                              />
+                              <Button onClick={handleEditSubmit}>
+                                Save Changes
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(product._id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

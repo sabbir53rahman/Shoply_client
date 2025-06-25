@@ -11,7 +11,7 @@ export const productApi = apiSlice.injectEndpoints({
                     body: info,
                 };
             },
-            invalidatesTags : ["product"]
+            invalidatesTags : ["Product"]
         }),
         getPaginatedProducts : builder.query({
             query : (query)=>{
@@ -19,7 +19,7 @@ export const productApi = apiSlice.injectEndpoints({
                     url : `/products/paginated?page=${query}`
                 };
             },
-            providesTags : ['product']
+            providesTags : ['Product']
         }),
         getAllProducts : builder.query({
             query : ()=>{
@@ -27,7 +27,7 @@ export const productApi = apiSlice.injectEndpoints({
                     url : `/products`
                 };
             },
-            providesTags : ['product']
+            providesTags : ['Product']
         }),
         getProduct : builder.query({
             query : (query)=>{
@@ -35,7 +35,7 @@ export const productApi = apiSlice.injectEndpoints({
                     url : `/products/${query}`
                 };
             },
-            providesTags : ['product']
+            providesTags : ['Product']
         }),
         updateProduct : builder.mutation({
             query : (info)=>{
@@ -45,7 +45,7 @@ export const productApi = apiSlice.injectEndpoints({
                     body : info?.updatedData
                 };
             },
-            providesTags : ['product']
+            providesTags : ['Product']
         }),
         deleteProduct : builder.mutation({
             query : (info)=>{
@@ -54,7 +54,7 @@ export const productApi = apiSlice.injectEndpoints({
                     method : "DELETE",
                 };
             },
-            providesTags : ['product']
+            providesTags : ['Product']
         }),
     })
 })
