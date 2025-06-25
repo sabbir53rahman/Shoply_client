@@ -45,13 +45,31 @@ export const productApi = apiSlice.injectEndpoints({
                     body : info?.updatedData
                 };
             },
-            providesTags : ['Product']
+            invalidatesTags : ['Product']
         }),
         deleteProduct : builder.mutation({
             query : (info)=>{
                 return {
                     url : `/products/${info}`,
                     method : "DELETE",
+                };
+            },
+            invalidatesTags : ['Product']
+        }),
+        addCategory : builder.mutation({
+            query: (info) => {
+                return {
+                    url: "/categorys",
+                    method: "POST",
+                    body: info,
+                };
+            },
+            invalidatesTags : ["Category"]
+        }),
+        getAllCategorys : builder.query({
+            query : ()=>{
+                return {
+                    url : `/categorys`
                 };
             },
             providesTags : ['Product']
@@ -65,5 +83,7 @@ export const {
     useGetAllProductsQuery,
     useGetProductQuery,
     useUpdateProductMutation,
-    useDeleteProductMutation
+    useDeleteProductMutation,
+    useAddCategoryMutation,
+    useGetAllCategorysQuery
 } = productApi

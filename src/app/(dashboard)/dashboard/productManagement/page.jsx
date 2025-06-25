@@ -10,6 +10,8 @@ import {
   useGetAllProductsQuery,
   useDeleteProductMutation,
   useUpdateProductMutation,
+  useAddCategoryMutation,
+  useGetAllCategorysQuery,
 } from "@/redux/features/productSlice/productSlice";
 
 import {
@@ -29,12 +31,14 @@ import {
 } from "@/components/ui/table";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Swal from "sweetalert2";
 
 export default function ProductManagement({ onAddProduct }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,11 +47,14 @@ export default function ProductManagement({ onAddProduct }) {
     name: "",
     category: "",
     price: "",
+    stock : ""
   });
 
   const { data: products = [], isLoading, isError } = useGetAllProductsQuery();
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
+  const [addCategory] = useAddCategoryMutation();
+  const {data : allCategorys} = useGetAllCategorysQuery();
 
   const handleEditOpen = (product) => {
     setSelectedProduct(product);
@@ -65,8 +72,9 @@ export default function ProductManagement({ onAddProduct }) {
 
   const handleEditSubmit = async () => {
     if (selectedProduct) {
-      await updateProduct({ id: selectedProduct._id, updatedData: editData });
+      await updateProduct({ id: selectedProduct?._id, updatedData: editData });
       setSelectedProduct(null);
+      return <DialogClose></DialogClose>
     }
   };
 
@@ -116,6 +124,20 @@ export default function ProductManagement({ onAddProduct }) {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleAddCategory = (e) =>{
+    e.preventDefault();
+    const newCategory = {category : e.target.category.value} ;
+    addCategory(newCategory)
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "New Category created successfully.",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    e.target.reset()
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -127,7 +149,7 @@ export default function ProductManagement({ onAddProduct }) {
             Manage your product inventory and listings
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col lg:flex-row gap-2">
           <Button variant="outline" onClick={handleBulkUpload}>
             <Upload className="w-4 h-4 mr-2" />
             Download CSV Template
@@ -136,6 +158,26 @@ export default function ProductManagement({ onAddProduct }) {
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>
+          <Dialog >
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> Add category
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white ">
+                <DialogHeader>
+                  <DialogTitle>Add Category.</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleAddCategory} className="space-y-3 flex flex-col w-full">
+                  <p className="text-[13px] ml-2">{"Add New Category :"}</p>
+                  <input type="text" className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none" name="category" placeholder="Category" />
+                  <input type="submit" className="text-white bg-teal-700 font-bold px-5 py-1.5 rounded " value="Add Category " />
+                </form>
+              </DialogContent>
+            </Dialog>
         </div>
       </div>
 
@@ -187,12 +229,12 @@ export default function ProductManagement({ onAddProduct }) {
                       <Badge
                         variant={product.stock > 0 ? "default" : "secondary"}
                       >
-                        {product.stock > 0 ? "active" : "out of stock"}
+                        {product?.stock > 0 ? product?.stock : "out of stock"}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Dialog>
+                        <Dialog >
                           <DialogTrigger asChild>
                             <Button
                               variant="outline"
@@ -210,23 +252,33 @@ export default function ProductManagement({ onAddProduct }) {
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-3">
+                              <p className="text-[13px] ml-2">{"Product's Name :"}</p>
                               <Input
                                 name="name"
                                 value={editData.name}
                                 onChange={handleEditChange}
                                 placeholder="Name"
                               />
+                              <p className="text-[13px] ml-2">{"Category :"}</p>
                               <Input
                                 name="category"
                                 value={editData.category}
                                 onChange={handleEditChange}
                                 placeholder="Category"
                               />
+                              <p className="text-[13px] ml-2">{"Price :"}</p>
                               <Input
                                 name="price"
                                 value={editData.price}
                                 onChange={handleEditChange}
                                 placeholder="Price"
+                              />
+                              <p className="text-[13px] ml-2">{"Stock :"}</p>
+                              <Input
+                                name="stock"
+                                value={editData?.stock}
+                                onChange={handleEditChange}
+                                placeholder="Stock"
                               />
                               <Button onClick={handleEditSubmit}>
                                 Save Changes
