@@ -12,53 +12,51 @@ const image_hosting_key = process.env.NEXT_PUBLIC_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 const Page = () => {
-    const inStyle = 'py-2 px-3 rounded-md border focus:border focus:border-sky-300 focus:outline-0 flex-grow border-gray-400 text-gray-900';
     const [selectedItems, setSelectedItems] = useState([]);
-    // const currentUser = useSelector(state => state);
     const [addProduct] = useAddProductMutation()
     const {data : allCategory} = useGetAllCategorysQuery()
-    console.log(allCategory)
     const filteredOptions = allCategory?.filter((item) => !selectedItems.includes(item._id));
+
     const [disable, setdisable] = useState(false)
     const disableButton = "bg-gray-400 hover:bg-gray-400 cursor-pointer text-white w-[80%] font-semibold px-8 py-2.5 rounded-lg shadow-lg transition"
     const normalButton = "bg-emerald-600 hover:bg-emerald-700 cursor-pointer text-white w-[80%] font-semibold px-8 py-2.5 rounded-lg shadow-lg transition"
 
     const handleAddProduct = async (e) =>{
         setdisable(true)
-      e.preventDefault()
-      try {
-        const imageFile ={image : e.target.photo.files[0]}
-        const res =await  axios.post(image_hosting_api, imageFile,{
-            headers:{
-                'Content-Type' : 'multipart/form-data'
-            }
-        } )
+        e.preventDefault()
+        try {
+            const imageFile ={image : e.target.photo.files[0]}
+            const res =await  axios.post(image_hosting_api, imageFile,{
+                headers:{
+                    'Content-Type' : 'multipart/form-data'
+                }
+            } )
 
-        if(res.data.success  === true){ 
-            const productInfo ={
-                name: e.target.name.value,
-                category :selectedItems,
-                image: res?.data?.data?.display_url,
-                description:e.target.description.value,
-                price: parseInt(e.target.price.value),
-                stock: parseInt(e.target.stock.value)
+            if(res.data.success  === true){ 
+                const productInfo ={
+                    name: e.target.name.value,
+                    category :selectedItems,
+                    image: res?.data?.data?.display_url,
+                    description:e.target.description.value,
+                    price: parseInt(e.target.price.value),
+                    stock: parseInt(e.target.stock.value)
+                }
+                console.log(productInfo)
+            
+                const resp = await addProduct(productInfo);
+                e.target.reset()
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: `product added successfully `,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                setdisable(false)
             }
-            console.log(productInfo)
-        
-            const resp = await addProduct(productInfo);
-            e.target.reset()
-            Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: `product added successfully `,
-                showConfirmButton: false,
-                timer: 1500
-            });
-            setdisable(false)
+        } catch (err) {
+            console.log('error from add product', err)
         }
-      } catch (err) {
-          console.log('error from add product', err)
-      }
     }
 
 

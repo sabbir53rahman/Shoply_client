@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import Swal from "sweetalert2";
 import Link from "next/link";
+import { Select } from "antd";
 
 export default function ProductManagement({ onAddProduct }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,7 +56,7 @@ export default function ProductManagement({ onAddProduct }) {
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [addCategory] = useAddCategoryMutation();
-  const {data : allCategorys} = useGetAllCategorysQuery();
+  const {data : allCategory} = useGetAllCategorysQuery()
 
   const handleEditOpen = (product) => {
     setSelectedProduct(product);

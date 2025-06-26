@@ -16,10 +16,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Search, Eye, Truck, CheckCircle, XCircle, ShoppingCart } from "lucide-react"
+import { useAddOrderMutation, useGetAllOrdersQuery } from "@/redux/features/orderSlice/orderSlice"
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const {data : allOrders} = useGetAllOrdersQuery()
+  console.log(allOrders)
 
   const orders = [
     {
@@ -64,7 +67,7 @@ export default function OrderManagement() {
     },
   ]
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = orders?.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.toLowerCase().includes(searchTerm.toLowerCase())
@@ -155,24 +158,24 @@ export default function OrderManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
+              {filteredOrders?.map((order) => (
+                <TableRow key={order?.id}>
+                  <TableCell className="font-medium">{order?.id}</TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order.customer}</p>
-                      <p className="text-sm text-muted-foreground">{order.email}</p>
+                      <p className="font-medium">{order?.customer}</p>
+                      <p className="text-sm text-muted-foreground">{order?.email}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{order.items}</TableCell>
-                  <TableCell className="font-medium">{order.total}</TableCell>
+                  <TableCell>{order?.items}</TableCell>
+                  <TableCell className="font-medium">{order?.total}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(order.status)} className="flex items-center gap-1 w-fit">
-                      {getStatusIcon(order.status)}
+                    <Badge variant={getStatusVariant(order?.status)} className="flex items-center gap-1 w-fit">
+                      {getStatusIcon(order?.status)}
                       {order.status.replace("_", " ")}
                     </Badge>
                   </TableCell>
-                  <TableCell>{order.date}</TableCell>
+                  <TableCell>{order?.date}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Dialog>
@@ -183,28 +186,28 @@ export default function OrderManagement() {
                         </DialogTrigger>
                         <DialogContent className="bg-white">
                           <DialogHeader>
-                            <DialogTitle>Order Details - {order.id}</DialogTitle>
+                            <DialogTitle>Order Details - {order?.id}</DialogTitle>
                             <DialogDescription>Manage this order and update its status</DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <p className="font-medium">Customer</p>
-                                <p className="text-sm text-muted-foreground">{order.customer}</p>
-                                <p className="text-sm text-muted-foreground">{order.email}</p>
+                                <p className="text-sm text-muted-foreground">{order?.customer}</p>
+                                <p className="text-sm text-muted-foreground">{order?.email}</p>
                               </div>
                               <div>
                                 <p className="font-medium">Payment Method</p>
-                                <p className="text-sm text-muted-foreground">{order.payment}</p>
+                                <p className="text-sm text-muted-foreground">{order?.payment}</p>
                               </div>
                             </div>
                             <div>
                               <p className="font-medium">Items</p>
-                              <p className="text-sm text-muted-foreground">{order.items}</p>
+                              <p className="text-sm text-muted-foreground">{order?.items}</p>
                             </div>
                             <div>
                               <p className="font-medium">Total Amount</p>
-                              <p className="text-lg font-bold">{order.total}</p>
+                              <p className="text-lg font-bold">{order?.total}</p>
                             </div>
                             <div className="flex gap-2">
                               {order.status === "processing" && (

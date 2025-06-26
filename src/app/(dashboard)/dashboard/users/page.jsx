@@ -16,10 +16,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Search, Eye, UserCheck, UserX, Users, Mail, Phone } from "lucide-react"
+import { useGetAllUsersQuery, useMakeAdminMutation } from "@/redux/features/manageUserSlice/manageUserSlice"
 
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const {data : allUsers} = useGetAllUsersQuery()
+  const [ makeAdmin ] = useMakeAdminMutation()
 
   const users = [
     {
@@ -84,11 +87,11 @@ export default function UsersManagement() {
     },
   ]
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = allUsers?.filter((user) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter
+      user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === "all" || user?.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
@@ -111,10 +114,10 @@ export default function UsersManagement() {
 
   const userStats = {
     total: users.length,
-    active: users.filter((u) => u.status === "active").length,
-    inactive: users.filter((u) => u.status === "inactive").length,
-    suspended: users.filter((u) => u.status === "suspended").length,
-    admins: users.filter((u) => u.role === "admin").length,
+    active: users?.filter((u) => u.status === "active").length,
+    inactive: users?.filter((u) => u.status === "inactive").length,
+    suspended: users?.filter((u) => u.status === "suspended").length,
+    admins: users?.filter((u) => u.role === "admin").length,
   }
 
   return (
@@ -132,7 +135,7 @@ export default function UsersManagement() {
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.total}</div>
+            <div className="text-2xl font-bold">{userStats?.total}</div>
           </CardContent>
         </Card>
 
@@ -142,7 +145,7 @@ export default function UsersManagement() {
             <UserCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.active}</div>
+            <div className="text-2xl font-bold">{userStats?.active}</div>
           </CardContent>
         </Card>
 
@@ -152,7 +155,7 @@ export default function UsersManagement() {
             <UserX className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.inactive}</div>
+            <div className="text-2xl font-bold">{userStats?.inactive}</div>
           </CardContent>
         </Card>
 
@@ -162,7 +165,7 @@ export default function UsersManagement() {
             <UserX className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.suspended}</div>
+            <div className="text-2xl font-bold">{userStats?.suspended}</div>
           </CardContent>
         </Card>
 
@@ -172,7 +175,7 @@ export default function UsersManagement() {
             <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.admins}</div>
+            <div className="text-2xl font-bold">{userStats?.admins}</div>
           </CardContent>
         </Card>
       </div>
@@ -223,39 +226,39 @@ export default function UsersManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
+              {filteredUsers?.map((user) => (
+                <TableRow key={user._id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">Joined {user.joinDate}</p>
+                      <p className="font-medium">{user?.name}</p>
+                      <p className="text-sm text-muted-foreground">Joined {user?.joinDate}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
                       <div className="flex items-center gap-1 text-sm">
                         <Mail className="w-3 h-3" />
-                        {user.email}
+                        {user?.email}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Phone className="w-3 h-3" />
-                        {user.phone}
+                        {user?.phone}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleVariant(user.role)} className="capitalize">
-                      {user.role}
+                    <Badge variant={getRoleVariant(user?.role)} className="capitalize">
+                      {user?.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(user.status)} className="capitalize">
-                      {user.status}
+                    <Badge variant={getStatusVariant(user?.status)} className="capitalize">
+                      {user?.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.totalOrders}</TableCell>
-                  <TableCell className="font-medium">{user.totalSpent}</TableCell>
-                  <TableCell>{user.lastLogin}</TableCell>
+                  <TableCell>{user?.totalOrders}</TableCell>
+                  <TableCell className="font-medium">{user?.totalSpent}</TableCell>
+                  <TableCell>{user?.lastLogin}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Dialog>
@@ -266,7 +269,7 @@ export default function UsersManagement() {
                         </DialogTrigger>
                         <DialogContent className="bg-white max-w-2xl">
                           <DialogHeader>
-                            <DialogTitle>User Details - {user.name}</DialogTitle>
+                            <DialogTitle>User Details - {user?.name}</DialogTitle>
                             <DialogDescription>Manage user account and permissions</DialogDescription>
                           </DialogHeader>
                           <div className="space-y-6">
@@ -276,16 +279,16 @@ export default function UsersManagement() {
                                   <h4 className="font-medium mb-2">Personal Information</h4>
                                   <div className="space-y-2 text-sm">
                                     <p>
-                                      <span className="font-medium">Name:</span> {user.name}
+                                      <span className="font-medium">Name:</span> {user?.name}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Email:</span> {user.email}
+                                      <span className="font-medium">Email:</span> {user?.email}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Phone:</span> {user.phone}
+                                      <span className="font-medium">Phone:</span> {user?.phone}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Join Date:</span> {user.joinDate}
+                                      <span className="font-medium">Join Date:</span> {user?.joinDate}
                                     </p>
                                   </div>
                                 </div>
@@ -295,14 +298,14 @@ export default function UsersManagement() {
                                   <div className="space-y-2">
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm">Role:</span>
-                                      <Badge variant={getRoleVariant(user.role)} className="capitalize">
+                                      <Badge variant={getRoleVariant(user?.role)} className="capitalize">
                                         {user.role}
                                       </Badge>
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm">Status:</span>
-                                      <Badge variant={getStatusVariant(user.status)} className="capitalize">
-                                        {user.status}
+                                      <Badge variant={getStatusVariant(user?.status)} className="capitalize">
+                                        {user?.status}
                                       </Badge>
                                     </div>
                                   </div>
@@ -314,13 +317,13 @@ export default function UsersManagement() {
                                   <h4 className="font-medium mb-2">Activity Summary</h4>
                                   <div className="space-y-2 text-sm">
                                     <p>
-                                      <span className="font-medium">Total Orders:</span> {user.totalOrders}
+                                      <span className="font-medium">Total Orders:</span> {user?.totalOrders}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Total Spent:</span> {user.totalSpent}
+                                      <span className="font-medium">Total Spent:</span> {user?.totalSpent}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Last Login:</span> {user.lastLogin}
+                                      <span className="font-medium">Last Login:</span> {user?.lastLogin}
                                     </p>
                                   </div>
                                 </div>
@@ -328,23 +331,25 @@ export default function UsersManagement() {
                                 <div>
                                   <h4 className="font-medium mb-2">Quick Actions</h4>
                                   <div className="space-y-2">
-                                    {user.status === "active" && (
+                                    {user?.status === "active" && (
                                       <Button variant="outline" size="sm" className="w-full">
                                         <UserX className="w-4 h-4 mr-2" />
                                         Suspend User
                                       </Button>
                                     )}
-                                    {user.status === "suspended" && (
+                                    {user?.status === "suspended" && (
                                       <Button variant="outline" size="sm" className="w-full">
                                         <UserCheck className="w-4 h-4 mr-2" />
                                         Activate User
                                       </Button>
                                     )}
-                                    {user.role === "customer" && (
-                                      <Button variant="outline" size="sm" className="w-full">
-                                        <Users className="w-4 h-4 mr-2" />
-                                        Make Admin
-                                      </Button>
+                                    {user?.role === "customer" || "user" && (
+                                      <button className="w-full" onClick={()=> makeAdmin(user?._id)}>
+                                        <Button variant="outline" size="sm" className="w-full">
+                                          <Users className="w-4 h-4 mr-2" />
+                                          Make Admin
+                                        </Button>
+                                      </button>
                                     )}
                                   </div>
                                 </div>
