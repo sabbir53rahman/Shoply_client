@@ -23,9 +23,7 @@ const LayoutContent = ({ children }) => {
 
   return (
     <>
-      <Navbar />
       {children}
-      <Footer />
     </>
   );
 };

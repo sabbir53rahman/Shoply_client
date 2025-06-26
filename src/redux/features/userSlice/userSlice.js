@@ -42,9 +42,9 @@ export const fetchCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("token");
 
-    if (!token || token === "null") {
-      return rejectWithValue({ message: "Token not found" });
-    }
+    // if (!token || token === "null") {
+    //   return rejectWithValue({ message: "Token not found" });
+    // }
 
     try {
       const response = await axios.get(`${BASE_URL}/users/currentUser`, {

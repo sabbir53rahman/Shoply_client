@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 const adminNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -116,17 +117,18 @@ export default function Sidebar() {
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-col h-screen w-64 bg-white text-gray-700 pt-[130px] p-6 fixed top-0 left-0 border-r border-gray-200 shadow-md">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-emerald-600 text-white flex items-center justify-center rounded-lg">
-            <Store className="w-6 h-6" />
+      <div className="hidden md:flex md:flex-col h-screen w-64 bg-white text-gray-700 pt-[20px] p-6 fixed top-0 left-0 border-r border-gray-200 shadow-md">
+        <Link href='/'>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-emerald-600 text-white flex items-center justify-center rounded-lg">
+              <Store className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xl font-bold">Shoply</p>
+              <p className="text-sm text-gray-500 capitalize">{user.role} Panel</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xl font-bold">Shoply</p>
-            <p className="text-sm text-gray-500 capitalize">{user.role} Panel</p>
-          </div>
-        </div>
-
+        </Link>
         <div className="mb-6 flex items-center gap-3">
           <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center">
             <User className="w-5 h-5" />

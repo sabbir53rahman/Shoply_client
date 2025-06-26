@@ -14,6 +14,8 @@ import {
   MessageCircle,
   Heart,
 } from "lucide-react";
+import Navbar from "@/components/Navbar/Navbar";
+import Footer from "@/components/Footer/Footer";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -79,6 +81,7 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <Navbar/>
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         {/* Background decoration */}
@@ -291,6 +294,7 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
+      <Footer/>
     </div>
   );
 };

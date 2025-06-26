@@ -105,7 +105,7 @@ export default function AdminDashboard({ userId }) {
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={() => router.push("/products")}>
+            <Button variant="outline" className="w-full mt-4" onClick={() => router.push("/dashboard/productManagement")}>
               Manage Products
             </Button>
           </CardContent>

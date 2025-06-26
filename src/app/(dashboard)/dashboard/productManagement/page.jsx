@@ -39,6 +39,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Swal from "sweetalert2";
+import Link from "next/link";
 
 export default function ProductManagement({ onAddProduct }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -154,10 +155,15 @@ export default function ProductManagement({ onAddProduct }) {
             <Upload className="w-4 h-4 mr-2" />
             Download CSV Template
           </Button>
-          <Button onClick={onAddProduct}>
+          {/* <Button onClick={onAddProduct}>
             <Plus className="w-4 h-4 mr-2" />
             Add Product
-          </Button>
+          </Button> */}
+          <Link href='/dashboard/addProduct' className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600" >
+            <Plus className="w-4 h-4 mr-2 " />
+            Add Product
+          </Link>
+
           <Dialog >
               <DialogTrigger asChild>
                 <Button

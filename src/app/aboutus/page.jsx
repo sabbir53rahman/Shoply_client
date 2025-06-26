@@ -7,17 +7,23 @@ import CompanyStory from "@/components/pages/about/CompanyStory";
 import CompanyValues from "@/components/pages/about/CompanyValues";
 import TeamSection from "@/components/pages/about/TeamSection";
 import CompanyCulture from "@/components/pages/about/CompanyCulture";
+import Navbar from "@/components/Navbar/Navbar";
+import Footer from "@/components/Footer/Footer";
 
 const AboutUs = () => {
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden">
-      <AboutHero/>
-      <MissionVision/>
-      <CompanyStory/>
-      <CompanyValues/>
-      <TeamSection/>
-      <CompanyCulture/>
-    </div>
+    <>
+      <Navbar/>
+      <div className="min-h-screen bg-black overflow-x-hidden">
+        <AboutHero/>
+        <MissionVision/>
+        <CompanyStory/>
+        <CompanyValues/>
+        <TeamSection/>
+        <CompanyCulture/>
+      </div>
+      <Footer/>
+    </>
   );
 };
 

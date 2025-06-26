@@ -34,12 +34,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import useAuth from "@/Firebase/useAuth";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   // Mock user state - replace with your actual auth logic
   // const [user, setUser] = useState(null); 
   const {user,logOut} = useAuth(); 
   console.log(user)
+  const currentUser = useSelector(state => state);
+  console.log(currentUser)
   // const user =   {
   //   name: "Sabbir Hossain",
   //   email: "sabbir@example.com",

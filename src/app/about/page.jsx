@@ -17,6 +17,8 @@ import {
   ArrowRight,
   Quote,
 } from "lucide-react";
+import Navbar from "@/components/Navbar/Navbar";
+import Footer from "@/components/Footer/Footer";
 
 const AboutPage = () => {
   const stats = [
@@ -99,6 +101,7 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen">
+      <Navbar/>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
@@ -403,6 +406,7 @@ const AboutPage = () => {
           </Button>
         </div>
       </section>
+      <Footer/>
     </div>
   );
 };
