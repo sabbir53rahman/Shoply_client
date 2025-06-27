@@ -1,11 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -13,73 +26,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Search, Star, Trash2, Eye } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Search, Star, Trash2, Eye } from "lucide-react";
+import { useGetAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
 
 export default function ReviewsManagement() {
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const reviews = [
-    {
-      id: 1,
-      product: "iPhone 15 Pro",
-      customer: "John Doe",
-      rating: 5,
-      comment:
-        "Excellent phone with amazing camera quality! The performance is outstanding and the build quality is top-notch.",
-      date: "2024-01-15",
-      status: "approved",
-    },
-    {
-      id: 2,
-      product: "Nike Air Max 90",
-      customer: "Jane Smith",
-      rating: 4,
-      comment: "Very comfortable shoes, great for daily wear. The design is classic and they fit perfectly.",
-      date: "2024-01-14",
-      status: "approved",
-    },
-    {
-      id: 3,
-      product: 'MacBook Pro 14"',
-      customer: "Mike Johnson",
-      rating: 5,
-      comment: "Perfect for work and creative projects. The M3 chip is incredibly fast and the display is beautiful.",
-      date: "2024-01-13",
-      status: "approved",
-    },
-    {
-      id: 4,
-      product: "Samsung Galaxy S24",
-      customer: "Sarah Wilson",
-      rating: 2,
-      comment: "This product is terrible and overpriced. Would not recommend to anyone.",
-      date: "2024-01-12",
-      status: "pending",
-    },
-  ]
+  const [searchTerm, setSearchTerm] = useState("");
+  const { data: reviews = [], isLoading, isError } = useGetAllReviewsQuery();
 
   const filteredReviews = reviews.filter(
     (review) =>
-      review.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.customer.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      review?.productId?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      review?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const renderStars = (rating) => {
-    return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
-        ))}
-      </div>
-    )
-  }
+  const renderStars = (rating) => (
+    <div className="flex items-center gap-1">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={`w-4 h-4 ${
+            i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+
+  if (isLoading) return <p className="p-6">Loading reviews...</p>;
+  if (isError)
+    return <p className="p-6 text-red-500">Failed to fetch reviews</p>;
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reviews Management</h1>
-        <p className="text-muted-foreground">Moderate and manage customer product reviews</p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Reviews Management
+        </h1>
+        <p className="text-muted-foreground">
+          Moderate and manage customer product reviews
+        </p>
       </div>
 
       <Card>
@@ -88,7 +76,9 @@ export default function ReviewsManagement() {
             <Star className="h-5 w-5 text-yellow-500" />
             Customer Reviews
           </CardTitle>
-          <CardDescription>Review and moderate customer feedback</CardDescription>
+          <CardDescription>
+            Review and moderate customer feedback
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4 mb-4">
@@ -117,16 +107,20 @@ export default function ReviewsManagement() {
             </TableHeader>
             <TableBody>
               {filteredReviews.map((review) => (
-                <TableRow key={review.id}>
-                  <TableCell className="font-medium">{review.product}</TableCell>
-                  <TableCell>{review.customer}</TableCell>
-                  <TableCell>{renderStars(review.rating)}</TableCell>
-                  <TableCell className="max-w-xs">
-                    <p className="truncate">{review.comment}</p>
+                <TableRow key={review._id}>
+                  <TableCell className="font-medium">
+                    {review?.productId?.name}
                   </TableCell>
-                  <TableCell>{review.date}</TableCell>
+                  <TableCell>{review?.userId?.name}</TableCell>
+                  <TableCell>{renderStars(review?.rating)}</TableCell>
+                  <TableCell className="max-w-xs">
+                    <p className="truncate">{review?.comment}</p>
+                  </TableCell>
                   <TableCell>
-                    <Badge variant={review.status === "approved" ? "default" : "secondary"}>{review.status}</Badge>
+                    {new Date(review?.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">pending</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -139,31 +133,43 @@ export default function ReviewsManagement() {
                         <DialogContent className="bg-white">
                           <DialogHeader>
                             <DialogTitle>Review Details</DialogTitle>
-                            <DialogDescription>Full review information and moderation options</DialogDescription>
+                            <DialogDescription>
+                              Full review information and moderation options
+                            </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
                               <h4 className="font-medium mb-2">Product</h4>
-                              <p className="text-sm text-muted-foreground">{review.product}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {review?.productId?.name}
+                              </p>
                             </div>
                             <div>
                               <h4 className="font-medium mb-2">Customer</h4>
-                              <p className="text-sm text-muted-foreground">{review.customer}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {review?.userId?.name}
+                              </p>
                             </div>
                             <div>
                               <h4 className="font-medium mb-2">Rating</h4>
-                              {renderStars(review.rating)}
+                              {renderStars(review?.rating)}
                             </div>
                             <div>
                               <h4 className="font-medium mb-2">Review</h4>
-                              <p className="text-sm text-muted-foreground">{review.comment}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {review?.comment}
+                              </p>
                             </div>
                             <div>
                               <h4 className="font-medium mb-2">Date</h4>
-                              <p className="text-sm text-muted-foreground">{review.date}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(
+                                  review?.createdAt
+                                ).toLocaleDateString()}
+                              </p>
                             </div>
                             <div className="flex gap-2 pt-4 border-t">
-                              {review.status === "pending" && <Button size="sm">Approve Review</Button>}
+                              <Button size="sm">Approve Review</Button>
                               <Button variant="destructive" size="sm">
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Review
@@ -184,5 +190,5 @@ export default function ReviewsManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

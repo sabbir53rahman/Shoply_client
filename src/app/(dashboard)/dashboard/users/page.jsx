@@ -47,6 +47,7 @@ import {
   useGetAllUsersQuery,
   useMakeAdminMutation,
 } from "@/redux/features/manageUserSlice/manageUserSlice";
+import Swal from "sweetalert2";
 
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
