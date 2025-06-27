@@ -12,6 +12,7 @@ import {
   useUpdateProductMutation,
   useAddCategoryMutation,
   useGetAllCategorysQuery,
+  useGetPaginatedProductsQuery,
 } from "@/redux/features/productSlice/productSlice";
 
 import {
@@ -51,12 +52,19 @@ export default function ProductManagement({ onAddProduct }) {
     price: "",
     stock : ""
   });
-
-  const { data: products = [], isLoading, isError } = useGetAllProductsQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: products = [], isLoading, isError } = useGetPaginatedProductsQuery(currentPage);
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [addCategory] = useAddCategoryMutation();
-  const {data : allCategory} = useGetAllCategorysQuery()
+
+  const { totalPages } = products;
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
+      setCurrentPage(pageNumber);
+    }
+  };
 
   const handleEditOpen = (product) => {
     setSelectedProduct(product);
@@ -89,7 +97,7 @@ export default function ProductManagement({ onAddProduct }) {
     }
   };
 
-  const filteredProducts = products.filter(
+  const filteredProducts = products?.products?.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -310,6 +318,38 @@ export default function ProductManagement({ onAddProduct }) {
           )}
         </CardContent>
       </Card>
+      <div className="flex justify-center items-center gap-2 mt-6">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        {[...Array(totalPages)].map((_, index) => {
+          const page = index + 1;
+          return (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-3 py-1 rounded ${
+                currentPage === page ? 'bg-emerald-600 text-white' : 'bg-gray-200'
+              }`}
+            >
+              {page}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

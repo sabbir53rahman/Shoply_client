@@ -105,7 +105,7 @@ export default function UsersManagement() {
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats?.total}</div>
+            <div className="text-2xl font-bold">{allUsers?.length}</div>
           </CardContent>
         </Card>
 
