@@ -25,10 +25,20 @@ export const reviewApi = apiSlice.injectEndpoints({
         { type: "Review", id: productId },
       ],
     }),
+
+    //all reviews
+    getAllReviews: builder.query({
+      query: () => ({
+        url: "/reviews",
+        credentials: "include",
+      }),
+      providesTags: ["Review"],
+    }),
   }),
 });
 
 export const {
   useAddReviewMutation,
   useGetProductReviewsQuery,
+  useGetAllReviewsQuery, 
 } = reviewApi;

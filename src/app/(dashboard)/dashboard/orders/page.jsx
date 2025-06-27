@@ -1,79 +1,30 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { Search, Eye, Truck, CheckCircle, XCircle, ShoppingCart } from "lucide-react"
-import { useAddOrderMutation, useGetAllOrdersQuery } from "@/redux/features/orderSlice/orderSlice"
+import { useGetAllOrdersQuery } from "@/redux/features/orderSlice/orderSlice"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const {data : allOrders} = useGetAllOrdersQuery()
-  console.log(allOrders)
-
-  const orders = [
-    {
-      id: "#ORD-001",
-      customer: "John Doe",
-      email: "john@example.com",
-      items: "iPhone 15 Pro, Case",
-      total: "$1,299.99",
-      status: "processing",
-      date: "2024-01-15",
-      payment: "Credit Card",
-    },
-    {
-      id: "#ORD-002",
-      customer: "Jane Smith",
-      email: "jane@example.com",
-      items: "Nike Air Max 90",
-      total: "$149.50",
-      status: "sent_to_courier",
-      date: "2024-01-18",
-      payment: "PayPal",
-    },
-    {
-      id: "#ORD-003",
-      customer: "Mike Johnson",
-      email: "mike@example.com",
-      items: 'MacBook Pro 14"',
-      total: "$2,399.99",
-      status: "delivered",
-      date: "2024-01-20",
-      payment: "Credit Card",
-    },
-    {
-      id: "#ORD-004",
-      customer: "Sarah Wilson",
-      email: "sarah@example.com",
-      items: "Samsung Galaxy S24",
-      total: "$899.99",
-      status: "cancelled",
-      date: "2024-01-22",
-      payment: "Cash on Delivery",
-    },
-  ]
+  const { data: orders = [], isLoading, isError } = useGetAllOrdersQuery()
 
   const filteredOrders = orders?.filter((order) => {
-    const matchesSearch =
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
+    const idMatch = order?._id?.toLowerCase().includes(searchTerm.toLowerCase())
+    const customerMatch = order?.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = idMatch || customerMatch
+    const matchesStatus = statusFilter === "all" || order?.status === statusFilter
     return matchesSearch && matchesStatus
   })
+  console.log(orders)
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -104,6 +55,9 @@ export default function OrderManagement() {
         return "outline"
     }
   }
+
+  if (isLoading) return <div className="p-6 text-muted-foreground">Loading orders...</div>
+  if (isError) return <div className="p-6 text-destructive">Failed to load orders.</div>
 
   return (
     <div className="p-6 space-y-6">
@@ -159,80 +113,45 @@ export default function OrderManagement() {
             </TableHeader>
             <TableBody>
               {filteredOrders?.map((order) => (
-                <TableRow key={order?.id}>
-                  <TableCell className="font-medium">{order?.id}</TableCell>
+                <TableRow key={order?._id}>
+                  <TableCell className="font-medium">#{order?._id.slice(-5)}</TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order?.customer}</p>
-                      <p className="text-sm text-muted-foreground">{order?.email}</p>
+                      <p className="font-medium">{order?.userId?.name || "N/A"}</p>
+                      <p className="text-sm text-muted-foreground">{order?.userId?.email || "N/A"}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{order?.items}</TableCell>
-                  <TableCell className="font-medium">{order?.total}</TableCell>
+                  <TableCell>{order?.productId?.name || "N/A"}</TableCell>
+                  <TableCell className="font-medium">${order?.price?.toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(order?.status)} className="flex items-center gap-1 w-fit">
                       {getStatusIcon(order?.status)}
-                      {order.status.replace("_", " ")}
+                      {order.status?.replace("_", " ")}
                     </Badge>
                   </TableCell>
-                  <TableCell>{order?.date}</TableCell>
+                  <TableCell>{new Date(order?.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-white">
-                          <DialogHeader>
-                            <DialogTitle>Order Details - {order?.id}</DialogTitle>
-                            <DialogDescription>Manage this order and update its status</DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="font-medium">Customer</p>
-                                <p className="text-sm text-muted-foreground">{order?.customer}</p>
-                                <p className="text-sm text-muted-foreground">{order?.email}</p>
-                              </div>
-                              <div>
-                                <p className="font-medium">Payment Method</p>
-                                <p className="text-sm text-muted-foreground">{order?.payment}</p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="font-medium">Items</p>
-                              <p className="text-sm text-muted-foreground">{order?.items}</p>
-                            </div>
-                            <div>
-                              <p className="font-medium">Total Amount</p>
-                              <p className="text-lg font-bold">{order?.total}</p>
-                            </div>
-                            <div className="flex gap-2">
-                              {order.status === "processing" && (
-                                <Button size="sm">
-                                  <Truck className="w-4 h-4 mr-2" />
-                                  Mark as Sent
-                                </Button>
-                              )}
-                              {order.status === "sent_to_courier" && (
-                                <Button size="sm">
-                                  <CheckCircle className="w-4 h-4 mr-2" />
-                                  Mark as Delivered
-                                </Button>
-                              )}
-                              {order.status !== "cancelled" && order.status !== "delivered" && (
-                                <Button variant="destructive" size="sm">
-                                  <XCircle className="w-4 h-4 mr-2" />
-                                  Cancel Order
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-white">
+                        <DialogHeader>
+                          <DialogTitle>Order Details - #{order?._id.slice(-5)}</DialogTitle>
+                          <DialogDescription>Manage this order and update its status</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 text-sm">
+                          <div><strong>Customer:</strong> {order?.customerName || "N/A"}</div>
+                          <div><strong>Email:</strong> {order?.email || "N/A"}</div>
+                          <div><strong>Item:</strong> {order?.productName || "N/A"}</div>
+                          <div><strong>Total:</strong> ${order?.price?.toFixed(2)}</div>
+                          <div><strong>Date:</strong> {new Date(order?.createdAt).toLocaleDateString()}</div>
+                          <div><strong>Status:</strong> {order?.status}</div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,9 +1,23 @@
+"use client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, TrendingDown, Users, Package, ShoppingCart, DollarSign } from "lucide-react"
+import { useGetLast30DaysEarningsQuery, useGetLast30DaysOrdersCountQuery } from "@/redux/features/orderSlice/orderSlice"
+import { useGetAllUsersQuery } from "@/redux/features/manageUserSlice/manageUserSlice"
+import CountUp from "react-countup"
+import { useTopSelling10Query } from "@/redux/features/productSlice/productSlice"
+import { Spin } from "antd"
 
 export default function Analytics() {
+  const {data : monthyRevenue} = useGetLast30DaysEarningsQuery()
+  const {data : monthlyOrder} = useGetLast30DaysOrdersCountQuery()
+  const {data : allUsers} = useGetAllUsersQuery()
+  const {data : topSelling , isLoading} = useTopSelling10Query()
+
+
+  console.log(monthlyOrder)
+
   const monthlyStats = [
     { month: "Jan", orders: 45, revenue: 12500 },
     { month: "Feb", orders: 52, revenue: 15200 },
@@ -50,7 +64,7 @@ export default function Analytics() {
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$21,300</div>
+            <div className="text-2xl font-bold"><CountUp end={monthyRevenue?.totalEarnings} duration={3} /></div>
             {/* <p className="text-xs text-muted-foreground">
               <span className="text-green-600 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
@@ -67,7 +81,7 @@ export default function Analytics() {
             <ShoppingCart className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">67</div>
+            <div className="text-2xl font-bold"><CountUp end={monthlyOrder?.totalOrders} duration={3} /></div>
             {/* <p className="text-xs text-muted-foreground">
               <span className="text-green-600 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
@@ -84,7 +98,7 @@ export default function Analytics() {
             <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,847</div>
+            <div className="text-2xl font-bold"><CountUp end={allUsers?.length} duration={3} /></div>
             {/* <p className="text-xs text-muted-foreground">
               <span className="text-green-600 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
@@ -101,7 +115,7 @@ export default function Analytics() {
             <BarChart3 className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3.2%</div>
+            <div className="text-2xl font-bold"><CountUp end={3.2} duration={3} />%</div>
             {/* <p className="text-xs text-muted-foreground">
               <span className="text-red-600 flex items-center gap-1">
                 <TrendingDown className="w-3 h-3" />
@@ -115,6 +129,7 @@ export default function Analytics() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Top Products */}
+        {isLoading && <div className="justify-center w-full h-full items-center"><Spin size="large" /></div>}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -125,21 +140,21 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topProducts.map((product, index) => (
-                <div key={product.name} className="flex items-center justify-between">
+              {topSelling?.map((product, index) => (
+                <div key={product?.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-muted-foreground">{product.sales} sales</p>
+                      <p className="font-medium">{product?.name}</p>
+                      <p className="text-sm text-muted-foreground">{product?.sold} sales</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{product.revenue}</p>
+                    <p className="font-medium">{product?.revenue}</p>
                     <div className="flex items-center gap-1">
-                      {product.trend === "up" ? (
+                      {product?.trend === "up" ? (
                         <TrendingUp className="w-3 h-3 text-green-600" />
                       ) : (
                         <TrendingDown className="w-3 h-3 text-red-600" />

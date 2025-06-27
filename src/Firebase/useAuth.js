@@ -89,14 +89,25 @@ const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser?.email) {
         try {
+          //get token and store client side
+            const userInfo = {email: currentUser.email};
+            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/jwt`, userInfo,{withCredentials : true})
+            .then(res =>{
+                if(res.data.token){
+                    localStorage.setItem('token', res.data.token);
+                }
+            })
           // await dispatch(fetchCurrentUser()).unwrap();
         } catch (error) {
           console.error("Error fetching user:", error);
         }
+      }else{
+        localStorage.removeItem('token');
       }
       setUser(currentUser);
       setIsAuthLoading(false);
-    });
+    }
+  );
 
     return () => unsubscribe();
   }, [dispatch]);

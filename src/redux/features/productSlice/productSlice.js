@@ -74,6 +74,22 @@ export const productApi = apiSlice.injectEndpoints({
             },
             providesTags : ['Product']
         }),
+        getLowStock : builder.query({
+            query : ()=>{
+                return {
+                    url : `/products/lowStock`
+                };
+            },
+            providesTags : ['Product']
+        }),
+        topSelling10 : builder.query({
+            query : ()=>{
+                return {
+                    url : `/products/topSelling`
+                };
+            },
+            providesTags : ['Product']
+        }),
     })
 })
 
@@ -85,5 +101,7 @@ export const {
     useUpdateProductMutation,
     useDeleteProductMutation,
     useAddCategoryMutation,
-    useGetAllCategorysQuery
+    useGetAllCategorysQuery,
+    useGetLowStockQuery,
+    useTopSelling10Query,
 } = productApi

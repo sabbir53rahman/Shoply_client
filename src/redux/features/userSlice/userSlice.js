@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk(
       //console.log("Login Response:", response.data);
 
       // Store JWT token
-      localStorage.setItem("token", token);
+      // localStorage.setItem("token", token);
 
       return user;
     } catch (error) {

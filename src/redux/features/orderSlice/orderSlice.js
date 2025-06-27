@@ -30,6 +30,38 @@ export const orderApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, userId) => [{ type: "Order", id: userId }],
     }),
+
+    // order of last 30 days
+    getLast30DaysOrdersCount: builder.query({
+      query: () => ({
+        url: "/orders/last30Days/orders",
+        credentials: "include",
+      }),
+    }),
+
+    //earnings of last 30 days
+    getLast30DaysEarnings: builder.query({
+      query: () => ({
+        url: "/orders/last30Days/earnings",
+        credentials: "include",
+      }),
+    }),
+
+    // last 5 months (orders + earnings)
+    getLast5MonthsStats: builder.query({
+      query: () => ({
+        url: "/orders/stats/last5Months",
+        credentials: "include",
+      }),
+    }),
+
+    // 3 recent orders
+    getRecentOrders: builder.query({
+      query: () => ({
+        url: "/orders/recentOrders",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -37,4 +69,8 @@ export const {
   useAddOrderMutation,
   useGetAllOrdersQuery,
   useGetUserOrderQuery,
+  useGetLast30DaysOrdersCountQuery,
+  useGetLast30DaysEarningsQuery,
+  useGetLast5MonthsStatsQuery,
+  useGetRecentOrdersQuery,
 } = orderApi;

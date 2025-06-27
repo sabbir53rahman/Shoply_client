@@ -47,6 +47,7 @@ import {
   useGetAllUsersQuery,
   useMakeAdminMutation,
 } from "@/redux/features/manageUserSlice/manageUserSlice";
+import Swal from "sweetalert2";
 
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -235,7 +236,7 @@ export default function UsersManagement() {
                       {user?.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user?.totalOrders}</TableCell>
+                  <TableCell>{user?.order}</TableCell>
                   <TableCell className="font-medium">
                     {user?.totalSpent}
                   </TableCell>

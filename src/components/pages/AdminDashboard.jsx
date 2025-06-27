@@ -4,35 +4,39 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, Package, ShoppingCart, DollarSign, AlertTriangle, TrendingUp, Plus, BarChart3 } from "lucide-react"
+import { useGetLowStockQuery } from "@/redux/features/productSlice/productSlice"
+import CountUp from "react-countup"
 
 export default function AdminDashboard({ userId }) {
   const router = useRouter()
+  const {data : lowStocks} = useGetLowStockQuery()
+  console.log( 'low',lowStocks)
 
   const stats = [
     {
       title: "Total Users",
-      value: "2,847",
+      value:'2847',
       change: "+12%",
       icon: Users,
       color: "text-blue-600",
     },
     {
       title: "Total Orders",
-      value: "1,234",
+      value: '1234',
       change: "+8%",
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       title: "Total Sales",
-      value: "$45,231",
+      value: '45231',
       change: "+23%",
       icon: DollarSign,
       color: "text-yellow-600",
     },
     {
       title: "Products",
-      value: "567",
+      value: '567',
       change: "+3%",
       icon: Package,
       color: "text-purple-600",
@@ -74,7 +78,7 @@ export default function AdminDashboard({ userId }) {
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold"><CountUp end={stat?.value} duration={3} /></div>
               <p className="text-xs text-muted-foreground">
                 <span className="text-green-600">{stat.change}</span> from last month
               </p>
@@ -95,7 +99,7 @@ export default function AdminDashboard({ userId }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {lowStockProducts.map((product) => (
+              {lowStocks?.map((product) => (
                 <div key={product.name} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{product.name}</p>
@@ -155,7 +159,7 @@ export default function AdminDashboard({ userId }) {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/products")}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/dashboard/productManagement")}>
           <CardContent className="flex items-center justify-center p-6">
             <div className="text-center">
               <Package className="h-8 w-8 mx-auto mb-2 text-blue-600" />
@@ -164,7 +168,7 @@ export default function AdminDashboard({ userId }) {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/orders")}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/dashboard/orders")}>
           <CardContent className="flex items-center justify-center p-6">
             <div className="text-center">
               <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-green-600" />
@@ -173,7 +177,7 @@ export default function AdminDashboard({ userId }) {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/users")}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/dashboard/users")}>
           <CardContent className="flex items-center justify-center p-6">
             <div className="text-center">
               <Users className="h-8 w-8 mx-auto mb-2 text-purple-600" />
@@ -182,7 +186,7 @@ export default function AdminDashboard({ userId }) {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/analytics")}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/dashboard/analytics")}>
           <CardContent className="flex items-center justify-center p-6">
             <div className="text-center">
               <BarChart3 className="h-8 w-8 mx-auto mb-2 text-orange-600" />
