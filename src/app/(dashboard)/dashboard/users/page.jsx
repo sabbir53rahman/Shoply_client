@@ -1,12 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,117 +33,68 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Search, Eye, UserCheck, UserX, Users, Mail, Phone } from "lucide-react"
-import { useGetAllUsersQuery, useMakeAdminMutation } from "@/redux/features/manageUserSlice/manageUserSlice"
+} from "@/components/ui/dialog";
+import {
+  Search,
+  Eye,
+  UserCheck,
+  UserX,
+  Users,
+  Mail,
+  Phone,
+} from "lucide-react";
+import {
+  useGetAllUsersQuery,
+  useMakeAdminMutation,
+} from "@/redux/features/manageUserSlice/manageUserSlice";
 
 export default function UsersManagement() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const {data : allUsers} = useGetAllUsersQuery()
-  const [ makeAdmin ] = useMakeAdminMutation()
-
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: "+1 (555) 123-4567",
-      role: "customer",
-      status: "active",
-      joinDate: "2024-01-15",
-      totalOrders: 12,
-      totalSpent: "$4,849.48",
-      lastLogin: "2024-01-20",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      phone: "+1 (555) 234-5678",
-      role: "customer",
-      status: "active",
-      joinDate: "2024-01-10",
-      totalOrders: 8,
-      totalSpent: "$2,156.99",
-      lastLogin: "2024-01-19",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@example.com",
-      phone: "+1 (555) 345-6789",
-      role: "customer",
-      status: "inactive",
-      joinDate: "2023-12-05",
-      totalOrders: 3,
-      totalSpent: "$899.99",
-      lastLogin: "2024-01-05",
-    },
-    {
-      id: 4,
-      name: "Sarah Wilson",
-      email: "sarah.wilson@example.com",
-      phone: "+1 (555) 456-7890",
-      role: "admin",
-      status: "active",
-      joinDate: "2023-11-20",
-      totalOrders: 0,
-      totalSpent: "$0.00",
-      lastLogin: "2024-01-20",
-    },
-    {
-      id: 5,
-      name: "David Brown",
-      email: "david.brown@example.com",
-      phone: "+1 (555) 567-8901",
-      role: "customer",
-      status: "suspended",
-      joinDate: "2024-01-08",
-      totalOrders: 1,
-      totalSpent: "$299.99",
-      lastLogin: "2024-01-12",
-    },
-  ]
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const { data: allUsers } = useGetAllUsersQuery();
+  const [makeAdmin] = useMakeAdminMutation();
 
   const filteredUsers = allUsers?.filter((user) => {
     const matchesSearch =
       user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user?.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || user?.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+      user?.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || user?.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusVariant = (status) => {
     switch (status) {
       case "active":
-        return "default"
+        return "default";
       case "inactive":
-        return "secondary"
+        return "secondary";
       case "suspended":
-        return "destructive"
+        return "destructive";
       default:
-        return "outline"
+        return "outline";
     }
-  }
+  };
 
   const getRoleVariant = (role) => {
-    return role === "admin" ? "default" : "outline"
-  }
+    return role === "admin" ? "default" : "outline";
+  };
 
   const userStats = {
-    total: users.length,
-    active: users?.filter((u) => u.status === "active").length,
-    inactive: users?.filter((u) => u.status === "inactive").length,
-    suspended: users?.filter((u) => u.status === "suspended").length,
-    admins: users?.filter((u) => u.role === "admin").length,
-  }
+    total: allUsers?.length || 0,
+    active: allUsers?.filter((u) => u.status === "active").length || 0,
+    inactive: allUsers?.filter((u) => u.status === "inactive").length || 0,
+    suspended: allUsers?.filter((u) => u.status === "suspended").length || 0,
+    admins: allUsers?.filter((u) => u.role === "admin").length || 0,
+  };
 
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Users Management</h1>
-        <p className="text-muted-foreground">Manage user accounts and permissions</p>
+        <p className="text-muted-foreground">
+          Manage user accounts and permissions
+        </p>
       </div>
 
       {/* User Statistics */}
@@ -186,7 +156,9 @@ export default function UsersManagement() {
             <Users className="h-5 w-5" />
             All Users
           </CardTitle>
-          <CardDescription>Manage user accounts, roles, and permissions</CardDescription>
+          <CardDescription>
+            Manage user accounts, roles, and permissions
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4 mb-4">
@@ -221,7 +193,6 @@ export default function UsersManagement() {
                 <TableHead>Status</TableHead>
                 <TableHead>Orders</TableHead>
                 <TableHead>Total Spent</TableHead>
-                <TableHead>Last Login</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -231,7 +202,9 @@ export default function UsersManagement() {
                   <TableCell>
                     <div>
                       <p className="font-medium">{user?.name}</p>
-                      <p className="text-sm text-muted-foreground">Joined {user?.joinDate}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Joined {user?.joinDate}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -247,18 +220,25 @@ export default function UsersManagement() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleVariant(user?.role)} className="capitalize">
+                    <Badge
+                      variant={getRoleVariant(user?.role)}
+                      className="capitalize"
+                    >
                       {user?.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(user?.status)} className="capitalize">
+                    <Badge
+                      variant={getStatusVariant(user?.status)}
+                      className="capitalize"
+                    >
                       {user?.status}
                     </Badge>
                   </TableCell>
                   <TableCell>{user?.totalOrders}</TableCell>
-                  <TableCell className="font-medium">{user?.totalSpent}</TableCell>
-                  <TableCell>{user?.lastLogin}</TableCell>
+                  <TableCell className="font-medium">
+                    {user?.totalSpent}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Dialog>
@@ -269,42 +249,66 @@ export default function UsersManagement() {
                         </DialogTrigger>
                         <DialogContent className="bg-white max-w-2xl">
                           <DialogHeader>
-                            <DialogTitle>User Details - {user?.name}</DialogTitle>
-                            <DialogDescription>Manage user account and permissions</DialogDescription>
+                            <DialogTitle>
+                              User Details - {user?.name}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Manage user account and permissions
+                            </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-6">
                             <div className="grid grid-cols-2 gap-6">
                               <div className="space-y-4">
                                 <div>
-                                  <h4 className="font-medium mb-2">Personal Information</h4>
+                                  <h4 className="font-medium mb-2">
+                                    Personal Information
+                                  </h4>
                                   <div className="space-y-2 text-sm">
                                     <p>
-                                      <span className="font-medium">Name:</span> {user?.name}
+                                      <span className="font-medium">Name:</span>{" "}
+                                      {user?.name}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Email:</span> {user?.email}
+                                      <span className="font-medium">
+                                        Email:
+                                      </span>{" "}
+                                      {user?.email}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Phone:</span> {user?.phone}
+                                      <span className="font-medium">
+                                        Phone:
+                                      </span>{" "}
+                                      {user?.phone}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Join Date:</span> {user?.joinDate}
+                                      <span className="font-medium">
+                                        Join Date:
+                                      </span>{" "}
+                                      {user?.joinDate}
                                     </p>
                                   </div>
                                 </div>
 
                                 <div>
-                                  <h4 className="font-medium mb-2">Account Status</h4>
+                                  <h4 className="font-medium mb-2">
+                                    Account Status
+                                  </h4>
                                   <div className="space-y-2">
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm">Role:</span>
-                                      <Badge variant={getRoleVariant(user?.role)} className="capitalize">
+                                      <Badge
+                                        variant={getRoleVariant(user?.role)}
+                                        className="capitalize"
+                                      >
                                         {user.role}
                                       </Badge>
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm">Status:</span>
-                                      <Badge variant={getStatusVariant(user?.status)} className="capitalize">
+                                      <Badge
+                                        variant={getStatusVariant(user?.status)}
+                                        className="capitalize"
+                                      >
                                         {user?.status}
                                       </Badge>
                                     </div>
@@ -314,40 +318,82 @@ export default function UsersManagement() {
 
                               <div className="space-y-4">
                                 <div>
-                                  <h4 className="font-medium mb-2">Activity Summary</h4>
+                                  <h4 className="font-medium mb-2">
+                                    Activity Summary
+                                  </h4>
                                   <div className="space-y-2 text-sm">
                                     <p>
-                                      <span className="font-medium">Total Orders:</span> {user?.totalOrders}
+                                      <span className="font-medium">
+                                        Total Orders:
+                                      </span>{" "}
+                                      {user?.totalOrders}
                                     </p>
                                     <p>
-                                      <span className="font-medium">Total Spent:</span> {user?.totalSpent}
+                                      <span className="font-medium">
+                                        Total Spent:
+                                      </span>{" "}
+                                      {user?.totalSpent}
                                     </p>
                                   </div>
                                 </div>
 
                                 <div>
-                                  <h4 className="font-medium mb-2">Quick Actions</h4>
+                                  <h4 className="font-medium mb-2">
+                                    Quick Actions
+                                  </h4>
                                   <div className="space-y-2">
                                     {user?.status === "active" && (
-                                      <Button variant="outline" size="sm" className="w-full">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                      >
                                         <UserX className="w-4 h-4 mr-2" />
                                         Suspend User
                                       </Button>
                                     )}
                                     {user?.status === "suspended" && (
-                                      <Button variant="outline" size="sm" className="w-full">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                      >
                                         <UserCheck className="w-4 h-4 mr-2" />
                                         Activate User
                                       </Button>
                                     )}
-                                    {user?.role === "customer" || "user" && (
-                                      <button className="w-full" onClick={()=> makeAdmin(user?._id)}>
-                                        <Button variant="outline" size="sm" className="w-full">
+                                    {user?.role === "customer" ||
+                                      ("user" && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="w-full"
+                                          onClick={() => {
+                                            Swal.fire({
+                                              title: "Are you sure?",
+                                              text: "You are about to make this user an admin.",
+                                              icon: "warning",
+                                              showCancelButton: true,
+                                              confirmButtonColor: "#3085d6",
+                                              cancelButtonColor: "#d33",
+                                              confirmButtonText:
+                                                "Yes, make admin",
+                                            }).then((result) => {
+                                              if (result.isConfirmed) {
+                                                makeAdmin(user?._id);
+                                                Swal.fire(
+                                                  "Done!",
+                                                  "User has been made an admin.",
+                                                  "success"
+                                                );
+                                              }
+                                            });
+                                          }}
+                                        >
                                           <Users className="w-4 h-4 mr-2" />
                                           Make Admin
                                         </Button>
-                                      </button>
-                                    )}
+                                      ))}
                                   </div>
                                 </div>
                               </div>
@@ -364,5 +410,5 @@ export default function UsersManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
