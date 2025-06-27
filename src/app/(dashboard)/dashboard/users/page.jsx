@@ -322,9 +322,6 @@ export default function UsersManagement() {
                                     <p>
                                       <span className="font-medium">Total Spent:</span> {user?.totalSpent}
                                     </p>
-                                    <p>
-                                      <span className="font-medium">Last Login:</span> {user?.lastLogin}
-                                    </p>
                                   </div>
                                 </div>
 
