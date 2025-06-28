@@ -8,7 +8,7 @@ function Dashboard() {
   const user =   {
     name: "Sabbir Hossain",
     email: "sabbir@example.com",
-    role: "admin",
+    role: "user",
   }
 
   if (!user) {

@@ -16,6 +16,7 @@ import {
   loginUser,
   logout,
 } from "@/redux/features/userSlice/userSlice";
+import axios from "axios";
 
 const auth = getAuth(app);
 
@@ -63,7 +64,7 @@ const useAuth = () => {
         password
       );
 
-      await dispatch(loginUser(email)).unwrap();
+      // await dispatch(loginUser(email)).unwrap();
 
       setUser(userCredential.user);
 
@@ -87,19 +88,31 @@ const useAuth = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
       if (currentUser?.email) {
+        // await dispatch(loginUser(currentUser?.email)).unwrap();
         try {
-          // await dispatch(fetchCurrentUser()).unwrap();
+            const userInfo = {email: currentUser.email};
+            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/jwt`, userInfo,{withCredentials : true})
+            .then(res =>{
+                if(res.data.token){
+                    localStorage.setItem('token', res.data.token);
+                }
+            })
+            
         } catch (error) {
           console.error("Error fetching user:", error);
         }
+      }else{
+        localStorage.removeItem('token');
       }
-      setUser(currentUser);
+      
       setIsAuthLoading(false);
-    });
+    }
+  );
 
     return () => unsubscribe();
-  }, [dispatch]);
+  }, [dispatch,user]);
 
   return { user, isAuthLoading, createUser, signIn, logOut };
 };

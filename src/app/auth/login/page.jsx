@@ -31,13 +31,13 @@ const LoginPage = () => {
       [name]: value,
     }));
   };
-
+   console.log('fomrm data login', formData)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await signIn(formData.email, formData.password);
+      await signIn(formData?.email, formData?.password);
 
       Swal.fire({
         position: "top-end",
@@ -49,10 +49,11 @@ const LoginPage = () => {
 
       router.push("/");
     } catch (err) {
+      console.log('err from login',err)
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "You don't have account sign up first.",
+        title: `${err?.message}`,
         showConfirmButton: false,
         timer: 1500,
       });

@@ -24,6 +24,7 @@ export default function OrderManagement() {
     const matchesStatus = statusFilter === "all" || order?.status === statusFilter
     return matchesSearch && matchesStatus
   })
+  console.log(orders)
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -116,11 +117,11 @@ export default function OrderManagement() {
                   <TableCell className="font-medium">#{order?._id.slice(-5)}</TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order?.customerName || "N/A"}</p>
-                      <p className="text-sm text-muted-foreground">{order?.email || "N/A"}</p>
+                      <p className="font-medium">{order?.userId?.name || "N/A"}</p>
+                      <p className="text-sm text-muted-foreground">{order?.userId?.email || "N/A"}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{order?.productName || "N/A"}</TableCell>
+                  <TableCell>{order?.productId?.name || "N/A"}</TableCell>
                   <TableCell className="font-medium">${order?.price?.toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(order?.status)} className="flex items-center gap-1 w-fit">

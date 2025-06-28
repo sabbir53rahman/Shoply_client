@@ -22,12 +22,12 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (email, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/users/login`, { email });
-      const { user, token } = response.data;
+      const response = await axios.get(`${BASE_URL}/users/login/${email}`);
+      const { user} = response.data;
       //console.log("Login Response:", response.data);
 
       // Store JWT token
-      localStorage.setItem("token", token);
+      // localStorage.setItem("token", token);
 
       return user;
     } catch (error) {

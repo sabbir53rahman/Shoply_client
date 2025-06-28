@@ -33,8 +33,9 @@ import { useGetAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice"
 export default function ReviewsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: reviews = [], isLoading, isError } = useGetAllReviewsQuery();
+  console.log(reviews)
 
-  const filteredReviews = reviews.filter(
+  const filteredReviews = reviews?.filter(
     (review) =>
       review?.productId?.name
         ?.toLowerCase()
@@ -106,8 +107,8 @@ export default function ReviewsManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredReviews.map((review) => (
-                <TableRow key={review._id}>
+              {filteredReviews?.map((review) => (
+                <TableRow key={review?._id}>
                   <TableCell className="font-medium">
                     {review?.productId?.name}
                   </TableCell>

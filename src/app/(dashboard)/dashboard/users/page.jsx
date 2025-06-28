@@ -236,7 +236,7 @@ export default function UsersManagement() {
                       {user?.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user?.totalOrders}</TableCell>
+                  <TableCell>{user?.order}</TableCell>
                   <TableCell className="font-medium">
                     {user?.totalSpent}
                   </TableCell>
