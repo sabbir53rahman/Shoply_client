@@ -4,9 +4,41 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star, Heart, ShoppingCart } from "lucide-react"
 import Image from "next/image"
+import { useAddWishlistMutation } from "@/redux/features/wishlist/wishlist"
+import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice"
+import useAuth from "@/Firebase/useAuth"
+import Swal from "sweetalert2"
 
 const ProductCard = ({ product }) => {
-  const renderStars = () => {
+  const [addWishlist] = useAddWishlistMutation()
+  const {user } = useAuth()
+  const {data : currentUser } =useGetCurrentUserQuery(user?.email)
+
+  const handleAddWishlist = ()=>{
+    if(currentUser?._id){
+      const wishlistData = {userId : currentUser?._id, productId : product?._id}
+      addWishlist(wishlistData)
+      .then(()=>{
+          Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Added to wishlist.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+      }).catch(err=>{
+        Swal.fire({
+                position: "top-end",
+                title: "Already in wishlist.",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+      })
+       
+    }
+  }
+
+  const renderStars = (rating) => {
     const stars = []
     for (let i = 1; i <= 5; i++) {
       stars.push(
@@ -42,7 +74,7 @@ const ProductCard = ({ product }) => {
 
         {/* Wishlist Button */}
         <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-          <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200">
+          <button onClick={() => handleAddWishlist()} className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200">
             <Heart className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors" />
           </button>
         </div>
@@ -84,7 +116,7 @@ const ProductCard = ({ product }) => {
 
         {/* Rating */}
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex items-center gap-0.5">{renderStars()}</div>
+          <div className="flex items-center gap-0.5">{renderStars(product?.rating)}</div>
           <span className="text-sm text-gray-500">({product.reviews})</span>
         </div>
 

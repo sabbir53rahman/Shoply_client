@@ -37,10 +37,7 @@ import useAuth from "@/Firebase/useAuth";
 import { useSelector } from "react-redux";
 
 const Navbar = () => {
-  // Mock user state - replace with your actual auth logic
-  // const [user, setUser] = useState(null); 
   const {user,logOut} = useAuth(); 
-  console.log(user)
   const currentUser = useSelector(state => state);
   console.log(currentUser)
   // const user =   {
@@ -51,13 +48,6 @@ const Navbar = () => {
   const [cartCount, setCartCount] = useState(3);
   const [wishlistCount, setWishlistCount] = useState(5);
 
-  //   const handleLogin = () => {
-  //     setUser({
-  //       name: "John Doe",
-  //       email: "john@example.com",
-  //       avatar: "/placeholder.svg?height=40&width=40",
-  //     });
-  //   };
 
   const handleLogout = () => {
     logOut()

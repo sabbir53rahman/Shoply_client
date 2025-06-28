@@ -39,6 +39,14 @@ export const manageUserSlice = apiSlice.injectEndpoints({
             },
             providesTags : ['User']
         }),
+        getCurrentUser : builder.query({
+            query : (query)=>{
+                return {
+                    url : `/users/${query}`
+                };
+            },
+            providesTags : ['User']
+        }),
     }),
 });
 
@@ -46,5 +54,6 @@ export const {
     useUpdateUserMutation,
     useDeleteUserMutation,
     useGetAllUsersQuery,
-    useMakeAdminMutation
+    useMakeAdminMutation,
+    useGetCurrentUserQuery
 } = manageUserSlice;

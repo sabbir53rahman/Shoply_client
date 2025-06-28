@@ -11,14 +11,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Package, Star, Heart, Clock, User } from "lucide-react";
 import Image from "next/image";
+import { useGetUserOrderQuery } from "@/redux/features/orderSlice/orderSlice";
+import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
+import useAuth from "@/Firebase/useAuth";
+import CountUp from "react-countup";
+import { useGetUsersAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
+import { useGetUserWishlistQuery } from "@/redux/features/wishlist/wishlist";
 
 export default function UserDashboard({ userId }) {
   const router = useRouter();
+  const {user } = useAuth()
+  const {data : currentUser } = useGetCurrentUserQuery(user?.email)
+  const {data : userOrder = []} = useGetUserOrderQuery(currentUser?._id)
+  const {data : usersAllReviews = []} = useGetUsersAllReviewsQuery(currentUser?.id)
+  const {data : userWishlists = []} = useGetUserWishlistQuery(currentUser?.id)
+  console.log(userOrder)
 
   const userStats = [
     {
       title: "Total Orders",
-      value: "12",
+      value: userOrder?.length || 0,
       icon: ShoppingCart,
       color: "text-blue-600",
     },
@@ -30,13 +42,13 @@ export default function UserDashboard({ userId }) {
     },
     {
       title: "Reviews Given",
-      value: "5",
+      value: usersAllReviews?.length || 0,
       icon: Star,
       color: "text-yellow-600",
     },
     {
       title: "Wishlist Items",
-      value: "23",
+      value: userWishlists?.length || 0,
       icon: Heart,
       color: "text-red-600",
     },
@@ -117,7 +129,7 @@ export default function UserDashboard({ userId }) {
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold"><CountUp end={stat.value} duration={3} /></div>
             </CardContent>
           </Card>
         ))}

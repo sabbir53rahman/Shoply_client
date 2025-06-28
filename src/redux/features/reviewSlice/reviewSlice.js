@@ -26,6 +26,16 @@ export const reviewApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getUsersAllReviews : builder.query({
+      query: (userId) => ({
+        url: `/reviews/usersAll/${userId}`,
+        credentials: "include",
+      }),
+      providesTags: (result, error, productId) => [
+        { type: "Review", id: productId },
+      ],
+    }),
+
     //all reviews
     getAllReviews: builder.query({
       query: () => ({
@@ -41,4 +51,5 @@ export const {
   useAddReviewMutation,
   useGetProductReviewsQuery,
   useGetAllReviewsQuery, 
+  useGetUsersAllReviewsQuery
 } = reviewApi;

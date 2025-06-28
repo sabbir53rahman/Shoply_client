@@ -61,7 +61,6 @@ const featuredProducts = [
 
 const FeaturedCollection = () => {
   const {data } = useGetPaginatedProductsQuery(1)
-  console.log('paginated product',data?.products)
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
@@ -80,7 +79,7 @@ const FeaturedCollection = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
           {data?.products?.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product?._id} product={product} />
           ))}
         </div>
 
