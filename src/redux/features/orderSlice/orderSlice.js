@@ -25,7 +25,7 @@ export const orderApi = apiSlice.injectEndpoints({
     // Get a single user's order by userId
     getUserOrder: builder.query({
       query: (userId) => ({
-        url: `/orders/${userId}`,
+        url: `/orders/userOrder/${userId}`,
         credentials: "include",
       }),
       providesTags: (result, error, userId) => [{ type: "Order", id: userId }],

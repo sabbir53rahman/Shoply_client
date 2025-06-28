@@ -42,7 +42,7 @@ export const manageUserSlice = apiSlice.injectEndpoints({
         getCurrentUser : builder.query({
             query : (query)=>{
                 return {
-                    url : `/users/${query}`
+                    url : `/users/login/${query}`
                 };
             },
             providesTags : ['User']

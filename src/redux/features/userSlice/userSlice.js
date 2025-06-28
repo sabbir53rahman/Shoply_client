@@ -23,15 +23,9 @@ export const loginUser = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${BASE_URL}/users/login/${email}`);
-      const { user} = response.data;
-      //console.log("Login Response:", response.data);
-
-      // Store JWT token
-      // localStorage.setItem("token", token);
-
-      return user;
+      return response?.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue('cop',error.response.data);
     }
   }
 );
@@ -41,10 +35,6 @@ export const fetchCurrentUser = createAsyncThunk(
   "user/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("token");
-
-    // if (!token || token === "null") {
-    //   return rejectWithValue({ message: "Token not found" });
-    // }
 
     try {
       const response = await axios.get(`${BASE_URL}/users/currentUser`, {

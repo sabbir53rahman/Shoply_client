@@ -5,14 +5,13 @@ import { Badge } from "@/components/ui/badge"
 import { Star, Heart, ShoppingCart } from "lucide-react"
 import Image from "next/image"
 import { useAddWishlistMutation } from "@/redux/features/wishlist/wishlist"
-import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice"
 import useAuth from "@/Firebase/useAuth"
 import Swal from "sweetalert2"
+import { useSelector } from "react-redux"
 
 const ProductCard = ({ product }) => {
   const [addWishlist] = useAddWishlistMutation()
-  const {user } = useAuth()
-  const {data : currentUser } =useGetCurrentUserQuery(user?.email)
+  const currentUser = useSelector(state => state?.user?.user);
 
   const handleAddWishlist = ()=>{
     if(currentUser?._id){
@@ -26,7 +25,7 @@ const ProductCard = ({ product }) => {
               showConfirmButton: false,
               timer: 1500,
             });
-      }).catch(err=>{
+      }).catch((err)=>{
         Swal.fire({
                 position: "top-end",
                 title: "Already in wishlist.",

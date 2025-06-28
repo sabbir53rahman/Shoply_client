@@ -64,8 +64,6 @@ const useAuth = () => {
         password
       );
 
-      // await dispatch(loginUser(email)).unwrap();
-
       setUser(userCredential.user);
 
       return userCredential.user;
@@ -89,8 +87,9 @@ const useAuth = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+       
       if (currentUser?.email) {
-        // await dispatch(loginUser(currentUser?.email)).unwrap();
+        dispatch(loginUser(currentUser?.email));
         try {
             const userInfo = {email: currentUser.email};
             axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/jwt`, userInfo,{withCredentials : true})
@@ -112,7 +111,7 @@ const useAuth = () => {
   );
 
     return () => unsubscribe();
-  }, [dispatch,user]);
+  }, [dispatch]);
 
   return { user, isAuthLoading, createUser, signIn, logOut };
 };
