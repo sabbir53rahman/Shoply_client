@@ -1,46 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Star, Heart, ShoppingCart } from "lucide-react"
-import Image from "next/image"
-import { useAddWishlistMutation } from "@/redux/features/wishlist/wishlist"
-import useAuth from "@/Firebase/useAuth"
-import Swal from "sweetalert2"
-import { useSelector } from "react-redux"
-
-const ProductCard = ({ product }) => {
-  const [addWishlist] = useAddWishlistMutation()
-  const currentUser = useSelector(state => state?.user?.user);
-
-  const handleAddWishlist = ()=>{
-    if(currentUser?._id){
-      const wishlistData = {userId : currentUser?._id, productId : product?._id}
-      addWishlist(wishlistData)
-      .then(()=>{
-          Swal.fire({
-              position: "top-end",
-              icon: "success",
-              title: "Added to wishlist.",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-      }).catch((err)=>{
-        Swal.fire({
-                position: "top-end",
-                title: "Already in wishlist.",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-      })
-       
-    }
-  }
-
-  const renderStars = (rating) => {
-    const stars = []
-=======
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +16,6 @@ const ProductCard = ({ product }) => {
   const renderStars = () => {
     const stars = [];
     const rating = product.rating || 0;
->>>>>>> 6a18aacbfa7b83cb9f8fa7791d7c7637bfb55b65
     for (let i = 1; i <= 5; i++) {
       stars.push(
         <Star
