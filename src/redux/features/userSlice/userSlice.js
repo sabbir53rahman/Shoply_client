@@ -22,11 +22,6 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (email, { rejectWithValue }) => {
     try {
-<<<<<<< HEAD
-      const res = await axios.get(`${BASE_URL}/users/login/${email}`);
-      return res.data; // your service returns user directly
-    } catch (err) {
-=======
       const response = await axios.get(`${BASE_URL}/users/login/${email}`);
       return response?.data;
     } catch (error) {
@@ -50,7 +45,6 @@ export const fetchCurrentUser = createAsyncThunk(
 
       return response.data;
     } catch (error) {
->>>>>>> origin/tasin
       return rejectWithValue(
         err.response?.data || { message: "Unknown error" }
       );
@@ -58,20 +52,6 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
-// ** Fetch Current User (using login endpoint for now) **
-export const fetchCurrentUser = createAsyncThunk(
-  "user/fetchCurrentUser",
-  async (email, { rejectWithValue }) => {
-    try {
-      const res = await axios.get(`${BASE_URL}/users/login/${email}`);
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data || { message: "Unknown error" }
-      );
-    }
-  }
-);
 
 // ** Fetch All Users **
 export const fetchAllUsers = createAsyncThunk(
