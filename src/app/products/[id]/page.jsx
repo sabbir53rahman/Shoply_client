@@ -22,13 +22,16 @@ import {
 import Image from "next/image";
 import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
+import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
 
 export default function ProductDetailsPage() {
+//   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
+//   console.log(data)
+const user = useSelector((state) => state.user);
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
 
-  const user = useSelector((state) => state.user);
-  console.log(user)
+  console.log(user);
   const userId = user?._id;
 
   const [quantity, setQuantity] = useState(1);

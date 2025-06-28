@@ -136,7 +136,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Product Info */}
-        <div className="p-7">
+        <div className="p-7 pb-0">
           {/* Category */}
           {product.category && (
             <div className="mb-3">
@@ -147,22 +147,19 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* Product Name */}
-          <h3 className="font-bold text-gray-900 text-lg mb-4 line-clamp-2 leading-tight min-h-[3.5rem] group-hover:text-gray-700 transition-colors duration-300">
+          <h3 className="font-bold text-gray-900 text-lg line-clamp-2 leading-tight min-h-[3.5rem] group-hover:text-gray-700 transition-colors duration-300">
             {product.name}
           </h3>
-      </div>
-      {/* Product Info */}
-      <div className="p-6">
-        {/* Product Name */}
-        <h3 className="font-semibold text-gray-900 text-base mb-3 line-clamp-2 leading-tight min-h-[3rem] group-hover:text-gray-700 transition-colors">
-          {product.name}
-        </h3>
-
-        {/* Rating */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex items-center gap-0.5">{renderStars(product?.rating)}</div>
-          <span className="text-sm text-gray-500">({product.reviews})</span>
         </div>
+        {/* Product Info */}
+        <div className="p-6 pt-0">
+          {/* Rating */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-0.5">
+              {renderStars(product?.rating)}
+            </div>
+            <span className="text-sm text-gray-500">({product.reviews})</span>
+          </div>
 
           {/* Price */}
           <div className="flex items-center justify-between mb-6">
