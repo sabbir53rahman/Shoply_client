@@ -17,15 +17,15 @@ import useAuth from "@/Firebase/useAuth";
 import CountUp from "react-countup";
 import { useGetUsersAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
 import { useGetUserWishlistQuery } from "@/redux/features/wishlist/wishlist";
+import { useSelector } from "react-redux";
+import { Spin } from "antd";
 
-export default function UserDashboard({ userId }) {
+export default function UserDashboard({ currentUser }) {
   const router = useRouter();
-  const {user } = useAuth()
-  const {data : currentUser } = useGetCurrentUserQuery(user?.email)
-  const {data : userOrder = []} = useGetUserOrderQuery(currentUser?._id)
-  const {data : usersAllReviews = []} = useGetUsersAllReviewsQuery(currentUser?.id)
-  const {data : userWishlists = []} = useGetUserWishlistQuery(currentUser?.id)
-  console.log(userOrder)
+  const {data : userOrder ,isLoading : orderLoading } = useGetUserOrderQuery(currentUser?._id)
+  const {data : usersAllReviews } = useGetUsersAllReviewsQuery(currentUser?._id)
+  const {data : userWishlists } = useGetUserWishlistQuery(currentUser?._id)
+  console.log(userOrder,'all review',usersAllReviews,'wishlist',userWishlists)
 
   const userStats = [
     {
@@ -136,6 +136,7 @@ export default function UserDashboard({ userId }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        
         {/* Recent Orders */}
         <Card>
           <CardHeader>
@@ -147,33 +148,36 @@ export default function UserDashboard({ userId }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
+              {
+                orderLoading ? <Spin tip="loading" size="large"/> : ''
+              }
+              {userOrder?.map((order) => (
                 <div
-                  key={order.id}
+                  key={order?._id}
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
                   <div className="space-y-1">
-                    <p className="font-medium">{order.id}</p>
+                    <p className="font-medium">{order?.id}</p>
                     <p className="text-sm text-muted-foreground">
-                      {order.items}
+                      {order?.items}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {order.date}
+                      {order?.date}
                     </p>
                   </div>
                   <div className="text-right space-y-1">
-                    <p className="font-medium">{order.total}</p>
+                    <p className="font-medium">{order?.total}</p>
                     <Badge
                       variant={
-                        order.status === "delivered"
+                        order?.status === "delivered"
                           ? "default"
-                          : order.status === "sent_to_courier"
+                          : order?.status === "sent_to_courier"
                           ? "secondary"
                           : "outline"
                       }
                       className="text-xs"
                     >
-                      {order.status.replace("_", " ")}
+                      {order?.status?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
@@ -200,28 +204,28 @@ export default function UserDashboard({ userId }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recommendedProducts.map((product) => (
+              {recommendedProducts?.map((product) => (
                 <div
-                  key={product.name}
+                  key={product?.name}
                   className="flex items-center gap-3 p-3 border rounded-lg"
                 >
                   <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
+                    src={product?.image || "/placeholder.svg"}
+                    alt={product?.name}
                     width={48}
                     height={48}
                     className="w-12 h-12 rounded-md object-cover"
                   />
                   <div className="flex-1">
-                    <p className="font-medium">{product.name}</p>
+                    <p className="font-medium">{product?.name}</p>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">
-                        {product.price}
+                        {product?.price}
                       </span>
                       <div className="flex items-center gap-1">
                         <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                         <span className="text-xs text-muted-foreground">
-                          {product.rating}
+                          {product?.rating}
                         </span>
                       </div>
                     </div>

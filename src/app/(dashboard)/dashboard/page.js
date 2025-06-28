@@ -4,7 +4,7 @@ import AdminDashboard from "@/components/pages/AdminDashboard";
 import UserDashboard from "@/components/pages/UserDashboard";
 
 function Dashboard() {
-  // const user = useSelector((state) => state.user.user);
+  const currentUser = useSelector(state => state?.user?.user);
   const user =   {
     name: "Sabbir Hossain",
     email: "sabbir@example.com",
@@ -18,9 +18,9 @@ function Dashboard() {
   return (
     <div>
       {user.role === "admin" ? (
-        <AdminDashboard userId={user._id} />
+        <AdminDashboard currentUser={currentUser} />
       ) : (
-        <UserDashboard userId={user._id} />
+        <UserDashboard currentUser={currentUser} />
       )}
     </div>
   );

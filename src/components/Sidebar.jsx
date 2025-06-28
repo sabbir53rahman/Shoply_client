@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sheet"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { useSelector } from "react-redux"
+import useAuth from "@/Firebase/useAuth"
 
 const adminNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -35,6 +37,8 @@ const adminNavItems = [
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
+  const { logOut} = useAuth()
+  const currentUser = useSelector(state => state?.user?.user);
 
   const user = {
     name: "Sabbir Hossain",
@@ -49,7 +53,8 @@ export default function Sidebar() {
   }
 
   const handleLogout = () => {
-    router.push("/login")
+    logOut()
+    router.push("/auth/login")
   }
 
   return (

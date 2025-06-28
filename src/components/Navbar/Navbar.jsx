@@ -38,7 +38,7 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const {user,logOut} = useAuth(); 
-  const currentUser = useSelector(state => state);
+  const currentUser = useSelector(state => state?.user?.user);
   console.log(currentUser)
   // const user =   {
   //   name: "Sabbir Hossain",
@@ -192,12 +192,6 @@ const Navbar = () => {
                           My Orders
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/profile" className="flex items-center">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Profile Settings
-                        </Link>
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={handleLogout}
@@ -349,13 +343,6 @@ const Navbar = () => {
                         >
                           <Package className="w-5 h-5 mr-3" />
                           My Orders
-                        </Link>
-                        <Link
-                          href="/profile"
-                          className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
-                        >
-                          <Settings className="w-5 h-5 mr-3" />
-                          Profile Settings
                         </Link>
                         <button
                           onClick={handleLogout}
