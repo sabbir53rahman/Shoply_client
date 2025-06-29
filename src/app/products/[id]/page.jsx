@@ -23,15 +23,16 @@ import Image from "next/image";
 import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
 import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
+import Navbar from "@/components/Navbar/Navbar";
 
 export default function ProductDetailsPage() {
 //   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
 //   console.log(data)
-const user = useSelector((state) => state.user);
+const user = useSelector((state) => state.user?.user);
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
 
-  console.log(user);
+  console.log('user from prou',user);
   const userId = user?._id;
 
   const [quantity, setQuantity] = useState(1);
@@ -110,6 +111,7 @@ const user = useSelector((state) => state.user);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <Navbar/>
       <div className="max-w-7xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-8">

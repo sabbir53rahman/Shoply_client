@@ -25,14 +25,6 @@ import Link from "next/link"
 import { useSelector } from "react-redux"
 import useAuth from "@/Firebase/useAuth"
 
-const adminNavItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", url: "/dashboard/productManagement", icon: Package },
-  { title: "Orders", url: "/dashboard/orders", icon: ShoppingCart },
-  { title: "Users", url: "/dashboard/users", icon: UserCog },
-  { title: "Reviews", url: "/dashboard/reviews", icon: Star },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
-]
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
@@ -40,13 +32,23 @@ export default function Sidebar() {
   const { logOut} = useAuth()
   const currentUser = useSelector(state => state?.user?.user);
 
-  const user = {
-    name: "Sabbir Hossain",
-    role: "admin",
-  }
+  // const user = {
+  //   name: "Sabbir Hossain",
+  //   role: "admin",
+  // }
 
-  const navItems = adminNavItems
-
+  const adminNavItems = [
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard  },
+    { title: "Products", url: "/dashboard/productManagement", icon: Package },
+    { title: "Orders", url: "/dashboard/orders", icon: ShoppingCart },
+    { title: "Users", url: "/dashboard/users", icon: UserCog },
+    { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+  ]
+  const userNavItems = [
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Orders", url: "/dashboard/orders", icon: ShoppingCart },
+  ]
   const handleNavigation = (url) => {
     router.push(url)
     setOpen(false)
@@ -77,7 +79,7 @@ export default function Sidebar() {
               </div>
               <div>
                 <p className="text-xl font-bold">Shoply</p>
-                <p className="text-sm text-gray-500 capitalize">{user.role} Panel</p>
+                <p className="text-sm text-gray-500 capitalize">{currentUser?.role} Panel</p>
               </div>
             </SheetTitle>
           </SheetHeader>
@@ -88,22 +90,33 @@ export default function Sidebar() {
                 <User className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-medium">{user.name}</p>
+                <p className="font-medium">{currentUser?.name}</p>
               </div>
             </div>
           </div>
 
           <nav className="flex-1 p-4">
             <ul className="space-y-2">
-              {navItems.map((item) => (
-                <li key={item.title}>
-                  <button
+              {currentUser?.role === "admin" &&  adminNavItems?.map((item) => (
+                 <li key={item.title}>
+                  {<button
                     onClick={() => handleNavigation(item.url)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition font-medium"
                   >
                     <item.icon className="w-5 h-5" />
                     <span>{item.title}</span>
-                  </button>
+                  </button>}
+                </li>
+              ))}
+              {currentUser?.role === "user" &&  userNavItems?.map((item) => (
+                 <li key={item.title}>
+                  {<button
+                    onClick={() => handleNavigation(item.url)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition font-medium"
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.title}</span>
+                  </button>}
                 </li>
               ))}
             </ul>
@@ -130,7 +143,7 @@ export default function Sidebar() {
             </div>
             <div>
               <p className="text-xl font-bold">Shoply</p>
-              <p className="text-sm text-gray-500 capitalize">{user.role} Panel</p>
+              <p className="text-sm text-gray-500 capitalize">{currentUser?.role} Panel</p>
             </div>
           </div>
         </Link>
@@ -138,12 +151,23 @@ export default function Sidebar() {
           <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center">
             <User className="w-5 h-5" />
           </div>
-          <p className="font-medium">{user.name}</p>
+          <p className="font-medium">{currentUser?.name}</p>
         </div>
 
         <nav className="flex-1">
           <ul className="space-y-2">
-            {navItems.map((item) => (
+            {currentUser?.role === "admin" &&  adminNavItems?.map((item) => (
+              <li key={item.title}>
+                <button
+                  onClick={() => handleNavigation(item.url)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition font-medium"
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.title}</span>
+                </button>
+              </li>
+            ))}
+            {currentUser?.role === "user" &&  userNavItems?.map((item) => (
               <li key={item.title}>
                 <button
                   onClick={() => handleNavigation(item.url)}

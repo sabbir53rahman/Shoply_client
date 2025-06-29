@@ -157,16 +157,16 @@ export default function UserDashboard({ currentUser }) {
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
                   <div className="space-y-1">
-                    <p className="font-medium">{order?.id}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order?.items}
+                    <p className="">{order?._id}</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {order?.productId?.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {order?.date}
+                      {order?.productId?.createdAt}
                     </p>
                   </div>
                   <div className="text-right space-y-1">
-                    <p className="font-medium">{order?.total}</p>
+                    <p className="font-medium">{order?.price}</p>
                     <Badge
                       variant={
                         order?.status === "delivered"
