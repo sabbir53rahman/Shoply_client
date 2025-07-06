@@ -90,6 +90,41 @@ export const productApi = apiSlice.injectEndpoints({
             },
             providesTags : ['Product']
         }),
+        updateIsFeatured : builder.mutation({
+            query : ({isFeature,productId})=>{
+                return {
+                    url : `/products/${productId}`,
+                    method : "PATCH",
+                    body : {isFeatured : isFeature}
+                };
+            },
+            invalidatesTags : ['Product']
+        }),
+        getFeaturedProducts : builder.query({
+            query : ()=>{
+                return {
+                    url : `/products/getFeatured`
+                };
+            },
+            providesTags : ['Product']
+        }),
+        getLeatestProducts : builder.query({
+            query : ()=>{
+                return {
+                    url : `/products/leatest-product`
+                };
+            },
+            providesTags : ['Product']
+        }),
+        getProductsByCategory : builder.query({
+            query : (query)=>{
+                return {
+                    url : `/products/by-category/${query}`
+                };
+            },
+            providesTags : ['Product']
+        }),
+
     })
 })
 
@@ -104,4 +139,8 @@ export const {
     useGetAllCategorysQuery,
     useGetLowStockQuery,
     useTopSelling10Query,
+    useUpdateIsFeaturedMutation,
+    useGetFeaturedProductsQuery,
+    useGetLeatestProductsQuery,
+    useGetProductsByCategoryQuery,
 } = productApi

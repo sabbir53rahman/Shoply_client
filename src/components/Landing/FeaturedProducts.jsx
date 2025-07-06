@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShoppingCart } from "lucide-react";
+import { ArrowRight, ShoppingCart, Slice } from "lucide-react";
 import Image from "next/image";
 import ProductCard from "../Product/ProductTem";
-import { useGetPaginatedProductsQuery } from "@/redux/features/productSlice/productSlice";
+import { useGetFeaturedProductsQuery, useGetLeatestProductsQuery, useGetPaginatedProductsQuery } from "@/redux/features/productSlice/productSlice";
+import { Skeleton } from "antd";
 
 const featuredProducts = [
   {
@@ -60,12 +61,14 @@ const featuredProducts = [
 ];
 
 const FeaturedCollection = () => {
-  const {data } = useGetPaginatedProductsQuery(1)
+  const {data, isLoading } = useGetFeaturedProductsQuery()
+  const {data : allProducts, isLoading : paginateLoadint } = useGetPaginatedProductsQuery(1)
+  const {data : leatestProducts, isLoading : popularLoading } = useGetLeatestProductsQuery()
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/*Featured Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             Featured Collection
@@ -78,7 +81,32 @@ const FeaturedCollection = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
-          {data?.products?.map((product) => (
+          {isLoading
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <div key={index} className="p-4 rounded-lg shadow bg-white">
+                  <div className="w-full bg-gray-300 rounded-lg h-20 md:h-32 xl:h-44"></div>
+                  <Skeleton active paragraph={{ rows: 4 }} />
+                </div>
+              ))
+            : data?.slice(0, 5).map((product) => (
+                <ProductCard key={product?._id} product={product} />
+          ))}
+        </div>
+
+        {/*Popular Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Leatest Products
+          </h2>
+          <p className="text-gray-600 text-lg mb-6">
+            Discover our handpicked premium products
+          </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
+          {leatestProducts?.slice(0,5).map((product) => (
             <ProductCard key={product?._id} product={product} />
           ))}
         </div>

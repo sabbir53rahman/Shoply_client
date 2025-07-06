@@ -19,6 +19,7 @@ import { useGetUsersAllReviewsQuery } from "@/redux/features/reviewSlice/reviewS
 import { useGetUserWishlistQuery } from "@/redux/features/wishlist/wishlist";
 import { useSelector } from "react-redux";
 import { Spin } from "antd";
+import Link from "next/link";
 
 export default function UserDashboard({ currentUser }) {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function UserDashboard({ currentUser }) {
   const {data : usersAllReviews } = useGetUsersAllReviewsQuery(currentUser?._id)
   const {data : userWishlists } = useGetUserWishlistQuery(currentUser?._id)
   console.log(userOrder,'all review',usersAllReviews,'wishlist',userWishlists)
+  console.log('copy copy', userOrder?.products?.productId?.name)
 
   const userStats = [
     {
@@ -105,7 +107,7 @@ export default function UserDashboard({ currentUser }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, John!
+            Welcome back, { currentUser?.name }!
           </h1>
           <p className="text-muted-foreground">
             Here&apos;s an overview of your shopping activity and
@@ -149,24 +151,37 @@ export default function UserDashboard({ currentUser }) {
           <CardContent>
             <div className="space-y-4">
               {
-                orderLoading ? <Spin tip="loading" size="large"/> : ''
+                orderLoading ? <div className="w-full flex justify-center items-center">
+                  <Spin  tip="loading" size="large"/>
+                  </div> : ''
+              }
+              { userOrder?.length < 1 && <div className="w-full flex justify-center items-center">
+                <p className="py-5">You have no order <Link href='/shop' className="font-semibold text-blue-500">View product</Link></p>
+              </div>
               }
               {userOrder?.map((order) => (
                 <div
                   key={order?._id}
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
-                  <div className="space-y-1">
-                    <p className="font-medium">{order?.id}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order?.items}
+                  <div className="space-y-">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {order?.products?.map((produt,idx) =><p className="p-3 shadow-sm my-1" key={idx}>
+                        {produt?.productId?.name}
+                      </p>)
+                      }
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {order?.date}
+                      {new Date(order?.createdAt).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                        })}
                     </p>
                   </div>
+                  <p className="font-medium">{order?.totalPrice}</p>
                   <div className="text-right space-y-1">
-                    <p className="font-medium">{order?.total}</p>
+                    
                     <Badge
                       variant={
                         order?.status === "delivered"

@@ -25,25 +25,33 @@ export const loginUser = createAsyncThunk(
       const response = await axios.get(`${BASE_URL}/users/login/${email}`);
       return response?.data;
     } catch (error) {
-      return rejectWithValue("cop", error.response.data);
+      return rejectWithValue('cop',error.response.data);
     }
   }
 );
 
-// ** Fetch Current User (using login endpoint for now) **
+// **Fetch Current User **
 export const fetchCurrentUser = createAsyncThunk(
   "user/fetchCurrentUser",
-  async (email, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem("token");
+
     try {
-      const res = await axios.get(`${BASE_URL}/users/login/${email}`);
-      return res.data;
-    } catch (err) {
+      const response = await axios.get(`${BASE_URL}/users/currentUser`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
       return rejectWithValue(
         err.response?.data || { message: "Unknown error" }
       );
     }
   }
 );
+
 
 // ** Fetch All Users **
 export const fetchAllUsers = createAsyncThunk(

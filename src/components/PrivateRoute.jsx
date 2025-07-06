@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
 const PrivateRoute = ({ children }) => {
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state?.user?.user);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 console.log(user)

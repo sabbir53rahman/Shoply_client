@@ -4,39 +4,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, Package, ShoppingCart, DollarSign, AlertTriangle, TrendingUp, Plus, BarChart3 } from "lucide-react"
-import { useGetLowStockQuery } from "@/redux/features/productSlice/productSlice"
+import { useGetAllProductsQuery, useGetLowStockQuery } from "@/redux/features/productSlice/productSlice"
 import CountUp from "react-countup"
+import { useGetAllUsersQuery } from "@/redux/features/manageUserSlice/manageUserSlice"
+import { useGetAllOrdersQuery, useGetRecentOrdersQuery } from "@/redux/features/orderSlice/orderSlice"
 
 export default function AdminDashboard({ userId }) {
   const router = useRouter()
   const {data : lowStocks} = useGetLowStockQuery()
-  console.log( 'low',lowStocks)
+  const {data : allUsers } = useGetAllUsersQuery()
+  const {data : allOrders } = useGetAllOrdersQuery()
+  const { data : allProducts } =useGetAllProductsQuery()
+  const { data : recentOrders } = useGetRecentOrdersQuery()
+  console.log(recentOrders)
 
   const stats = [
     {
       title: "Total Users",
-      value:'2847',
+      value: allUsers?.length,
       change: "+12%",
       icon: Users,
       color: "text-blue-600",
     },
     {
       title: "Total Orders",
-      value: '1234',
+      value: allOrders?.length,
       change: "+8%",
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       title: "Total Sales",
-      value: '45231',
+      value: '',
       change: "+23%",
       icon: DollarSign,
       color: "text-yellow-600",
     },
     {
       title: "Products",
-      value: '567',
+      value: allProducts?.length,
       change: "+3%",
       icon: Package,
       color: "text-purple-600",
@@ -49,11 +55,11 @@ export default function AdminDashboard({ userId }) {
     { name: "MacBook Pro", stock: 1, category: "Electronics" },
   ]
 
-  const recentOrders = [
-    { id: "#ORD-001", customer: "John Doe", total: "$299.99", status: "processing" },
-    { id: "#ORD-002", customer: "Jane Smith", total: "$149.50", status: "sent_to_courier" },
-    { id: "#ORD-003", customer: "Mike Johnson", total: "$89.99", status: "delivered" },
-  ]
+  // const recentOrders = [
+  //   { id: "#ORD-001", customer: "John Doe", total: "$299.99", status: "processing" },
+  //   { id: "#ORD-002", customer: "Jane Smith", total: "$149.50", status: "sent_to_courier" },
+  //   { id: "#ORD-003", customer: "Mike Johnson", total: "$89.99", status: "delivered" },
+  // ]
 
   return (
     <div className="p-6 space-y-6">
@@ -100,7 +106,7 @@ export default function AdminDashboard({ userId }) {
           <CardContent>
             <div className="space-y-3">
               {lowStocks?.map((product) => (
-                <div key={product.name} className="flex items-center justify-between">
+                <div key={product.name} className="flex shadow-sm items-center justify-between">
                   <div>
                     <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">{product.category}</p>
@@ -126,7 +132,7 @@ export default function AdminDashboard({ userId }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentOrders.map((order) => (
+              {recentOrders?.map((order) => (
                 <div key={order.id} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{order.id}</p>
