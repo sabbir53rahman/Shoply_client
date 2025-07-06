@@ -22,38 +22,10 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (email, { rejectWithValue }) => {
     try {
-<<<<<<< HEAD
-      const res = await axios.get(`${BASE_URL}/users/login/${email}`);
-      return res.data; // your service returns user directly
-    } catch (err) {
-=======
       const response = await axios.get(`${BASE_URL}/users/login/${email}`);
       return response?.data;
     } catch (error) {
-      return rejectWithValue('cop',error.response.data);
-    }
-  }
-);
-
-// **Fetch Current User **
-export const fetchCurrentUser = createAsyncThunk(
-  "user/fetchCurrentUser",
-  async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await axios.get(`${BASE_URL}/users/currentUser`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      return response.data;
-    } catch (error) {
->>>>>>> origin/tasin
-      return rejectWithValue(
-        err.response?.data || { message: "Unknown error" }
-      );
+      return rejectWithValue("cop", error.response.data);
     }
   }
 );
