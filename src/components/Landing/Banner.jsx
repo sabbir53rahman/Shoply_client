@@ -26,6 +26,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import PrivateRoute from "../PrivateRoute";
+import Link from "next/link";
 
 const slides = [
   {
@@ -452,7 +453,7 @@ const HeroBannerSlider = () => {
                 const IconComponent = category.icon;
                 return (
                   <SwiperSlide key={index} className="!overflow-visible py-2">
-                    <div className="group cursor-pointer transform hover:scale-105 transition-all duration-300 hover:z-10 relative">
+                    <Link href={`/categories/${category?.name.toLowerCase()}`} className="group cursor-pointer transform hover:scale-105 transition-all duration-300 hover:z-10 relative">
                       <div
                         className={`${category.bgColor} rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group-hover:border-gray-200`}
                       >
@@ -470,7 +471,7 @@ const HeroBannerSlider = () => {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   </SwiperSlide>
                 );
               })}

@@ -13,6 +13,7 @@ import {
   useAddCategoryMutation,
   useGetAllCategorysQuery,
   useGetPaginatedProductsQuery,
+  useUpdateIsFeaturedMutation,
 } from "@/redux/features/productSlice/productSlice";
 
 import {
@@ -42,6 +43,7 @@ import {
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { Select } from "antd";
+import AdminRoute from "@/components/AdminRoute";
 
 export default function ProductManagement({ onAddProduct }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,11 +54,12 @@ export default function ProductManagement({ onAddProduct }) {
     price: "",
     stock : ""
   });
-  const [currentPage, setCurrentPage] = useState(1);
+  const [ currentPage, setCurrentPage ] = useState(1);
   const { data: products = [], isLoading, isError } = useGetPaginatedProductsQuery(currentPage);
-  const [deleteProduct] = useDeleteProductMutation();
-  const [updateProduct] = useUpdateProductMutation();
-  const [addCategory] = useAddCategoryMutation();
+  const [ deleteProduct ] = useDeleteProductMutation();
+  const [ updateProduct ] = useUpdateProductMutation();
+  const [ addCategory ] = useAddCategoryMutation();
+  const [ updateIsFeatured ] = useUpdateIsFeaturedMutation()
 
   const { totalPages } = products;
 
@@ -148,208 +151,244 @@ export default function ProductManagement({ onAddProduct }) {
     e.target.reset()
   }
 
+  const handleUpdateFeatured =async ({isFeature,productId})=>{
+    console.log(isFeature,productId)
+    try {
+      await updateIsFeatured({isFeature : isFeature, productId : productId}).unwrap();
+      Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Feature updated!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    } catch (error) {
+      Swal.fire({
+      position: "top-end",
+      icon: "error",
+      title: "Can't update feature.",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    }
+  }
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Product Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your product inventory and listings
-          </p>
-        </div>
-        <div className="flex flex-col lg:flex-row gap-2">
-          <Button variant="outline" onClick={handleBulkUpload}>
-            <Upload className="w-4 h-4 mr-2" />
-            Download CSV Template
-          </Button>
-          {/* <Button onClick={onAddProduct}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button> */}
-          <Link href='/dashboard/addProduct' className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600" >
-            <Plus className="w-4 h-4 mr-2 " />
-            Add Product
-          </Link>
-
-          <Dialog >
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Add category
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white ">
-                <DialogHeader>
-                  <DialogTitle>Add Category.</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleAddCategory} className="space-y-3 flex flex-col w-full">
-                  <p className="text-[13px] ml-2">{"Add New Category :"}</p>
-                  <input type="text" className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none" name="category" placeholder="Category" />
-                  <input type="submit" className="text-white bg-teal-700 font-bold px-5 py-1.5 rounded " value="Add Category " />
-                </form>
-              </DialogContent>
-            </Dialog>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Products
-          </CardTitle>
-          <CardDescription>Manage your product catalog</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
+    <AdminRoute role={"admin"}>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Product Management
+            </h1>
+            <p className="text-muted-foreground">
+              Manage your product inventory and listings
+            </p>
           </div>
+          <div className="flex flex-col lg:flex-row gap-2">
+            <Button variant="outline" onClick={handleBulkUpload}>
+              <Upload className="w-4 h-4 mr-2" />
+              Download CSV Template
+            </Button>
+            {/* <Button onClick={onAddProduct}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </Button> */}
+            <Link href='/dashboard/addProduct' className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600" >
+              <Plus className="w-4 h-4 mr-2 " />
+              Add Product
+            </Link>
 
-          {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading products...</p>
-          ) : isError ? (
-            <p className="text-sm text-red-500">Failed to load products.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.map((product) => (
-                  <TableRow key={product._id}>
-                    <TableCell className="font-medium">
-                      {product.name}
-                    </TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>${parseFloat(product.price).toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={product.stock > 0 ? "default" : "secondary"}
-                      >
-                        {product?.stock > 0 ? product?.stock : "out of stock"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Dialog >
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditOpen(product)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-white">
-                            <DialogHeader>
-                              <DialogTitle>Edit Product</DialogTitle>
-                              <DialogDescription>
-                                Update product details
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-3">
-                              <p className="text-[13px] ml-2">{"Product's Name :"}</p>
-                              <Input
-                                name="name"
-                                value={editData.name}
-                                onChange={handleEditChange}
-                                placeholder="Name"
-                              />
-                              <p className="text-[13px] ml-2">{"Category :"}</p>
-                              <Input
-                                name="category"
-                                value={editData.category}
-                                onChange={handleEditChange}
-                                placeholder="Category"
-                              />
-                              <p className="text-[13px] ml-2">{"Price :"}</p>
-                              <Input
-                                name="price"
-                                value={editData.price}
-                                onChange={handleEditChange}
-                                placeholder="Price"
-                              />
-                              <p className="text-[13px] ml-2">{"Stock :"}</p>
-                              <Input
-                                name="stock"
-                                value={editData?.stock}
-                                onChange={handleEditChange}
-                                placeholder="Stock"
-                              />
-                              <Button onClick={handleEditSubmit}>
-                                Save Changes
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+            <Dialog >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> Add category
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-white ">
+                  <DialogHeader>
+                    <DialogTitle>Add Category.</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleAddCategory} className="space-y-3 flex flex-col w-full">
+                    <p className="text-[13px] ml-2">{"Add New Category :"}</p>
+                    <input type="text" className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none" name="category" placeholder="Category" />
+                    <input type="submit" className="text-white bg-teal-700 font-bold px-5 py-1.5 rounded " value="Add Category " />
+                  </form>
+                </DialogContent>
+              </Dialog>
+          </div>
+        </div>
 
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(product._id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Products
+            </CardTitle>
+            <CardDescription>Manage your product catalog</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            {isLoading ? (
+              <p className="text-sm text-muted-foreground">Loading products...</p>
+            ) : isError ? (
+              <p className="text-sm text-red-500">Failed to load products.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-      <div className="flex justify-center items-center gap-2 mt-6">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
+                </TableHeader>
+                <TableBody>
+                  {filteredProducts.map((product) => (
+                    <TableRow key={product._id}>
+                      <TableCell className="font-medium">
+                        {product.name}
+                      </TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell>${parseFloat(product.price).toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={product.stock > 0 ? "default" : "secondary"}
+                        >
+                          {product?.stock > 0 ? product?.stock : "out of stock"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {!product?.isFeatured && <button onClick={()=>handleUpdateFeatured({isFeature : true, productId : product?._id})} className="py-1 border border-fuchsia-200 px-2.5 rounded bg">
+                          Make Featured
+                        </button>
+                        }
+                        {product?.isFeatured && <button onClick={()=>handleUpdateFeatured({isFeature : false, productId : product?._id})} className="py-1 border text-white bg-emerald-400 border-fuchsia-200 px-2.5 rounded bg">
+                          Remove Featured
+                        </button>
+                        }
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Dialog >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditOpen(product)}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-white">
+                              <DialogHeader>
+                                <DialogTitle>Edit Product</DialogTitle>
+                                <DialogDescription>
+                                  Update product details
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-3">
+                                <p className="text-[13px] ml-2">{"Product's Name :"}</p>
+                                <Input
+                                  name="name"
+                                  value={editData.name}
+                                  onChange={handleEditChange}
+                                  placeholder="Name"
+                                />
+                                <p className="text-[13px] ml-2">{"Category :"}</p>
+                                <Input
+                                  name="category"
+                                  value={editData.category}
+                                  onChange={handleEditChange}
+                                  placeholder="Category"
+                                />
+                                <p className="text-[13px] ml-2">{"Price :"}</p>
+                                <Input
+                                  name="price"
+                                  value={editData.price}
+                                  onChange={handleEditChange}
+                                  placeholder="Price"
+                                />
+                                <p className="text-[13px] ml-2">{"Stock :"}</p>
+                                <Input
+                                  name="stock"
+                                  value={editData?.stock}
+                                  onChange={handleEditChange}
+                                  placeholder="Stock"
+                                />
+                                <Button onClick={handleEditSubmit}>
+                                  Save Changes
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
 
-        {[...Array(totalPages)].map((_, index) => {
-          const page = index + 1;
-          return (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-3 py-1 rounded ${
-                currentPage === page ? 'bg-emerald-600 text-white' : 'bg-gray-200'
-              }`}
-            >
-              {page}
-            </button>
-          );
-        })}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(product._id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
 
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
+          {[...Array(totalPages)].map((_, index) => {
+            const page = index + 1;
+            return (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === page ? 'bg-emerald-600 text-white' : 'bg-gray-200'
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
-    </div>
+    </AdminRoute>
   );
 }

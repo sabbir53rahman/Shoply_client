@@ -115,7 +115,7 @@ const ProductCard = ({ product }) => {
           </div>
 
           {/* Product Image with Loading State */}
-          <div className="absolute inset-0 p-8">
+          <div className="absolute inset-0 py-5 px-4">
             {!imageLoaded && (
               <div className="absolute inset-8 bg-gray-200 animate-pulse rounded-2xl" />
             )}
@@ -136,10 +136,10 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Product Info */}
-        <div className="p-7 pb-0">
+        <div className="p-4 pb-0">
           {/* Category */}
           {product.category && (
-            <div className="mb-3">
+            <div className="mb-2">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-full">
                 {product.category}
               </span>
@@ -147,44 +147,47 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* Product Name */}
-          <h3 className="font-bold text-gray-900 text-lg line-clamp-2 leading-tight min-h-[3.5rem] group-hover:text-gray-700 transition-colors duration-300">
+          <h3 className="font-bold text-gray-900 text-lg line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-gray-700 transition-colors duration-300">
             {product.name}
           </h3>
         </div>
         {/* Product Info */}
-        <div className="p-6 pt-0">
-          {/* Rating */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-0.5">
-              {renderStars(product?.rating)}
+        <div className="p-3 pb-4 pt-0">
+          <div className="flex py-2 justify-between flex-row-reverse items-center">
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-0.5">
+                {renderStars(product?.rating)}
+              </div>
+              <span className="text-sm text-gray-500">({product.reviews})</span>
             </div>
-            <span className="text-sm text-gray-500">({product.reviews})</span>
-          </div>
 
-          {/* Price */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              {product.salePrice ? (
-                <>
+            {/* Price */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {product.salePrice ? (
+                  <>
+                    <span className="text-2xl font-bold text-gray-900">
+                      ${product.salePrice.toFixed(2)}
+                    </span>
+                    <span className="text-lg text-gray-500 line-through">
+                      ${product.originalPrice.toFixed(2)}
+                    </span>
+                  </>
+                ) : (
                   <span className="text-2xl font-bold text-gray-900">
-                    ${product.salePrice.toFixed(2)}
+                    ${product.price?.toFixed(2)}
                   </span>
-                  <span className="text-lg text-gray-500 line-through">
-                    ${product.originalPrice.toFixed(2)}
-                  </span>
-                </>
-              ) : (
-                <span className="text-2xl font-bold text-gray-900">
-                  ${product.price?.toFixed(2)}
-                </span>
+                )}
+              </div>
+              {product.discount && (
+                <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                  -{product.discount}%
+                </div>
               )}
             </div>
-            {product.discount && (
-              <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
-                -{product.discount}%
-              </div>
-            )}
           </div>
+            
 
           {/* Stock Indicator */}
           {product.inStock && product.stock && (
@@ -201,7 +204,7 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* Action Button */}
-          {product.inStock ? (
+          {product.stock >0 ? (
             <Link href={`/products/${product._id}`} className="block group">
               <Button className="w-full primary_button text-white rounded-2xl py-4 text-sm font-bold transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group/btn border-0">
                 <span className="flex items-center justify-center gap-2">

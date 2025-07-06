@@ -47,7 +47,6 @@ export default function Sidebar() {
   ]
   const userNavItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Orders", url: "/dashboard/orders", icon: ShoppingCart },
   ]
   const handleNavigation = (url) => {
     router.push(url)

@@ -1,13 +1,14 @@
 import { apiSlice } from "../apiSlice/apiSlice";
 
 export const orderApi = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     // Create a new order
     addOrder: builder.mutation({
-      query: ({ productId, quantity, userId, price }) => ({
+      query: (query) => ({
         url: "/orders",
         method: "POST",
-        body: { productId, quantity, userId, price },
+        body: query,
         credentials: "include",
       }),
       invalidatesTags: ["Order"],
@@ -62,6 +63,18 @@ export const orderApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    updateStatus : builder.mutation({
+        query : ({orderId,status})=>{
+            return {
+                url : `/orders/updateStatus/${orderId}`,
+                method : "PATCH",
+                body : {status : status},
+            };
+        },
+        invalidatesTags : ['Order']
+    }),
+
   }),
 });
 
@@ -73,4 +86,6 @@ export const {
   useGetLast30DaysEarningsQuery,
   useGetLast5MonthsStatsQuery,
   useGetRecentOrdersQuery,
+  useUpdateStatusMutation
+
 } = orderApi;

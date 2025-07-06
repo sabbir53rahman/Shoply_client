@@ -24,6 +24,7 @@ import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
 import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
 import Navbar from "@/components/Navbar/Navbar";
+import Swal from "sweetalert2";
 
 export default function ProductDetailsPage() {
 //   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
@@ -53,14 +54,22 @@ const user = useSelector((state) => state.user?.user);
     }
 
     try {
-      await addOrder({
-        productId: product._id,
-        quantity,
-        userId,
-        price: product.price * quantity,
-      }).unwrap();
-
-      console.log("✅ Order created successfully!");
+      const newOrder = {
+        userId : user?._id,
+        products : {
+          productId : product?._id,
+          quantity 
+        }
+      }
+      await addOrder(newOrder).unwrap();
+      Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Order successfull.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+      console.log("✅ Order created successfull!");
     } catch (err) {
       console.error("❌ Failed to create order:", err);
     }
@@ -110,9 +119,9 @@ const user = useSelector((state) => state.user?.user);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 ">
       <Navbar/>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-8">
           <div className="flex items-center space-x-2 text-sm text-gray-500">
