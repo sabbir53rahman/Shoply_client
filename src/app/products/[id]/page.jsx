@@ -18,60 +18,131 @@ import {
   Plus,
   Minus,
   Package,
+  Trash,
 } from "lucide-react";
 import Image from "next/image";
 import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
-import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
 import Navbar from "@/components/Navbar/Navbar";
 import Swal from "sweetalert2";
+import {
+  useAddReviewMutation,
+  useGetProductReviewsQuery,
+  useDeleteReviewMutation,
+} from "@/redux/features/reviewSlice/reviewSlice";
 
 export default function ProductDetailsPage() {
-//   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
-//   console.log(data)
-const user = useSelector((state) => state.user?.user);
+  const user = useSelector((state) => state.user?.user);
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
 
-  console.log('user from prou',user);
-  const userId = user?._id;
+  const {
+    data: reviews,
+    isLoading: isReviewsLoading,
+    refetch,
+  } = useGetProductReviewsQuery(id);
+  const [addReview] = useAddReviewMutation();
+  const [deleteReview] = useDeleteReviewMutation();
 
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addOrder] = useAddOrderMutation();
 
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const userId = user?._id;
+
   const handleQuantityChange = (change) => {
-    setQuantity((prev) => {
-      const newQty = prev + change;
-      return Math.max(1, Math.min(newQty, product?.stock || 1));
-    });
+    setQuantity((prev) =>
+      Math.max(1, Math.min(prev + change, product?.stock || 1))
+    );
   };
 
   const handleAddToCart = async () => {
     if (!userId) {
-      console.error("You must be logged in to place an order.");
+      Swal.fire(
+        "Login Required",
+        "Please log in to place an order.",
+        "warning"
+      );
       return;
     }
 
     try {
-      const newOrder = {
-        userId : user?._id,
-        products : {
-          productId : product?._id,
-          quantity 
-        }
-      }
-      await addOrder(newOrder).unwrap();
+      await addOrder({
+        userId,
+        products: { productId: product?._id, quantity },
+      }).unwrap();
       Swal.fire({
-              position: "top-end",
-              icon: "success",
-              title: "Order successfull.",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-      console.log("✅ Order created successfull!");
+        position: "top-end",
+        icon: "success",
+        title: "Order successful.",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (err) {
       console.error("❌ Failed to create order:", err);
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!reviewComment.trim()) {
+      Swal.fire("Empty review", "Please enter a comment.", "warning");
+      return;
+    }
+
+    try {
+      setIsSubmittingReview(true);
+      await addReview({
+        productId: product._id,
+        userId,
+        rating: reviewRating,
+        comment: reviewComment,
+      }).unwrap();
+      Swal.fire({
+        icon: "success",
+        title: "Thank you for your review!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setReviewComment("");
+      setReviewRating(5);
+      refetch();
+    } catch (err) {
+      Swal.fire("Error", "Failed to submit review.", "error");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    console.log("Deleting reviewId:", reviewId); 
+    const confirm = await Swal.fire({
+      title: "Delete this review?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+    });
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await deleteReview({
+        id: reviewId,
+        userId: user._id,
+        role: user.role,
+      }).unwrap();
+      Swal.fire({
+        icon: "success",
+        title: "Review deleted.",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+      refetch();
+    } catch (err) {
+      console.log("Failed delete:", err);
+      Swal.fire("Error", "Failed to delete review.", "error");
     }
   };
 
@@ -119,10 +190,9 @@ const user = useSelector((state) => state.user?.user);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
-      <Navbar/>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
         <nav className="mb-8">
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <span>Home</span>
@@ -134,7 +204,6 @@ const user = useSelector((state) => state.user?.user);
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image */}
           <div>
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-white">
@@ -161,26 +230,20 @@ const user = useSelector((state) => state.user?.user);
             </Card>
           </div>
 
-          {/* Details */}
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center gap-1">
-                  {renderStars(product.rating)}
-                  <span className="text-sm text-gray-600 ml-2">
-                    ({product.numReviews} reviews)
-                  </span>
-                </div>
-                <Badge variant="outline" className="capitalize">
-                  {product.category}
-                </Badge>
+            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                {renderStars(product.rating)}
+                <span className="text-sm text-gray-600 ml-2">
+                  ({product.numReviews} reviews)
+                </span>
               </div>
+              <Badge variant="outline" className="capitalize">
+                {product.category}
+              </Badge>
             </div>
 
-            {/* Price & Stock */}
             <div className="space-y-2">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-green-600">
@@ -193,25 +256,27 @@ const user = useSelector((state) => state.user?.user);
                   {product.sold} units sold
                 </p>
               )}
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    product.inStock ? "bg-green-500" : "bg-red-500"
-                  }`}
-                />
-                <span
-                  className={`font-medium ${
-                    product.inStock ? "text-green-700" : "text-red-700"
-                  }`}
-                >
-                  {product.inStock
-                    ? `In Stock (${product.stock} available)`
-                    : "Out of Stock"}
-                </span>
-              </div>
             </div>
 
-            {/* Description */}
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  product.inStock ? "bg-green-500" : "bg-red-500"
+                }`}
+              />
+              <span
+                className={`font-medium ${
+                  product.inStock ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {product.inStock
+                  ? `In Stock (${product.stock} available)`
+                  : "Out of Stock"}
+              </span>
+            </div>
+
+            <Separator />
+
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
               <p className="text-gray-600 leading-relaxed">
@@ -221,7 +286,6 @@ const user = useSelector((state) => state.user?.user);
 
             <Separator />
 
-            {/* Quantity + Cart */}
             {product.inStock && (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
@@ -284,7 +348,6 @@ const user = useSelector((state) => state.user?.user);
 
             <Separator />
 
-            {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                 <Truck className="w-5 h-5 text-blue-600" />
@@ -309,7 +372,6 @@ const user = useSelector((state) => state.user?.user);
               </div>
             </div>
 
-            {/* Info */}
             <Card className="p-4 bg-gray-50">
               <h3 className="font-semibold mb-3">Product Information</h3>
               <div className="space-y-2 text-sm">
@@ -331,6 +393,79 @@ const user = useSelector((state) => state.user?.user);
                 </div>
               </div>
             </Card>
+
+            {/* Review Form */}
+            <div className="mt-6 p-6 bg-white rounded-lg shadow-sm space-y-4">
+              <h3 className="text-xl font-semibold">Leave a Review</h3>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    onClick={() => setReviewRating(star)}
+                    className={`w-4 h-4 cursor-pointer transition ${
+                      star <= reviewRating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+                <span className="ml-2 text-sm text-gray-600">
+                  {reviewRating} star{reviewRating > 1 ? "s" : ""}
+                </span>
+              </div>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={3}
+                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Write your comment..."
+              />
+              <Button
+                onClick={handleReviewSubmit}
+                disabled={isSubmittingReview}
+                className="primary_button h-12 px-6 text-lg font-semibold"
+              >
+                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              </Button>
+            </div>
+
+            {/* Reviews */}
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
+              {isReviewsLoading ? (
+                <p>Loading reviews...</p>
+              ) : reviews?.length > 0 ? (
+                reviews.map((review) => (
+                  <Card key={review._id} className="p-4 mb-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      {renderStars(review.rating)}
+                      <span className="text-xs text-gray-500 ml-auto">
+                        {formatDate(review.createdAt)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-sm text-gray-800">
+                        {review.userId?.name}
+                      </p>
+                      {(user?._id === review.userId?._id ||
+                        user?.role === "admin") && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDeleteReview(review._id)}
+                          className="flex items-center gap-1"
+                        >
+                          <Trash className="w-4 h-4" /> Delete
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-gray-700 mt-1">{review.comment}</p>
+                  </Card>
+                ))
+              ) : (
+                <p>No reviews yet. Be the first to review this product!</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

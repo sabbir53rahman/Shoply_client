@@ -26,7 +26,8 @@ export const reviewApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    getUsersAllReviews : builder.query({
+    // Get all reviews by user
+    getUsersAllReviews: builder.query({
       query: (userId) => ({
         url: `/reviews/usersAll/${userId}`,
         credentials: "include",
@@ -36,7 +37,7 @@ export const reviewApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    //all reviews
+    // Get all reviews
     getAllReviews: builder.query({
       query: () => ({
         url: "/reviews",
@@ -44,12 +45,24 @@ export const reviewApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Review"],
     }),
+
+    // Delete a review
+    deleteReview: builder.mutation({
+      query: ({ id, userId, role }) => ({
+        url: `/reviews/${id}?userId=${userId}&role=${role}`,
+        method: "DELETE",
+        body: { userId, role },
+        credentials: "include",
+      }),
+      invalidatesTags: ["Review"],
+    }),
   }),
 });
 
 export const {
   useAddReviewMutation,
   useGetProductReviewsQuery,
-  useGetAllReviewsQuery, 
-  useGetUsersAllReviewsQuery
+  useGetAllReviewsQuery,
+  useGetUsersAllReviewsQuery,
+  useDeleteReviewMutation,
 } = reviewApi;
