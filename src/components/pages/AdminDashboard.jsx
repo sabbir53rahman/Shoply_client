@@ -111,11 +111,11 @@ export default function AdminDashboard({ userId }) {
                     <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">{product.category}</p>
                   </div>
-                  <Badge variant="destructive">{product.stock} left</Badge>
+                  <Badge variant="destructive" className={'text-red-500'}>{product.stock} left</Badge>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={() => router.push("/dashboard/productManagement")}>
+            <Button variant="outline" className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => router.push("/dashboard/productManagement")}>
               Manage Products
             </Button>
           </CardContent>
@@ -133,13 +133,13 @@ export default function AdminDashboard({ userId }) {
           <CardContent>
             <div className="space-y-3">
               {recentOrders?.map((order) => (
-                <div key={order.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{order.id}</p>
-                    <p className="text-sm text-muted-foreground">{order.customer}</p>
+                <div key={order?._id} className="flex items-center justify-between my-1 shadow-md py-4 px-2 rounded">
+                  <div className="flex flex-col xl:flex-row gap-1 xl:gap-8">
+                    <p className="font-medium">{order?.userId?.email}</p>
+                    <p className="font-medium text-green-700">{order?.products?.length} products</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">{order.total}</p>
+                  <div className="text-right flex flex-col xl:flex-row gap-1.5 xl:gap-4">
+                    <p className="font-medium">Total : {order?.totalPrice}$</p>
                     <Badge
                       variant={
                         order.status === "delivered"
@@ -156,7 +156,7 @@ export default function AdminDashboard({ userId }) {
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={() => router.push("/orders")}>
+            <Button variant="outline" className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => router.push("/dashboard/orders")}>
               View All Orders
             </Button>
           </CardContent>

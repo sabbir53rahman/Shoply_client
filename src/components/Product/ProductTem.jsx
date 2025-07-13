@@ -7,11 +7,16 @@ import { Star, Heart, ShoppingCart, Eye, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAddCartDetailsMutation } from "@/redux/features/cartSlice/cartSlice";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
 const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const router = useRouter();
+  const [addCartDetails] = useAddCartDetailsMutation()
+  const currentUser = useSelector(state => state?.user?.user)
 
   const renderStars = () => {
     const stars = [];
@@ -29,17 +34,45 @@ const ProductCard = ({ product }) => {
     return stars;
   };
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle =  (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
   };
 
-  const handleQuickAdd = (e) => {
+  const handleQuickAdd =async (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    console.log("Quick add to cart:", product.name);
-    // Add your quick add to cart logic here
+    e.stopPropagation(); 
+    if(!currentUser){
+      return Swal.fire({
+        position: "top-end",
+        title: "Please login first!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+    try {
+      const cartDetails = {
+        productId : product?._id,
+        userId : currentUser?._id
+      }
+        
+      await addCartDetails(cartDetails).unwrap()
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Added to the cart!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      Swal.fire({
+        position: "top-end",
+        title: "Already added!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
   };
 
   return (
@@ -94,7 +127,7 @@ const ProductCard = ({ product }) => {
                     className="flex-1 bg-gray-900/95 backdrop-blur-md hover:bg-gray-900 text-white rounded-2xl py-3 text-sm font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 border-0"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Quick Add
+                    Add To Cart
                   </Button>
                   <Button
                     variant="outline"

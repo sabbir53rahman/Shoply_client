@@ -25,6 +25,7 @@ import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
 import Navbar from "@/components/Navbar/Navbar";
 import Swal from "sweetalert2";
+<<<<<<< HEAD
 import {
   useAddReviewMutation,
   useGetProductReviewsQuery,
@@ -43,10 +44,22 @@ export default function ProductDetailsPage() {
   } = useGetProductReviewsQuery(id);
   const [addReview] = useAddReviewMutation();
   const [deleteReview] = useDeleteReviewMutation();
+=======
+import { useAddCartDetailsMutation } from "@/redux/features/cartSlice/cartSlice";
+
+export default function ProductDetailsPage() {
+//   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
+//   console.log(data)
+  const user = useSelector((state) => state.user?.user);
+  const { id } = useParams();
+  const { data: product, isLoading, error } = useGetProductQuery(id);
+  const userId = user?._id;
+>>>>>>> tasin
 
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addOrder] = useAddOrderMutation();
+  const [addCartDetails] = useAddCartDetailsMutation()
 
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
@@ -60,7 +73,7 @@ export default function ProductDetailsPage() {
     );
   };
 
-  const handleAddToCart = async () => {
+  const handleAddOrder = async () => {
     if (!userId) {
       Swal.fire(
         "Login Required",
@@ -69,7 +82,6 @@ export default function ProductDetailsPage() {
       );
       return;
     }
-
     try {
       await addOrder({
         userId,
@@ -143,6 +155,30 @@ export default function ProductDetailsPage() {
     } catch (err) {
       console.log("Failed delete:", err);
       Swal.fire("Error", "Failed to delete review.", "error");
+    }
+  };
+  
+  const handleAddToCart =async () => {
+    try {
+      const cartDetails = {
+        productId : product?._id,
+        userId : user?._id
+      }
+      await addCartDetails(cartDetails).unwrap()
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Added to the cart!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      Swal.fire({
+        position: "top-end",
+        title: "Already added!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 
@@ -317,12 +353,21 @@ export default function ProductDetailsPage() {
 
                 <div className="flex gap-3">
                   <Button
-                    onClick={handleAddToCart}
+                    onClick={handleAddOrder}
                     className="flex-1 h-12 text-lg primary_button font-semibold"
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Order Now - ${(product.price * quantity).toFixed(2)}
                   </Button>
+                  
+                  <button
+                    onClick={()=>handleAddToCart()}
+                    variant="outline"
+                    size="lg"
+                    className="h-12 border border-gray-200 text-white bg-cyan-950 hover:bg-emerald-700 px-4 flex gap-2 items-center justify-center rounded-lg"
+                  >Add To Cart
+                    <ShoppingCart className="w-5 h-5" />
+                  </button>
                   <Button
                     variant="outline"
                     size="lg"
@@ -335,13 +380,7 @@ export default function ProductDetailsPage() {
                       }`}
                     />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-12 px-4 bg-transparent"
-                  >
-                    <Share2 className="w-5 h-5" />
-                  </Button>
+                  
                 </div>
               </div>
             )}
