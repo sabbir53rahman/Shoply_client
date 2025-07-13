@@ -25,20 +25,20 @@ import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
 import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
 import Navbar from "@/components/Navbar/Navbar";
 import Swal from "sweetalert2";
+import { useAddCartDetailsMutation } from "@/redux/features/cartSlice/cartSlice";
 
 export default function ProductDetailsPage() {
 //   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
 //   console.log(data)
-const user = useSelector((state) => state.user?.user);
+  const user = useSelector((state) => state.user?.user);
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
-
-  console.log('user from prou',user);
   const userId = user?._id;
 
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addOrder] = useAddOrderMutation();
+  const [addCartDetails] = useAddCartDetailsMutation()
 
   const handleQuantityChange = (change) => {
     setQuantity((prev) => {
@@ -47,12 +47,11 @@ const user = useSelector((state) => state.user?.user);
     });
   };
 
-  const handleAddToCart = async () => {
+  const handleAddOrder = async () => {
     if (!userId) {
       console.error("You must be logged in to place an order.");
       return;
     }
-
     try {
       const newOrder = {
         userId : user?._id,
@@ -74,6 +73,30 @@ const user = useSelector((state) => state.user?.user);
       console.error("❌ Failed to create order:", err);
     }
   };
+
+    const handleAddToCart =async () => {
+      try {
+        const cartDetails = {
+          productId : product?._id,
+          userId : user?._id
+        }
+        await addCartDetails(cartDetails).unwrap()
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Added to the cart!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        Swal.fire({
+          position: "top-end",
+          title: "Already added!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    };
 
   const renderStars = (rating) =>
     Array.from({ length: 5 }, (_, i) => (
@@ -253,12 +276,21 @@ const user = useSelector((state) => state.user?.user);
 
                 <div className="flex gap-3">
                   <Button
-                    onClick={handleAddToCart}
+                    onClick={handleAddOrder}
                     className="flex-1 h-12 text-lg primary_button font-semibold"
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Order Now - ${(product.price * quantity).toFixed(2)}
                   </Button>
+                  
+                  <button
+                    onClick={()=>handleAddToCart()}
+                    variant="outline"
+                    size="lg"
+                    className="h-12 border border-gray-200 text-white bg-cyan-950 hover:bg-emerald-700 px-4 flex gap-2 items-center justify-center rounded-lg"
+                  >Add To Cart
+                    <ShoppingCart className="w-5 h-5" />
+                  </button>
                   <Button
                     variant="outline"
                     size="lg"
@@ -271,13 +303,7 @@ const user = useSelector((state) => state.user?.user);
                       }`}
                     />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-12 px-4 bg-transparent"
-                  >
-                    <Share2 className="w-5 h-5" />
-                  </Button>
+                  
                 </div>
               </div>
             )}

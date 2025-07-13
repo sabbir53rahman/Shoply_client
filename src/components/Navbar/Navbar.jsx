@@ -35,18 +35,19 @@ import {
 } from "../ui/dropdown-menu";
 import useAuth from "@/Firebase/useAuth";
 import { useSelector } from "react-redux";
+import { useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice";
 
 const Navbar = () => {
   const {user,logOut} = useAuth(); 
   const currentUser = useSelector(state => state?.user?.user);
-  console.log(currentUser)
   // const user =   {
   //   name: "Sabbir Hossain",
   //   email: "sabbir@example.com",
   //   role: "admin",
   // }
   const [cartCount, setCartCount] = useState(3);
-  const [wishlistCount, setWishlistCount] = useState(5);
+  const [wishlistCount, setWishlistCount] = useState(5)
+  const {data : userCarts} = useGetUserCartQuery(currentUser?._id)
 
 
   const handleLogout = () => {
@@ -144,13 +145,13 @@ const Navbar = () => {
 
               {/* Shopping Cart - Hidden on mobile */}
               <Link
-                href="/cart"
+                href="/addToCart"
                 className="hidden md:flex relative p-2 text-gray-700 hover:text-emerald-600 transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
+                    {userCarts?.length}
                   </span>
                 )}
               </Link>
