@@ -25,36 +25,19 @@ import { useGetProductQuery } from "@/redux/features/productSlice/productSlice";
 import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice";
 import Navbar from "@/components/Navbar/Navbar";
 import Swal from "sweetalert2";
-<<<<<<< HEAD
 import {
   useAddReviewMutation,
   useGetProductReviewsQuery,
   useDeleteReviewMutation,
 } from "@/redux/features/reviewSlice/reviewSlice";
-
-export default function ProductDetailsPage() {
-  const user = useSelector((state) => state.user?.user);
-  const { id } = useParams();
-  const { data: product, isLoading, error } = useGetProductQuery(id);
-
-  const {
-    data: reviews,
-    isLoading: isReviewsLoading,
-    refetch,
-  } = useGetProductReviewsQuery(id);
-  const [addReview] = useAddReviewMutation();
-  const [deleteReview] = useDeleteReviewMutation();
-=======
 import { useAddCartDetailsMutation } from "@/redux/features/cartSlice/cartSlice";
 
+
 export default function ProductDetailsPage() {
-//   const { data: currentUser } = useGetCurrentUserQuery(user?.email);
-//   console.log(data)
   const user = useSelector((state) => state.user?.user);
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
   const userId = user?._id;
->>>>>>> tasin
 
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -64,8 +47,13 @@ export default function ProductDetailsPage() {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-
-  const userId = user?._id;
+  const {
+    data: reviews,
+    isLoading: isReviewsLoading,
+    refetch,
+  } = useGetProductReviewsQuery(id);
+  const [addReview] = useAddReviewMutation();
+  const [deleteReview] = useDeleteReviewMutation();
 
   const handleQuantityChange = (change) => {
     setQuantity((prev) =>
