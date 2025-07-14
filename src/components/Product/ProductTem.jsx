@@ -43,10 +43,18 @@ const ProductCard = ({ product }) => {
   const handleQuickAdd =async (e) => {
     e.preventDefault();
     e.stopPropagation(); 
-    if(!currentUser){
+    if(!currentUser || currentUser?.role === "admin"){
       return Swal.fire({
         position: "top-end",
         title: "Please login first!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+    if(currentUser?.role === "admin"){
+      return Swal.fire({
+        position: "top-end",
+        title: "Admin can't order!",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -100,22 +108,6 @@ const ProductCard = ({ product }) => {
               </Badge>
             </div>
           )}
-
-          {/* Wishlist Button */}
-          <div className="absolute top-5 right-5 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <button
-              onClick={handleWishlistToggle}
-              className="w-12 h-12 bg-white/95 backdrop-blur-md rounded-full shadow-xl flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 border border-gray-100"
-            >
-              <Heart
-                className={`w-5 h-5 transition-all duration-200 ${
-                  isWishlisted
-                    ? "text-red-500 fill-red-500 scale-110"
-                    : "text-gray-600 hover:text-red-500"
-                }`}
-              />
-            </button>
-          </div>
 
           {/* Quick Actions - Shows on Hover */}
           <div className="absolute bottom-5 left-5 right-5 z-20 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-6 group-hover:translate-y-0">

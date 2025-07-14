@@ -130,19 +130,6 @@ const Navbar = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-4">
-              {/* Wishlist - Hidden on mobile */}
-              <Link
-                href="/wishlist"
-                className="hidden md:flex relative p-2 text-gray-700 hover:text-emerald-600 transition-colors"
-              >
-                <Heart className="w-6 h-6" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
-
               {/* Shopping Cart - Hidden on mobile */}
               <Link
                 href="/addToCart"

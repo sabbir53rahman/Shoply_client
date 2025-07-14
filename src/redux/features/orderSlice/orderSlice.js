@@ -32,6 +32,14 @@ export const orderApi = apiSlice.injectEndpoints({
       providesTags: (result, error, userId) => [{ type: "Order", id: userId }],
     }),
 
+    getUserOrderDetails: builder.query({
+      query: (userId) => ({
+        url: `/orders/userOrderDetails/${userId}`,
+        credentials: "include",
+      }),
+      providesTags: (result, error, userId) => [{ type: "Order", id: userId }],
+    }),
+
     // order of last 30 days
     getLast30DaysOrdersCount: builder.query({
       query: () => ({
@@ -65,11 +73,11 @@ export const orderApi = apiSlice.injectEndpoints({
     }),
 
     updateStatus : builder.mutation({
-        query : ({orderId,status})=>{
+        query : ({orderId,status,cancle})=>{
             return {
                 url : `/orders/updateStatus/${orderId}`,
                 method : "PATCH",
-                body : {status : status},
+                body : {status : status,cancle : cancle },
             };
         },
         invalidatesTags : ['Order']
@@ -86,6 +94,7 @@ export const {
   useGetLast30DaysEarningsQuery,
   useGetLast5MonthsStatsQuery,
   useGetRecentOrdersQuery,
-  useUpdateStatusMutation
+  useUpdateStatusMutation,
+  useGetUserOrderDetailsQuery
 
 } = orderApi;

@@ -1,75 +1,15 @@
 "use client"
-
-import { useState } from "react"
-import { Cross, LucideCross, Minus, Plus, Trash2, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {  X } from "lucide-react"
 import Navbar from "@/components/Navbar/Navbar"
 import { useDeleteCartMutation, useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice"
 import { useSelector } from "react-redux"
-import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function ShoppingCart() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Basic T-shirt",
-      size: "M",
-      color: "Grey",
-      price: 20.0,
-      quantity: 2,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-      id: 2,
-      name: "Basic T-shirt",
-      size: "M",
-      color: "Grey",
-      price: 20.0,
-      quantity: 2,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-      id: 3,
-      name: "Basic T-shirt",
-      size: "M",
-      color: "Grey",
-      price: 20.0,
-      quantity: 2,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-      id: 4,
-      name: "Basic T-shirt",
-      size: "M",
-      color: "Grey",
-      price: 20.0,
-      quantity: 2,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-  ])
-  const [quantity, setQuantity] = useState(1);
   const currentUser = useSelector(state =>  state?.user?.user)
-  const [addOrder] = useAddOrderMutation()
   const [deleteCart] = useDeleteCartMutation()
   const {data} = useGetUserCartQuery(currentUser?._id)
-  console.log('add to cart',data)
-
-  const handleUpdateOrder = async()=>{
-    try {
-        
-    } catch (error) {
-        Swal.fire({
-      position: "top-end",
-      icon : 'error',
-      title: "Can't order",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    }
-  }
 
   const removeItem =async (id) => {
     try {
@@ -134,7 +74,7 @@ export default function ShoppingCart() {
 
         {
             data === undefined || data.length < 1 ?
-                <button disabled className="w-[80%] bg-gray-400 hover:bg-gray-400 text-white text-lg my-6 rounded-lg font-medium">
+                <button disabled className="w-[80%] mx-auto  block text-center px-2 bg-gray-400 text-white text-lg py-2 rounded-lg font-medium">
                     Proceed to Pay
                 </button> :
                 <div className="w-full py-6">

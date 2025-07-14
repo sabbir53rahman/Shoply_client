@@ -42,8 +42,6 @@ const Page = () => {
                     price: parseInt(e.target.price.value),
                     stock: parseInt(e.target.stock.value)
                 }
-                console.log(productInfo)
-            
                 const resp = await addProduct(productInfo);
                 e.target.reset()
                 Swal.fire({

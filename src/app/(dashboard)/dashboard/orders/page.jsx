@@ -55,6 +55,7 @@ import AdminRoute from "@/components/AdminRoute";
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [cancleReason, setCancleReason] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: orders = [], isLoading, isError } = useGetAllOrdersQuery();
   const [updateStatus] = useUpdateStatusMutation();
@@ -75,18 +76,18 @@ export default function OrderManagement() {
   const handleStatus = async (e, orderId) => {
     e.preventDefault();
     const status = e.target.status.value;
-    console.log(orderId, status);
+    const cancle = e?.target?.cancle?.value || "empty";
+    console.log(status,cancle)
 
     try {
-      await updateStatus({ orderId, status }).unwrap();
-
+      await updateStatus({ orderId, status, cancle }).unwrap();
       Swal.fire({
         position: "top-start",
         title: `Status updated as ${status}`,
         showConfirmButton: false,
         timer: 1500,
       });
-
+      setCancleReason("")
       console.log("updated");
     } catch (error) {
       console.log(error);
@@ -267,6 +268,7 @@ export default function OrderManagement() {
                                   defaultValue={order?.status}
                                   placeholder="update status"
                                   name="status"
+                                  onChange={(e)=> setCancleReason(e.target.value)}
                                   required
                                   className="w-full border text-gray-800 border-gray-300 rounded-lg px-4 py-2"
                                 >
@@ -275,6 +277,18 @@ export default function OrderManagement() {
                                   <option value="delivered">delivered</option>
                                   <option value="cancelled">cancelled</option>
                                 </select>
+                                {
+                                  cancleReason === "cancelled" && <select
+                                    defaultValue={"Out of stock"}
+                                    placeholder="update status"
+                                    name="cancle"
+                                    required
+                                    className="w-full border text-gray-800 border-gray-300 rounded-lg px-4 py-2"
+                                  >
+                                    <option value="Out of stock">Out of Stock</option>
+                                    <option value="Address issues">Address issue</option>
+                                  </select>
+                                }
                                 <input
                                   type="submit"
                                   className="bg-emerald-600 rounded p-3 py-2 text-white"

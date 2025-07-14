@@ -13,6 +13,7 @@ import { useAddOrderMutation } from "@/redux/features/orderSlice/orderSlice"
 import Swal from "sweetalert2"
 import { useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice"
 import { useSelector } from "react-redux"
+import PrivateRoute from "@/components/PrivateRoute"
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -127,255 +128,258 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="">
-        <Navbar/>
-      <div className="max-w-7xl mx-auto px-4 min-h-screen py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Header */}
+    <PrivateRoute>
+      <div className="">
+          <Navbar/>
+        <div className="max-w-7xl mx-auto px-4 min-h-screen py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Header */}
 
-            {/* Shipping Address Section */}
-            <Card className="shadow-sm">
+              {/* Shipping Address Section */}
               <Card className="shadow-sm">
-                <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
-                  <CardTitle className="text-xl font-semibold">Payment Method</CardTitle>
+                <Card className="shadow-sm">
+                  <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
+                    <CardTitle className="text-xl font-semibold">Payment Method</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 mt-2">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          id="cash"
+                          name="payment"
+                          value="cash"
+                          checked={paymentMethod === "cash"}
+                          onChange={() => setPaymentMethod("cash")}
+                        />
+                        <label htmlFor="cash">Cash on Delivery</label>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          id="sslcommerz"
+                          name="payment"
+                          value="sslcommerz"
+                          checked={paymentMethod === "sslcommerz"}
+                          onChange={() => setPaymentMethod("sslcommerz")}
+                        />
+                        <label htmlFor="sslcommerz">Prepaid (SSLCommerz)</label>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <CardTitle className="text-2xl font-semibold">Shipping address</CardTitle>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Address lookup powered by Google, view <button className="underline">Privacy policy</button> To optout
+                    change <button className="underline">cookie preferences</button>.
+                  </p>
+                  <p className="text-sm text-gray-600">*Indicates required field</p>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div htmlFor="name" className="text-sm font-medium text-gray-700">
+                        NAME *
+                      </div>
+                      <Input
+                        id="name"
+                        value={addressData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <div htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        Phone *
+                      </div>
+                      <Input 
+                        id="phone"
+                        value={addressData.phone}
+                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div htmlFor="street" className="text-sm font-medium text-gray-700">
+                      ADDRESS - STREET*
+                    </div>
+                    <Input
+                      id="street"
+                      value={addressData.street}
+                      onChange={(e) => handleInputChange("street", e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <div htmlFor="thana" className="text-sm font-medium text-gray-700">
+                      Thana *
+                    </div>
+                    <Input
+                      id="thana"
+                      placeholder="Leave blank if P.O. Box in Address 1"
+                      value={addressData.thana}
+                      onChange={(e) => handleInputChange("thana", e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div htmlFor="district" className="text-sm font-medium text-gray-700">
+                        District *
+                      </div>
+                      <Input
+                        id="district"
+                        value={addressData.district}
+                        onChange={(e) => handleInputChange("district", e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <div htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                        House Number *
+                      </div>
+                      <Input
+                        id="houseNumber"
+                        value={addressData.houseNumber}
+                        onChange={(e) => handleInputChange("houseNumber", e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    {/* <div>
+                      <div htmlFor="state" className="text-sm font-medium text-gray-700">
+                        STATE *
+                      </div>
+                      <Select onValueChange={(value) => handleInputChange("state", value)}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AL">Alabama</SelectItem>
+                          <SelectItem value="AK">Alaska</SelectItem>
+                          <SelectItem value="AZ">Arizona</SelectItem>
+                          <SelectItem value="AR">Arkansas</SelectItem>
+                          <SelectItem value="CA">California</SelectItem>
+                          <SelectItem value="CO">Colorado</SelectItem>
+                          <SelectItem value="CT">Connecticut</SelectItem>
+                          <SelectItem value="DE">Delaware</SelectItem>
+                          <SelectItem value="FL">Florida</SelectItem>
+                          <SelectItem value="GA">Georgia</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div> */}
+                  </div>
+
+                  <Button disabled={isLoading || !cartItems }
+                    onClick={handleAddOrder}
+                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
+                  >
+                    {paymentMethod === "sslcommerz" ? "Pay Now (SSLCommerz)" : "Place Order (Cash on Delivery)"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Summary */}
+              <Card className="shadow-sm bg-emerald-600 text-white">
+                <CardHeader className=" bg-emerald-600 text-white mb-2 rounded-t-lg">
+                  <CardTitle className="text-xl font-semibold">Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 mt-2">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        id="cash"
-                        name="payment"
-                        value="cash"
-                        checked={paymentMethod === "cash"}
-                        onChange={() => setPaymentMethod("cash")}
-                      />
-                      <label htmlFor="cash">Cash on Delivery</label>
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span className="font-semibold">${subtotal?.toFixed(2)}</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        id="sslcommerz"
-                        name="payment"
-                        value="sslcommerz"
-                        checked={paymentMethod === "sslcommerz"}
-                        onChange={() => setPaymentMethod("sslcommerz")}
-                      />
-                      <label htmlFor="sslcommerz">Prepaid (SSLCommerz)</label>
+                    <div className="flex justify-between">
+                      <span>Shipping</span>
+                      <span className="font-semibold">FREE</span>
                     </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1">
+                        <span>Estimated tax</span>
+                        <Info className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <span>--</span>
+                    </div>
+                  </div>
+                  <Separator className="bg-gray-300" />
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span>Total</span>
+                    <span>${parseInt(subtotal?.toFixed(2))}</span>
                   </div>
                 </CardContent>
               </Card>
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-4">
-                  <CardTitle className="text-2xl font-semibold">Shipping address</CardTitle>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Address lookup powered by Google, view <button className="underline">Privacy policy</button> To optout
-                  change <button className="underline">cookie preferences</button>.
-                </p>
-                <p className="text-sm text-gray-600">*Indicates required field</p>
-              </CardHeader>
 
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <div htmlFor="name" className="text-sm font-medium text-gray-700">
-                      NAME *
-                    </div>
-                    <Input
-                      id="name"
-                      value={addressData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <div htmlFor="phone" className="text-sm font-medium text-gray-700">
-                      Phone *
-                    </div>
-                    <Input 
-                      id="phone"
-                      value={addressData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div htmlFor="street" className="text-sm font-medium text-gray-700">
-                    ADDRESS - STREET*
-                  </div>
-                  <Input
-                    id="street"
-                    value={addressData.street}
-                    onChange={(e) => handleInputChange("street", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <div htmlFor="thana" className="text-sm font-medium text-gray-700">
-                    Thana *
-                  </div>
-                  <Input
-                    id="thana"
-                    placeholder="Leave blank if P.O. Box in Address 1"
-                    value={addressData.thana}
-                    onChange={(e) => handleInputChange("thana", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <div htmlFor="district" className="text-sm font-medium text-gray-700">
-                      District *
-                    </div>
-                    <Input
-                      id="district"
-                      value={addressData.district}
-                      onChange={(e) => handleInputChange("district", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <div htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
-                      House Number *
-                    </div>
-                    <Input
-                      id="houseNumber"
-                      value={addressData.houseNumber}
-                      onChange={(e) => handleInputChange("houseNumber", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  {/* <div>
-                    <div htmlFor="state" className="text-sm font-medium text-gray-700">
-                      STATE *
-                    </div>
-                    <Select onValueChange={(value) => handleInputChange("state", value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="AL">Alabama</SelectItem>
-                        <SelectItem value="AK">Alaska</SelectItem>
-                        <SelectItem value="AZ">Arizona</SelectItem>
-                        <SelectItem value="AR">Arkansas</SelectItem>
-                        <SelectItem value="CA">California</SelectItem>
-                        <SelectItem value="CO">Colorado</SelectItem>
-                        <SelectItem value="CT">Connecticut</SelectItem>
-                        <SelectItem value="DE">Delaware</SelectItem>
-                        <SelectItem value="FL">Florida</SelectItem>
-                        <SelectItem value="GA">Georgia</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div> */}
-                </div>
-
-                <Button disabled={isLoading || !cartItems }
-                  onClick={handleAddOrder}
-                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
-                >
-                  {paymentMethod === "sslcommerz" ? "Pay Now (SSLCommerz)" : "Place Order (Cash on Delivery)"}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Summary */}
-            <Card className="shadow-sm bg-emerald-600 text-white">
-              <CardHeader className=" bg-emerald-600 text-white mb-2 rounded-t-lg">
-                <CardTitle className="text-xl font-semibold">Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 mt-2">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span className="font-semibold">${subtotal?.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span className="font-semibold">FREE</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <span>Estimated tax</span>
-                      <Info className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <span>--</span>
-                  </div>
-                </div>
-                <Separator className="bg-gray-300" />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
-                  <span>${parseInt(subtotal?.toFixed(2))}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Cart */}
-            <Card className="shadow-sm ">
-              <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  Cart (2 Items)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 my-3 px-3">
-                {cartItems?.map((item) => (
-                  <div key={item?._id} className="flex shadow-md border p-1 py-2 items-center gap-4">
-                    <div className="text- ">
-                      <Image
-                      src={item?.productId?.image || "/placeholder.svg"}
-                      alt={item?.productId?.name} height={50} width={60}
-                      className="w-20 h-20 object-cover rounded-md bg-gray-100" />
+              {/* Cart */}
+              <Card className="shadow-sm ">
+                <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5" />
+                    Cart (2 Items)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6 my-3 px-3">
+                  {cartItems?.map((item) => (
+                    <div key={item?._id} className="flex shadow-md border p-1 py-2 items-center gap-4">
+                      <div className="text- ">
+                        <Image
+                        src={item?.productId?.image || "/placeholder.svg"}
+                        alt={item?.productId?.name} height={50} width={60}
+                        className="w-20 h-20 object-cover rounded-md bg-gray-100" />
+                        
+                      </div>
+                      <div className="flex-1 space-y-0.5">
+                        <h3 className="font-semibold text-lg">{item?.productId?.name}</h3>
+                        <p className="font-semibold my-3 ">price : ${item?.productId?.price?.toFixed(2)}</p>
+                        <div className="flex items-center gap-4">
+                            <span className="">Quantity : </span>
+                            <div className="flex items-center border justify-center w- rounded-lg">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleQuantityChange(item._id,-1)}
+                                disabled={item?.quantity <= 1}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-12 text-center font-medium">
+                                {item?.quantity}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleQuantityChange(item._id,1)}
+                                disabled={item?.quantity >= item.productId?.stock}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                      </div>
                       
                     </div>
-                    <div className="flex-1 space-y-0.5">
-                      <h3 className="font-semibold text-lg">{item?.productId?.name}</h3>
-                      <p className="font-semibold my-3 ">price : ${item?.productId?.price?.toFixed(2)}</p>
-                      <div className="flex items-center gap-4">
-                          <span className="">Quantity : </span>
-                          <div className="flex items-center border justify-center w- rounded-lg">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleQuantityChange(item._id,-1)}
-                              disabled={item?.quantity <= 1}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Minus className="w-4 h-4" />
-                            </Button>
-                            <span className="w-12 text-center font-medium">
-                              {item?.quantity}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleQuantityChange(item._id,1)}
-                              disabled={item?.quantity >= item.productId?.stock}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                    </div>
-                    
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PrivateRoute>
+      
   )
 }

@@ -108,5 +108,7 @@ body {
   background: hsl(var(--background));
 }
 
-
+.font-450{
+  font-weight: 450;
+}
 

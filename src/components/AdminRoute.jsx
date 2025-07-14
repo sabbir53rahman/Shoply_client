@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 const AdminRoute = ({role,children}) => {
 
     const currentUser = useSelector(state => state?.user?.user)
-    console.log('curret user from adminRoute', currentUser)
     const isMatched = role.includes(currentUser?.role)
     
     if(isMatched === true){

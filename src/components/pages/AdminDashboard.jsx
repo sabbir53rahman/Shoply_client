@@ -106,7 +106,7 @@ export default function AdminDashboard({ userId }) {
           <CardContent>
             <div className="space-y-3">
               {lowStocks?.map((product) => (
-                <div key={product.name} className="flex shadow-sm items-center justify-between">
+                <div key={product.name} className="flex bg-emerald-50/40 shadow-sm items-center justify-between">
                   <div>
                     <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">{product.category}</p>
@@ -133,10 +133,10 @@ export default function AdminDashboard({ userId }) {
           <CardContent>
             <div className="space-y-3">
               {recentOrders?.map((order) => (
-                <div key={order?._id} className="flex items-center justify-between my-1 shadow-md py-4 px-2 rounded">
+                <div key={order?._id} className="flex items-center bg-emerald-50/50  justify-between my-1  py-4 px-2 rounded">
                   <div className="flex flex-col xl:flex-row gap-1 xl:gap-8">
-                    <p className="font-medium">{order?.userId?.email}</p>
-                    <p className="font-medium text-green-700">{order?.products?.length} products</p>
+                    <p className="font-medium text-[14px]">{order?.userId?.email}</p>
+                    <p className="font-medium text-[15px] text-green-700">{order?.products?.length} products</p>
                   </div>
                   <div className="text-right flex flex-col xl:flex-row gap-1.5 xl:gap-4">
                     <p className="font-medium">Total : {order?.totalPrice}$</p>

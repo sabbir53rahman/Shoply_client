@@ -50,12 +50,24 @@ const LoginPage = () => {
       router.push("/");
     } catch (err) {
       console.log('err from login',err)
+      let message = "Something went wrong. Please try again.";
+    
+      if (err.code === 'auth/invalid-credential') {
+        message = "Invalid email or password. Please try again.";
+      } else if (err.code === 'auth/user-not-found') {
+        message = "No user found with this email.";
+      } else if (err.code === 'auth/wrong-password') {
+        message = "Incorrect password.";
+      } else if (err.code === 'auth/too-many-requests') {
+        message = "Too many failed attempts. Please try again later.";
+      }
+
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: `${err?.message}`,
+        title: message,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
       });
     } finally {
       setIsLoading(false);
