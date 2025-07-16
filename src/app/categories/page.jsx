@@ -44,7 +44,7 @@ const Page = () => {
 
             <CategorySection/>
 
-            <div className="grid w-[96%] xl:w-[90%] mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
+            <div className="grid container mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
                 {isLoading
                     ? Array.from({ length: 5 }).map((_, index) => (
                         <div key={index} className="p-4 rounded-lg shadow bg-white">

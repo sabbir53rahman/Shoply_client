@@ -84,21 +84,21 @@ const slides = [
 
 const categories = [
   {
-    name: "Vegetables",
+    name: "Vegetable",
     icon: Leaf,
     color: "from-green-400 to-green-600",
     bgColor: "bg-green-50",
     count: "250+ items",
   },
   {
-    name: "Fruits",
+    name: "Fruit",
     icon: Apple,
     color: "from-red-400 to-red-600",
     bgColor: "bg-red-50",
     count: "180+ items",
   },
   {
-    name: "Meats",
+    name: "Meat",
     icon: Beef,
     color: "from-red-500 to-red-700",
     bgColor: "bg-red-50",
@@ -112,7 +112,7 @@ const categories = [
     count: "95+ items",
   },
   {
-    name: "Juices",
+    name: "Juice",
     icon: Grape,
     color: "from-purple-400 to-purple-600",
     bgColor: "bg-purple-50",
