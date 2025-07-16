@@ -28,13 +28,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Search, Star, Trash2, Eye } from "lucide-react";
-import { useGetAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
+import { useDeleteReviewMutation, useGetAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
 import AdminRoute from "@/components/AdminRoute";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
 export default function ReviewsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: reviews = [], isLoading, isError } = useGetAllReviewsQuery();
-  console.log(reviews)
+  const { data: reviews = [], isLoading, isError,refetch } = useGetAllReviewsQuery();
+  const user = useSelector(state => state?.user?.user)
+  const [deleteReview] = useDeleteReviewMutation()
 
   const filteredReviews = reviews?.filter(
     (review) =>
@@ -43,6 +46,34 @@ export default function ReviewsManagement() {
         .includes(searchTerm.toLowerCase()) ||
       review?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDeleteReview = async (reviewId) => { 
+    const confirm = await Swal.fire({
+      title: "Delete this review?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+    });
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await deleteReview({
+        id: reviewId,
+        userId: user._id,
+        role: user.role,
+      }).unwrap();
+      Swal.fire({
+        icon: "success",
+        title: "Review deleted.",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+      refetch();
+    } catch (err) {
+      console.log("Failed delete:", err);
+      Swal.fire("Error", "Failed to delete review.", "error");
+    }
+  };
 
   const renderStars = (rating) => (
     <div className="flex items-center gap-1">
@@ -104,7 +135,6 @@ export default function ReviewsManagement() {
                   <TableHead>Rating</TableHead>
                   <TableHead>Comment</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -121,9 +151,6 @@ export default function ReviewsManagement() {
                     </TableCell>
                     <TableCell>
                       {new Date(review?.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">pending</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -159,7 +186,7 @@ export default function ReviewsManagement() {
                               </div>
                               <div>
                                 <h4 className="font-medium mb-2">Review</h4>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm line-clamp-1 text-muted-foreground">
                                   {review?.comment}
                                 </p>
                               </div>
@@ -171,19 +198,12 @@ export default function ReviewsManagement() {
                                   ).toLocaleDateString()}
                                 </p>
                               </div>
-                              <div className="flex gap-2 pt-4 border-t">
-                                <Button size="sm">Approve Review</Button>
-                                <Button variant="destructive" size="sm">
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Delete Review
-                                </Button>
-                              </div>
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="outline" size="sm">
+                        <button onClick={()=> handleDeleteReview(review?._id)} className="flex gap-2 px-3 py-1.5 rounded-lg bg-emerald-50">
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </button>
                       </div>
                     </TableCell>
                   </TableRow>

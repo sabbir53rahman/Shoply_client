@@ -73,7 +73,7 @@ export default function UserDashboard({ currentUser }) {
       confirmButtonText: "Yes, delete it!"
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await updateStatus({ orderId : id, status : "cancelled" }).unwrap();
+        await updateStatus({ orderId : id, status : "cancelled" ,cancle : "Customer request" }).unwrap();
         Swal.fire({
           title: "Deleted!",
           text: "Your file has been deleted.",
@@ -175,7 +175,7 @@ export default function UserDashboard({ currentUser }) {
                     </Badge>
                   </div>
                   {
-                    order?.status === "processing" && <button onClick={()=>handleCancleOrder(order?._id)} className="p-1.5 px-2.5 mr-4 text-sm font-bold shadow bg-zinc-400 text-white rounded-full border ">Cancle Order</button>
+                    order?.status === "processing" && <button onClick={()=>handleCancleOrder(order?._id)} className="p-1 px-2.5 mr-4 text-sm font-bold shadow bg-zinc-400 text-white rounded-full border ">Cancle Order</button>
                   }
                 </div>
               ))}

@@ -43,7 +43,7 @@ const ProductCard = ({ product }) => {
   const handleQuickAdd =async (e) => {
     e.preventDefault();
     e.stopPropagation(); 
-    if(!currentUser || currentUser?.role === "admin"){
+    if(!currentUser){
       return Swal.fire({
         position: "top-end",
         title: "Please login first!",

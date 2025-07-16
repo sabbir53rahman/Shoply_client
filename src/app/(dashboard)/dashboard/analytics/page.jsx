@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, TrendingDown, Users, Package, ShoppingCart, DollarSign } from "lucide-react"
-import { useGetLast30DaysEarningsQuery, useGetLast30DaysOrdersCountQuery, useGetLast5MonthsStatsQuery } from "@/redux/features/orderSlice/orderSlice"
+import { useGetCanclePercentageQuery, useGetLast30DaysEarningsQuery, useGetLast30DaysOrdersCountQuery, useGetLast5MonthsStatsQuery } from "@/redux/features/orderSlice/orderSlice"
 import { useGetAllUsersQuery } from "@/redux/features/manageUserSlice/manageUserSlice"
 import CountUp from "react-countup"
 import { useTopSelling10Query } from "@/redux/features/productSlice/productSlice"
@@ -17,6 +17,9 @@ export default function Analytics() {
   const {data : allUsers} = useGetAllUsersQuery()
   const {data : topSelling , isLoading} = useTopSelling10Query()
   const {data : fiveMonthState , isLoading : fiveMonthLoading} = useGetLast5MonthsStatsQuery()
+  const {data : canclePercentage} = useGetCanclePercentageQuery()
+
+  console.log(canclePercentage)
 
   const cancellationReasons = [
     { reason: "Out of Stock", count: 12, percentage: 40 },
@@ -122,7 +125,7 @@ export default function Analytics() {
               <p className="text-[15px] font">Earnings of last five months.</p >
             </div>
             <div className="">
-              <div className="w-full h-[400px] bg-white p-4 rounded-xl shadow-md">
+              <div className="w-full h-[400px] bg-white p-4 ">
               <h2 className="text-xl font-bold text-gray-700 mb-4">Monthly Earnings</h2>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={fiveMonthState}>
@@ -144,7 +147,7 @@ export default function Analytics() {
               <p className="text-[15px] font">Last five months total Order.</p >
             </div>
             <div className="">
-              <div className="w-full h-[400px] bg-white p-4 rounded-xl shadow-md">
+              <div className="w-full h-[400px] bg-white p-4 ">
               <h2 className="text-xl font-bold text-gray-700 mb-4">Monthly Orders.</h2>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={fiveMonthState}>
@@ -171,11 +174,11 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {cancellationReasons.map((reason) => (
+              {canclePercentage?.reasons?.map((reason) => (
                 <div key={reason.reason} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline">{reason.count}</Badge>
                     <span className="font-medium">{reason.reason}</span>
+                    <Badge variant="outline">{reason.count}</Badge>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-20 bg-muted rounded-full h-2">
