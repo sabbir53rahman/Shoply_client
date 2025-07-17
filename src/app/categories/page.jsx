@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import categoryBnr from '../../assets/categorybnr.jpg'
 import Navbar from '@/components/Navbar/Navbar';
-import CategorySection from '@/components/Landing/categorySection';
+import CategorySection from '@/components/Landing/CategorySection';
 import ProductCard from '@/components/Product/ProductTem';
 import { Skeleton } from 'antd';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productSlice/productSlice';
