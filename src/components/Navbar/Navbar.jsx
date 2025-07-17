@@ -22,6 +22,7 @@ import {
   LogOut,
   Settings,
   Package,
+  UserRound,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -152,13 +153,20 @@ const Navbar = () => {
                         variant="ghost"
                         className="flex items-center space-x-2 p-2"
                       >
-                        <Image
-                          src={user.avatar || "/placeholder.svg"}
-                          alt={user.name}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
+                        {
+                            currentUser?.avater ?
+                            <Image
+                            src={user.avatar || "/placeholder.svg"}
+                            alt={user.name}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
+                          :
+                          <div className=" border flex justify-center size-10 items-center rounded-full ">
+                            <UserRound className="w-[36px] h-[36px] text-3xl" />
+                          </div>
+                          }
                         <span className="hidden lg:block font-medium">
                           {user.name}
                         </span>
@@ -309,13 +317,20 @@ const Navbar = () => {
                     {user ? (
                       <div className="border-t pt-6 space-y-2">
                         <div className="flex items-center space-x-3 px-4 py-3 bg-emerald-50 rounded-lg">
-                          <Image
+                          {
+                            currentUser?.avater ?
+                            <Image
                             src={user.avatar || "/placeholder.svg"}
                             alt={user.name}
                             width={40}
                             height={40}
                             className="rounded-full"
                           />
+                          :
+                          <div className="p-0.5 border w-10 h-10 rounded-full ">
+                            <UserRound />
+                          </div>
+                          }
                           <div>
                             <p className="font-medium text-gray-900">
                               {user.name}
@@ -326,7 +341,7 @@ const Navbar = () => {
                           </div>
                         </div>
                         <Link
-                          href="/orders"
+                          href="/dashboard/my-orders"
                           className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                           <Package className="w-5 h-5 mr-3" />

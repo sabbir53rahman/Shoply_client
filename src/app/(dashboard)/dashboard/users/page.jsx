@@ -119,7 +119,7 @@ export default function UsersManagement() {
               <UserCheck className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{userStats?.active}</div>
+              <div className="text-2xl font-bold">{allUsers?.length}</div>
             </CardContent>
           </Card>
 
@@ -165,7 +165,7 @@ export default function UsersManagement() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center md:w-[40%] gap-4 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -175,17 +175,6 @@ export default function UsersManagement() {
                   className="pl-8"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <Table>
@@ -366,38 +355,23 @@ export default function UsersManagement() {
                                           Activate User
                                         </Button>
                                       )}
-                                      {user?.role === "customer" ||
-                                        ("user" && (
+                                      {user?.role ===  "user" && 
                                           <Button
                                             variant="outline"
                                             size="sm"
                                             className="w-full bg-emerald-600 text-white"
                                             onClick={() => {
-                                              Swal.fire({
-                                                title: "Are you sure?",
-                                                text: "You are about to make this user an admin.",
-                                                icon: "warning",
-                                                showCancelButton: true,
-                                                confirmButtonColor: "#3085d6",
-                                                cancelButtonColor: "#d33",
-                                                confirmButtonText:
-                                                  "Yes, make admin",
-                                              }).then((result) => {
-                                                if (result.isConfirmed) {
                                                   makeAdmin(user?._id);
                                                   Swal.fire(
                                                     "Done!",
                                                     "User has been made an admin.",
                                                     "success"
                                                   );
-                                                }
-                                              });
                                             }}
                                           >
                                             <Users className="w-4 h-4 mr-2" />
                                             Make Admin
-                                          </Button>
-                                        ))}
+                                          </Button>}
                                     </div>
                                   </div>
                                 </div>

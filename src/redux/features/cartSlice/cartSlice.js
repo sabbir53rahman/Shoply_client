@@ -16,7 +16,7 @@ export const cartSlice = apiSlice.injectEndpoints({
                 url: `/carts/userCart/${userId}`,
                 credentials: "include",
             }),
-            providesTags: ["Cart"],
+            providesTags: ["Cart","Order"],
         }),
         getAllCart : builder.query({
             query: () => ({

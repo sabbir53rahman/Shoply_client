@@ -11,7 +11,7 @@ export const orderApi = apiSlice.injectEndpoints({
         body: query,
         credentials: "include",
       }),
-      invalidatesTags: ["Order"],
+      invalidatesTags: ["Order","Cart"],
     }),
 
     // Get all orders
@@ -83,6 +83,13 @@ export const orderApi = apiSlice.injectEndpoints({
         invalidatesTags : ['Order']
     }),
 
+     getCanclePercentage: builder.query({
+      query: () => ({
+        url: "/orders/canclePercentage",
+        credentials: "include",
+      }),
+    }),
+
   }),
 });
 
@@ -95,6 +102,7 @@ export const {
   useGetLast5MonthsStatsQuery,
   useGetRecentOrdersQuery,
   useUpdateStatusMutation,
-  useGetUserOrderDetailsQuery
+  useGetUserOrderDetailsQuery,
+  useGetCanclePercentageQuery
 
 } = orderApi;
