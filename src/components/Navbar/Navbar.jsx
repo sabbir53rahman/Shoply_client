@@ -156,8 +156,8 @@ const Navbar = () => {
                         {
                             currentUser?.avater ?
                             <Image
-                            src={user.avatar || "/placeholder.svg"}
-                            alt={user.name}
+                            src={user?.avatar}
+                            alt={user?.name}
                             width={40}
                             height={40}
                             className="rounded-full"
@@ -320,8 +320,8 @@ const Navbar = () => {
                           {
                             currentUser?.avater ?
                             <Image
-                            src={user.avatar || "/placeholder.svg"}
-                            alt={user.name}
+                            src={user?.avatar}
+                            alt={user?.name}
                             width={40}
                             height={40}
                             className="rounded-full"

@@ -306,17 +306,6 @@ const HeroBannerSlider = () => {
                         <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                         {slide.buttonText}
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="bg-white/20 backdrop-blur-sm border-white/30 hover:bg-white/30 text-gray-900 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base lg:text-lg font-semibold rounded-xl group w-full sm:w-auto"
-                      >
-                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
-                        <span className="hidden sm:inline">
-                          Add to Wishlist
-                        </span>
-                        <span className="sm:hidden">Wishlist</span>
-                      </Button>
                     </div>
                   </div>
 
@@ -346,7 +335,7 @@ const HeroBannerSlider = () => {
                         {/* Main Product Image */}
                         <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
                           <Image
-                            src={slide.image || "/placeholder.svg"}
+                            src={slide?.image }
                             alt={slide.title}
                             fill
                             className="object-contain p-4 sm:p-6 lg:p-8 drop-shadow-2xl hover:scale-105 transition-transform duration-500"

@@ -317,7 +317,7 @@ const AboutPage = () => {
                 <CardContent className="p-8 text-center">
                   <div className="relative w-32 h-32 mx-auto mb-6">
                     <Image
-                      src={member.image || "/placeholder.svg"}
+                      src={member.image}
                       alt={member.name}
                       fill
                       className="object-cover rounded-full group-hover:scale-105 transition-transform"

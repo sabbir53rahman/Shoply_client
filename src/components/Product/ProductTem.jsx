@@ -145,7 +145,7 @@ const ProductCard = ({ product }) => {
               <div className="absolute inset-8 bg-gray-200 animate-pulse rounded-2xl" />
             )}
             <Image
-              src={product?.image || "/placeholder.svg?height=300&width=300"}
+              src={product?.image}
               alt={product.name}
               fill
               className={`object-cover group-hover:scale-110 transition-all duration-700 rounded-2xl ${

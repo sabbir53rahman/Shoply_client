@@ -48,7 +48,7 @@ export default function ShoppingCart() {
                 <div key={item?.productId?._id} className="bg-white rounded-lg shadow-md p-3 md:p-6 flex flex-co sm:flex-row items-center gap-3 md:gap-6">
                 {/* Product Image */}
                 <div className="size-12 md:size-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image src={item?.productId?.image || "/placeholder.svg"} height={100} width={150} alt={item?.productId?.name} className="w-full h-full object-cover" />
+                    <Image src={item?.productId?.image} height={100} width={150} alt={item?.productId?.name} className="w-full h-full object-cover" />
                 </div>
 
                 {/* Product Details */}

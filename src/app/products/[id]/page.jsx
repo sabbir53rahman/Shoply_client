@@ -304,7 +304,7 @@ export default function ProductDetailsPage() {
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-white">
                 <Image
-                  src={product.image || "/placeholder.svg?height=600&width=600"}
+                  src={product?.image}
                   alt={product.name}
                   fill
                   className="object-cover"

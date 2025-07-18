@@ -207,7 +207,7 @@ export default function UserDashboard({ currentUser }) {
                   className="flex items-center gap-3 p-3 border rounded-lg"
                 >
                   <Image
-                    src={product?.image || "/placeholder.svg"}
+                    src={product?.image}
                     alt={product?.name}
                     width={48}
                     height={48}
