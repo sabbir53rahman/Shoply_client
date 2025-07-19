@@ -6,6 +6,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,9 +26,10 @@ const useAuth = () => {
   const [user, setUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const dispatch = useDispatch();
+  const googleProvider = new GoogleAuthProvider();
 
   // Function to create a user
-  const createUser = async ({name, email, password, role}) => {
+  const createUser = async ({ name, email, password, role }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -73,10 +76,14 @@ const useAuth = () => {
     }
   };
 
+  const googleSignIn = () => {
+    return signInWithPopup(auth, googleProvider);
+  };
+
   const logOut = async () => {
     try {
       await signOut(auth);
-      dispatch(logout())
+      dispatch(logout());
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error.message);
@@ -87,33 +94,34 @@ const useAuth = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-       
+
       if (currentUser?.email) {
         dispatch(loginUser(currentUser?.email));
         try {
-            const userInfo = {email: currentUser.email};
-            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/jwt`, userInfo,{withCredentials : true})
-            .then(res =>{
-                if(res.data.token){
-                    localStorage.setItem('token', res.data.token);
-                }
+          const userInfo = { email: currentUser.email };
+          axios
+            .post(`${process.env.NEXT_PUBLIC_BASE_URL}/jwt`, userInfo, {
+              withCredentials: true,
             })
-            
+            .then((res) => {
+              if (res.data.token) {
+                localStorage.setItem("token", res.data.token);
+              }
+            });
         } catch (error) {
           console.error("Error fetching user:", error);
         }
-      }else{
-        localStorage.removeItem('token');
+      } else {
+        localStorage.removeItem("token");
       }
-      
+
       setIsAuthLoading(false);
-    }
-  );
+    });
 
     return () => unsubscribe();
   }, [dispatch]);
 
-  return { user, isAuthLoading, createUser, signIn, logOut };
+  return { user, isAuthLoading, createUser, signIn, googleSignIn, logOut };
 };
 
 export default useAuth;
