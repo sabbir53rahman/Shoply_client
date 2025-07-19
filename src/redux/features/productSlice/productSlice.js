@@ -132,6 +132,15 @@ export const productApi = apiSlice.injectEndpoints({
       },
       providesTags: ["Product"],
     }),
+
+    searchProductsByName: builder.query({
+      query: (name) => {
+        return {
+          url: `/products/search?name=${encodeURIComponent(name)}`,
+        };
+      },
+      providesTags: ["Product"],
+    }),
   }),
 });
 
@@ -151,4 +160,5 @@ export const {
   useGetLeatestProductsQuery,
   useGetProductsByCategoryQuery,
   useGetProductsByPriceRangeQuery,
+  useSearchProductsByNameQuery,
 } = productApi;
