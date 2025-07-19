@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,23 +43,24 @@ import { Input } from "@/components/ui/input";
 
 export default function ProductDetailsPage() {
   const user = useSelector((state) => state.user?.user);
+  const router = useRouter();
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
   const userId = user?._id;
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [addressData, setAddressData] = useState({
-    name : "",
-    phone : "",
-    street : "",
-    thana : "",
-    district : "",
-    houseNumber : "",
-  })
+    name: "",
+    phone: "",
+    street: "",
+    thana: "",
+    district: "",
+    houseNumber: "",
+  });
 
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addOrder] = useAddOrderMutation();
-  const [addCartDetails] = useAddCartDetailsMutation()
+  const [addCartDetails] = useAddCartDetailsMutation();
 
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
@@ -82,8 +83,8 @@ export default function ProductDetailsPage() {
     setAddressData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleAddOrder = async () => {
     if (!userId) {
@@ -92,7 +93,7 @@ export default function ProductDetailsPage() {
         "Please log in to place an order.",
         "warning"
       );
-      return;
+      return router.push("/auth/login");
     }
     // if(user?.role === "admin"){
     //   return Swal.fire({
@@ -102,7 +103,7 @@ export default function ProductDetailsPage() {
     //     timer: 1500,
     //   });
     // }
-    if(!addressData.name){
+    if (!addressData.name) {
       Swal.fire({
         position: "top-end",
         icon: "error",
@@ -114,12 +115,12 @@ export default function ProductDetailsPage() {
 
     const newOrder = {
       userId: user._id,
-      products : [{ productId: product?._id, quantity ,price :product?.price }],
+      products: [{ productId: product?._id, quantity, price: product?.price }],
       address: addressData,
       paymentMethod,
       totalPrice: product?.price * quantity,
     };
-    console.log(newOrder)
+    console.log(newOrder);
 
     if (paymentMethod === "cash") {
       try {
@@ -135,19 +136,18 @@ export default function ProductDetailsPage() {
         console.error("❌ Failed to create order:", err);
       }
     } else if (paymentMethod === "sslcommerz") {
+      const res = await fetch("/api/ssl-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newOrder),
+      });
 
-        const res = await fetch("/api/ssl-request", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newOrder),
-        });
-
-        const data = await res.json();
-        if (data?.GatewayPageURL) {
-          window.location.replace(data.GatewayPageURL);
-        } else {
-          console.error("❌ SSLCommerz initiation failed");
-        }
+      const data = await res.json();
+      if (data?.GatewayPageURL) {
+        window.location.replace(data.GatewayPageURL);
+      } else {
+        console.error("❌ SSLCommerz initiation failed");
+      }
     }
   };
 
@@ -182,7 +182,7 @@ export default function ProductDetailsPage() {
   };
 
   const handleDeleteReview = async (reviewId) => {
-    console.log("Deleting reviewId:", reviewId); 
+    console.log("Deleting reviewId:", reviewId);
     const confirm = await Swal.fire({
       title: "Delete this review?",
       icon: "warning",
@@ -209,22 +209,22 @@ export default function ProductDetailsPage() {
       Swal.fire("Error", "Failed to delete review.", "error");
     }
   };
-  
-  const handleAddToCart =async () => {
-    if(user?.role === "admin"){
-          return Swal.fire({
-            position: "top-end",
-            title: "Admin can't order!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
+
+  const handleAddToCart = async () => {
+    if (user?.role === "admin") {
+      return Swal.fire({
+        position: "top-end",
+        title: "Admin can't order!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
     try {
       const cartDetails = {
-        productId : product?._id,
-        userId : user?._id
-      }
-      await addCartDetails(cartDetails).unwrap()
+        productId: product?._id,
+        userId: user?._id,
+      };
+      await addCartDetails(cartDetails).unwrap();
       Swal.fire({
         position: "top-end",
         icon: "success",
@@ -414,157 +414,210 @@ export default function ProductDetailsPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  
-
                   {/* checkout  */}
-                  <Card> 
+                  <Card>
                     <CardContent>
                       <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            className="flex-1  text-lg primary_button h-12 font-semibold"
-                          >
+                        <DialogTrigger
+                          onClick={() => {
+                            return router.push("/auth/login");
+                          }}
+                          asChild
+                        >
+                          <Button className="flex-1  text-lg primary_button h-12 font-semibold">
                             <ShoppingCart className="w-5 h-5 mr-2" />
                             Order Now - ${(product.price * quantity).toFixed(2)}
                           </Button>
                         </DialogTrigger>
                         <DialogContent forceMount className="bg-white">
                           <Card className="shadow-sm">
-                                        <Card className="shadow-sm">
-                                          <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
-                                            <CardTitle className="text-xl font-semibold">Payment Method</CardTitle>
-                                          </CardHeader>
-                                          <CardContent className="space-y-4 mt-2">
-                                            <div className="space-y-2">
-                                              <div className="flex items-center gap-3">
-                                                <input
-                                                  type="radio"
-                                                  id="cash"
-                                                  name="payment"
-                                                  value="cash"
-                                                  checked={paymentMethod === "cash"}
-                                                  onChange={() => setPaymentMethod("cash")}
-                                                />
-                                                <label htmlFor="cash">Cash on Delivery</label>
-                                              </div>
-                                              <div className="flex items-center gap-3">
-                                                <input
-                                                  type="radio"
-                                                  id="sslcommerz"
-                                                  name="payment"
-                                                  value="sslcommerz"
-                                                  checked={paymentMethod === "sslcommerz"}
-                                                  onChange={() => setPaymentMethod("sslcommerz")}
-                                                />
-                                                <label htmlFor="sslcommerz">Prepaid (SSLCommerz)</label>
-                                              </div>
-                                            </div>
-                                          </CardContent>
-                                        </Card>
-                                        <CardHeader className="pb-4">
-                                          <div className="flex items-center gap-4">
-                                            <CardTitle className="text-2xl font-semibold">Shipping address</CardTitle>
-                                          </div>
-                                          <p className="text-sm text-gray-600 mt-2">
-                                            Address lookup powered by Google
-                                          </p>
-                                        </CardHeader>
-                          
-                                        <CardContent className="space-y-6">
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                              <div htmlFor="name" className="text-sm font-medium text-gray-700">
-                                                NAME *
-                                              </div>
-                                              <Input
-                                                id="name"
-                                                value={addressData.name}
-                                                onChange={(e) => handleInputChange("name", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                                            <div>
-                                              <div htmlFor="phone" className="text-sm font-medium text-gray-700">
-                                                Phone *
-                                              </div>
-                                              <Input 
-                                                id="phone"
-                                                value={addressData.phone}
-                                                onChange={(e) => handleInputChange("phone", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                              <div htmlFor="street" className="text-sm font-medium text-gray-700">
-                                                ADDRESS - STREET*
-                                              </div>
-                                              <Input
-                                                id="street"
-                                                value={addressData.street}
-                                                onChange={(e) => handleInputChange("street", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                            
-                                            <div>
-                                              <div htmlFor="thana" className="text-sm font-medium text-gray-700">
-                                                Thana *
-                                              </div>
-                                              <Input
-                                                id="thana"
-                                                placeholder=""
-                                                value={addressData.thana}
-                                                onChange={(e) => handleInputChange("thana", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                              <div htmlFor="district" className="text-sm font-medium text-gray-700">
-                                                District *
-                                              </div>
-                                              <Input
-                                                id="district"
-                                                value={addressData.district}
-                                                onChange={(e) => handleInputChange("district", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                                            <div>
-                                              <div htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
-                                                House Number *
-                                              </div>
-                                              <Input
-                                                id="houseNumber"
-                                                value={addressData.houseNumber}
-                                                onChange={(e) => handleInputChange("houseNumber", e.target.value)}
-                                                className="mt-1"
-                                              />
-                                            </div>
-                                          </div>
-                          
-                                          <Button 
-                                            onClick={handleAddOrder}
-                                            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
-                                          >
-                                            {paymentMethod === "sslcommerz" ? "Pay Now (SSLCommerz)" : "Place Order (Cash on Delivery)"}
-                                          </Button>
-                                        </CardContent>
-                                      </Card>
+                            <Card className="shadow-sm">
+                              <CardHeader className="bg-emerald-600 text-white rounded-t-lg">
+                                <CardTitle className="text-xl font-semibold">
+                                  Payment Method
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="space-y-4 mt-2">
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="radio"
+                                      id="cash"
+                                      name="payment"
+                                      value="cash"
+                                      checked={paymentMethod === "cash"}
+                                      onChange={() => setPaymentMethod("cash")}
+                                    />
+                                    <label htmlFor="cash">
+                                      Cash on Delivery
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="radio"
+                                      id="sslcommerz"
+                                      name="payment"
+                                      value="sslcommerz"
+                                      checked={paymentMethod === "sslcommerz"}
+                                      onChange={() =>
+                                        setPaymentMethod("sslcommerz")
+                                      }
+                                    />
+                                    <label htmlFor="sslcommerz">
+                                      Prepaid (SSLCommerz)
+                                    </label>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-4">
+                                <CardTitle className="text-2xl font-semibold">
+                                  Shipping address
+                                </CardTitle>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-2">
+                                Address lookup powered by Google
+                              </p>
+                            </CardHeader>
+
+                            <CardContent className="space-y-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <div
+                                    htmlFor="name"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    NAME *
+                                  </div>
+                                  <Input
+                                    id="name"
+                                    value={addressData.name}
+                                    onChange={(e) =>
+                                      handleInputChange("name", e.target.value)
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <div
+                                    htmlFor="phone"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    Phone *
+                                  </div>
+                                  <Input
+                                    id="phone"
+                                    value={addressData.phone}
+                                    onChange={(e) =>
+                                      handleInputChange("phone", e.target.value)
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <div
+                                    htmlFor="street"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    ADDRESS - STREET*
+                                  </div>
+                                  <Input
+                                    id="street"
+                                    value={addressData.street}
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "street",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+
+                                <div>
+                                  <div
+                                    htmlFor="thana"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    Thana *
+                                  </div>
+                                  <Input
+                                    id="thana"
+                                    placeholder=""
+                                    value={addressData.thana}
+                                    onChange={(e) =>
+                                      handleInputChange("thana", e.target.value)
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <div
+                                    htmlFor="district"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    District *
+                                  </div>
+                                  <Input
+                                    id="district"
+                                    value={addressData.district}
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "district",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <div
+                                    htmlFor="houseNumber"
+                                    className="text-sm font-medium text-gray-700"
+                                  >
+                                    House Number *
+                                  </div>
+                                  <Input
+                                    id="houseNumber"
+                                    value={addressData.houseNumber}
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "houseNumber",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
+
+                              <Button
+                                onClick={handleAddOrder}
+                                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
+                              >
+                                {paymentMethod === "sslcommerz"
+                                  ? "Pay Now (SSLCommerz)"
+                                  : "Place Order (Cash on Delivery)"}
+                              </Button>
+                            </CardContent>
+                          </Card>
                         </DialogContent>
                       </Dialog>
                     </CardContent>
                   </Card>
 
                   <button
-                    onClick={()=>handleAddToCart()}
+                    onClick={() => handleAddToCart()}
                     variant="outline"
                     size="lg"
                     className="h-12 border border-gray-200 text-white bg-cyan-950 hover:bg-emerald-700 px-4 flex gap-2 items-center justify-center rounded-lg"
-                  >Add To Cart
+                  >
+                    Add To Cart
                     <ShoppingCart className="w-5 h-5" />
                   </button>
                   <Button
@@ -579,7 +632,6 @@ export default function ProductDetailsPage() {
                       }`}
                     />
                   </Button>
-                  
                 </div>
               </div>
             )}
