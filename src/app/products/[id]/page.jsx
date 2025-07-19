@@ -99,10 +99,7 @@ export default function ProductDetailsPage() {
     //   return Swal.fire({
     //     position: "top-end",
     //     title: "Admin can't order!",
-    //     showConfirmButton: false,
-    //     timer: 1500,
-    //   });
-    // }
+    //     showConfirmButton: false,y
     if (!addressData.name) {
       Swal.fire({
         position: "top-end",
