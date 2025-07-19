@@ -299,13 +299,15 @@ const HeroBannerSlider = () => {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                      <Button
-                        size="lg"
-                        className="bg-gray-900 hover:bg-gray-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base lg:text-lg font-semibold rounded-xl group w-full sm:w-auto"
-                      >
-                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
-                        {slide.buttonText}
-                      </Button>
+                      <Link href={"/products"}>
+                        <Button
+                          size="lg"
+                          className="bg-gray-900 hover:bg-gray-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base lg:text-lg font-semibold rounded-xl group w-full sm:w-auto"
+                        >
+                          <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
+                          {slide.buttonText}
+                        </Button>
+                      </Link>
                     </div>
                   </div>
 
@@ -335,7 +337,7 @@ const HeroBannerSlider = () => {
                         {/* Main Product Image */}
                         <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
                           <Image
-                            src={slide?.image }
+                            src={slide?.image}
                             alt={slide.title}
                             fill
                             className="object-contain p-4 sm:p-6 lg:p-8 drop-shadow-2xl hover:scale-105 transition-transform duration-500"
@@ -442,7 +444,10 @@ const HeroBannerSlider = () => {
                 const IconComponent = category.icon;
                 return (
                   <SwiperSlide key={index} className="!overflow-visible py-2">
-                    <Link href={`/categories/${category?.name.toLowerCase()}`} className="group cursor-pointer transform hover:scale-105 transition-all duration-300 hover:z-10 relative">
+                    <Link
+                      href={`/categories/${category?.name.toLowerCase()}`}
+                      className="group cursor-pointer transform hover:scale-105 transition-all duration-300 hover:z-10 relative"
+                    >
                       <div
                         className={`${category.bgColor} rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group-hover:border-gray-200`}
                       >
