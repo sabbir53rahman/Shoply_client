@@ -148,11 +148,13 @@ const ProductCard = ({ product }) => {
               src={product?.image}
               alt={product.name}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className={`object-cover group-hover:scale-110 transition-all duration-700 rounded-2xl ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onLoad={() => setImageLoaded(true)}
               priority
+              unoptimized
             />
           </div>
 

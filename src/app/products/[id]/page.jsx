@@ -307,8 +307,10 @@ export default function ProductDetailsPage() {
                   src={product?.image}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 968px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                   priority
+                  unoptimized
                 />
                 {product.isFeatured && (
                   <Badge className="absolute top-4 left-4 bg-orange-500">

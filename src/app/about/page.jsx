@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import team1 from "../../assets/team1.jpg";
+import team2 from "../../assets/team2.jpg"
+import team3 from "../../assets/team3.jpg"
 
 const AboutPage = () => {
   const stats = [
@@ -63,19 +66,19 @@ const AboutPage = () => {
     {
       name: "Sarah Johnson",
       role: "Founder & CEO",
-      image: "/placeholder.svg?height=300&width=300",
+      image: team1,
       bio: "Passionate about sustainable farming and healthy living for over 15 years.",
     },
     {
       name: "Michael Chen",
       role: "Head of Operations",
-      image: "/placeholder.svg?height=300&width=300",
+      image: team2,
       bio: "Expert in supply chain management with a focus on organic food distribution.",
     },
     {
       name: "Emily Rodriguez",
       role: "Quality Manager",
-      image: "/placeholder.svg?height=300&width=300",
+      image: team3,
       bio: "Ensures every product meets our high standards for freshness and quality.",
     },
   ];
@@ -87,7 +90,7 @@ const AboutPage = () => {
       content:
         "Grocy has transformed how I shop for groceries. The quality is exceptional and delivery is always on time!",
       rating: 5,
-      image: "/placeholder.svg?height=60&width=60",
+      image: team1,
     },
     {
       name: "David Wilson",
@@ -95,7 +98,7 @@ const AboutPage = () => {
       content:
         "As someone who cares about organic food, Grocy is my go-to store. Their selection is amazing!",
       rating: 5,
-      image: "/placeholder.svg?height=60&width=60",
+      image: team2,
     },
   ];
 
@@ -360,7 +363,7 @@ const AboutPage = () => {
 
                   <div className="flex items-center gap-4">
                     <Image
-                      src={testimonial.image || "/placeholder.svg"}
+                      src={testimonial.image}
                       alt={testimonial.name}
                       width={60}
                       height={60}

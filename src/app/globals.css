@@ -112,3 +112,18 @@ body {
   font-weight: 450;
 }
 
+.leftBanner{
+  background-image: url('../assets/healthy.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 300px;
+}
+
+.rightBanner{
+  background-image: url('../assets/rvegetable.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 300px;
+}

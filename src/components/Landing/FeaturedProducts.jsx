@@ -6,59 +6,9 @@ import Image from "next/image";
 import ProductCard from "../Product/ProductTem";
 import { useGetFeaturedProductsQuery, useGetLeatestProductsQuery, useGetPaginatedProductsQuery } from "@/redux/features/productSlice/productSlice";
 import { Skeleton } from "antd";
+import rVegetable from "../../assets/rvegetable.png"
+import healthyFood from "../../assets/healthy.png"
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Cucumber 500 G (Approx. 200 G - 2500 G)",
-    image: "/placeholder.svg?height=200&width=200",
-    rating: 4,
-    reviews: 1,
-    originalPrice: 15.0,
-    salePrice: 8.0,
-    discount: 47,
-    badge: "Sale",
-    available: true,
-  },
-  {
-    id: 2,
-    name: "Potato Per Kg (Approx. 950 G - 1000 G)",
-    image: "/placeholder.svg?height=200&width=200",
-    rating: 0,
-    reviews: 0,
-    price: 12.0,
-    available: true,
-  },
-  {
-    id: 3,
-    name: "Amaranthus 1 Bunch (Approx 160 G - 1500 G)",
-    image: "/placeholder.svg?height=200&width=200",
-    rating: 4,
-    reviews: 2,
-    price: 15.0,
-    available: true,
-  },
-  {
-    id: 4,
-    name: "Milky Mist Mango Fruit Yogurt 100 G (Cup)",
-    image: "/placeholder.svg?height=200&width=200",
-    rating: 4,
-    reviews: 3,
-    price: 15.0,
-    badge: "Sold out",
-    available: false,
-  },
-  {
-    id: 5,
-    name: "Heinz Baby Puree With Peach, Mango, Banana",
-    image: "/placeholder.svg?height=200&width=200",
-    rating: 0,
-    reviews: 0,
-    price: 20.0,
-    badge: "100% NATURAL",
-    available: true,
-  },
-];
 
 const FeaturedCollection = () => {
   const {data, isLoading } = useGetFeaturedProductsQuery()
@@ -114,7 +64,7 @@ const FeaturedCollection = () => {
         {/* Promotional Banners */}
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Left Banner - Grocery Deals */}
-          <div className="relative bg-gradient-to-br from-purple-200 via-purple-100 to-blue-100 rounded-3xl overflow-hidden p-10 hover:shadow-xl transition-shadow duration-300">
+          <div className="relative leftBanner rounded-3xl overflow-hidden p-10 hover:shadow-xl transition-shadow duration-300">
             <div className="relative z-10">
               <div className="inline-block bg-white/30 backdrop-blur-sm text-purple-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 Up to 45% OFF
@@ -134,18 +84,12 @@ const FeaturedCollection = () => {
 
             {/* Decorative Elements */}
             <div className="absolute right-0 bottom-0 w-72 h-72 opacity-20">
-              <Image
-                src="/placeholder.svg?height=300&width=400"
-                alt="Grocery basket"
-                width={400}
-                height={300}
-                className="object-contain"
-              />
+              
             </div>
           </div>
 
           {/* Right Banner - Fruit Juice */}
-          <div className="relative bg-gradient-to-br from-orange-100 via-yellow-50 to-amber-100 rounded-3xl overflow-hidden p-10 hover:shadow-xl transition-shadow duration-300">
+          <div className="relative rightBanner rounded-3xl overflow-hidden p-10 hover:shadow-xl transition-shadow duration-300">
             <div className="relative z-10">
               <div className="inline-block bg-orange-500 text-white px-5 py-2 rounded-full text-sm font-bold mb-6">
                 Flat 15% OFF
@@ -165,13 +109,7 @@ const FeaturedCollection = () => {
 
             {/* Decorative Elements */}
             <div className="absolute right-0 bottom-0 w-56 h-56 opacity-30">
-              <Image
-                src="/placeholder.svg?height=200&width=200"
-                alt="Orange juice"
-                width={200}
-                height={200}
-                className="object-contain"
-              />
+              
             </div>
           </div>
         </div>
