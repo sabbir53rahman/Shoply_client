@@ -407,7 +407,10 @@ export default function ProductDetailsPage() {
                     <CardContent>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="flex-1  text-lg primary_button h-12 font-semibold">
+                          <Button
+                            className="flex-1  text-lg primary_button h-12 font-semibold"
+                            disabled={product.stock === 0}
+                          >
                             <ShoppingCart className="w-5 h-5 mr-2" />
                             {product.stock === 0
                               ? "Sold Out"
@@ -608,19 +611,6 @@ export default function ProductDetailsPage() {
                     Add To Cart
                     <ShoppingCart className="w-5 h-5" />
                   </button>
-
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => setIsWishlisted(!isWishlisted)}
-                    className="h-12 px-4"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        isWishlisted ? "fill-red-500 text-red-500" : ""
-                      }`}
-                    />
-                  </Button>
                 </div>
               </div>
             )}
