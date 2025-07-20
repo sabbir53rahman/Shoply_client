@@ -10,13 +10,16 @@ import { useRouter } from "next/navigation";
 import { useAddCartDetailsMutation } from "@/redux/features/cartSlice/cartSlice";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import { errorMessage, success, warning } from "../ui/message";
 
 const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
   const router = useRouter();
-  const [addCartDetails] = useAddCartDetailsMutation()
-  const currentUser = useSelector(state => state?.user?.user)
+  const [addCartDetails] = useAddCartDetailsMutation();
+  const currentUser = useSelector((state) => state?.user?.user);
+  console.log(cartLoading);
 
   const renderStars = () => {
     const stars = [];
@@ -34,52 +37,36 @@ const ProductCard = ({ product }) => {
     return stars;
   };
 
-  const handleWishlistToggle =  (e) => {
+  const handleWishlistToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
   };
 
-  const handleQuickAdd =async (e) => {
+  const handleQuickAdd = async (e) => {
     e.preventDefault();
-    e.stopPropagation(); 
-    if(!currentUser){
-      return Swal.fire({
-        position: "top-end",
-        title: "Please login first!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+    setCartLoading(true);
+    e.stopPropagation();
+    if (!currentUser) {
+      setCartLoading(false);
+      return errorMessage("Please login first to add to cart.");
     }
-    if(currentUser?.role === "admin"){
-      return Swal.fire({
-        position: "top-end",
-        title: "Admin can't order!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+    if (currentUser?.role === "admin") {
+      setCartLoading(false);
+      return warning("Admin can't add to cart!");
     }
     try {
       const cartDetails = {
-        productId : product?._id,
-        userId : currentUser?._id
-      }
-        
-      await addCartDetails(cartDetails).unwrap()
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Added to the cart!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+        productId: product?._id,
+        userId: currentUser?._id,
+      };
+
+      await addCartDetails(cartDetails).unwrap();
+      success("Product added to cart successfully!");
+      return setCartLoading(false);
     } catch (error) {
-      Swal.fire({
-        position: "top-end",
-        title: "Already added!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      errorMessage("Failed to add product to cart.");
+      setCartLoading(false);
     }
   };
 
@@ -115,6 +102,7 @@ const ProductCard = ({ product }) => {
               {product.inStock ? (
                 <>
                   <Button
+                    disabled={cartLoading}
                     onClick={handleQuickAdd}
                     className="flex-1 bg-gray-900/95 backdrop-blur-md hover:bg-gray-900 text-white rounded-2xl py-3 text-sm font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 border-0"
                   >
@@ -214,7 +202,6 @@ const ProductCard = ({ product }) => {
               )}
             </div>
           </div>
-            
 
           {/* Stock Indicator */}
           {product.inStock && product.stock && (
@@ -231,7 +218,7 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* Action Button */}
-          {product.stock >0 ? (
+          {product.stock > 0 ? (
             <Link href={`/products/${product._id}`} className="block group">
               <Button className="w-full primary_button text-white rounded-2xl py-4 text-sm font-bold transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group/btn border-0">
                 <span className="flex items-center justify-center gap-2">

@@ -20,6 +20,7 @@ import vagetable from "@/assets/vagetable.jpg";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import useAuth from "@/Firebase/useAuth";
+import { Toast } from "@/components/ui/message";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -40,23 +41,16 @@ const LoginPage = () => {
     }));
   };
 
-  console.log("fomrm data login", formData);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       await signIn(formData?.email, formData?.password);
-
-      Swal.fire({
-        position: "top-end",
+      Toast.fire({
         icon: "success",
-        title: "User login successfully.",
-        showConfirmButton: false,
-        timer: 1500,
+        title: "Signed in successfully",
       });
-
       router.push("/");
     } catch (err) {
       console.log("err from login", err);
@@ -72,12 +66,9 @@ const LoginPage = () => {
         message = "Too many failed attempts. Please try again later.";
       }
 
-      Swal.fire({
-        position: "top-end",
+      Toast.fire({
         icon: "error",
         title: message,
-        showConfirmButton: false,
-        timer: 2000,
       });
     } finally {
       setIsLoading(false);
@@ -86,23 +77,18 @@ const LoginPage = () => {
 
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
+
     try {
       await googleSignIn();
-      Swal.fire({
-        position: "top-end",
+      Toast.fire({
         icon: "success",
-        title: "Signed in with Google successfully.",
-        showConfirmButton: false,
-        timer: 1500,
+        title: "Signed in successfully",
       });
       router.push("/");
     } catch (error) {
-      Swal.fire({
-        position: "top-end",
+      Toast.fire({
         icon: "error",
-        title: "Google sign-in failed.",
-        showConfirmButton: false,
-        timer: 1500,
+        title: "Signed in failed!",
       });
     } finally {
       setIsLoading(false);
