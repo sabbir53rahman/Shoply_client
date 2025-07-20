@@ -9,9 +9,21 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Package, Star, Heart, Clock, User, CircleDashed } from "lucide-react";
+import {
+  ShoppingCart,
+  Package,
+  Star,
+  Heart,
+  Clock,
+  User,
+  CircleDashed,
+} from "lucide-react";
 import Image from "next/image";
-import { useGetUserOrderDetailsQuery, useGetUserOrderQuery, useUpdateStatusMutation } from "@/redux/features/orderSlice/orderSlice";
+import {
+  useGetUserOrderDetailsQuery,
+  useGetUserOrderQuery,
+  useUpdateStatusMutation,
+} from "@/redux/features/orderSlice/orderSlice";
 import { useGetCurrentUserQuery } from "@/redux/features/manageUserSlice/manageUserSlice";
 import useAuth from "@/Firebase/useAuth";
 import CountUp from "react-countup";
@@ -22,17 +34,25 @@ import { Spin } from "antd";
 import Link from "next/link";
 import Swal from "sweetalert2";
 import { useGetFeaturedProductsQuery } from "@/redux/features/productSlice/productSlice";
+import { useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice";
 
 export default function UserDashboard({ currentUser }) {
   const router = useRouter();
-  const {data : userOrder  ,isLoading : orderLoading } = useGetUserOrderQuery(currentUser?._id)
-  const {data : userOrderDetails =[] ,isLoading : orderDetailsLoading } = useGetUserOrderDetailsQuery(currentUser?._id)
-  const {data : usersAllReviews } = useGetUsersAllReviewsQuery(currentUser?._id)
-  const {data : userWishlists } = useGetUserWishlistQuery(currentUser?._id)
-  const [updateStatus] = useUpdateStatusMutation()
-  const {data : recommendedProducts} = useGetFeaturedProductsQuery()
+  const { data: userOrder, isLoading: orderLoading } = useGetUserOrderQuery(
+    currentUser?._id
+  );
+  const { data: userOrderDetails = [], isLoading: orderDetailsLoading } =
+    useGetUserOrderDetailsQuery(currentUser?._id);
+  const { data: usersAllReviews } = useGetUsersAllReviewsQuery(
+    currentUser?._id
+  );
+  const { data: userWishlists } = useGetUserCartQuery(currentUser?._id);
+  const [updateStatus] = useUpdateStatusMutation();
+  const { data: recommendedProducts } = useGetFeaturedProductsQuery();
 
-  const userDilevered = userOrderDetails.filter(order => order.status === "delivered")
+  const userDilevered = userOrderDetails.filter(
+    (order) => order.status === "delivered"
+  );
 
   const userStats = [
     {
@@ -54,15 +74,14 @@ export default function UserDashboard({ currentUser }) {
       color: "text-yellow-600",
     },
     {
-      title: "Wishlist Items",
+      title: "Cart Items",
       value: userWishlists?.length || 0,
       icon: Heart,
       color: "text-red-600",
     },
   ];
 
-  const handleCancleOrder =async (id)=>{
-    
+  const handleCancleOrder = async (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -70,27 +89,30 @@ export default function UserDashboard({ currentUser }) {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await updateStatus({ orderId : id, status : "cancelled" ,cancle : "Customer request" }).unwrap();
+        await updateStatus({
+          orderId: id,
+          status: "cancelled",
+          cancle: "Customer request",
+        }).unwrap();
         Swal.fire({
           title: "Deleted!",
           text: "Your file has been deleted.",
-          icon: "success"
+          icon: "success",
         });
       }
     });
-  }
+  };
 
- 
   return (
     <div className="p-6 space-y-6 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, { currentUser?.name }!
+            Welcome back, {currentUser?.name}!
           </h1>
           <p className="text-muted-foreground">
             Here&apos;s an overview of your shopping activity and
@@ -110,14 +132,15 @@ export default function UserDashboard({ currentUser }) {
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold"><CountUp end={stat.value} duration={3} /></div>
+              <div className="text-2xl font-bold">
+                <CountUp end={stat.value} duration={3} />
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        
         {/* Recent Orders */}
         <Card>
           <CardHeader>
@@ -129,15 +152,26 @@ export default function UserDashboard({ currentUser }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {
-                orderLoading ? <div className="w-full flex justify-center items-center">
-                  <Spin  tip="loading" size="large"/>
-                  </div> : ''
-              }
-              { userOrder?.length < 1 && <div className="w-full flex justify-center items-center">
-                <p className="py-5">You have no order <Link href='/products' className="font-semibold text-blue-500">View product</Link></p>
-              </div>
-              }
+              {orderLoading ? (
+                <div className="w-full flex justify-center items-center">
+                  <Spin tip="loading" size="large" />
+                </div>
+              ) : (
+                ""
+              )}
+              {userOrder?.length < 1 && (
+                <div className="w-full flex justify-center items-center">
+                  <p className="py-5">
+                    You have no order{" "}
+                    <Link
+                      href="/products"
+                      className="font-semibold text-blue-500"
+                    >
+                      View product
+                    </Link>
+                  </p>
+                </div>
+              )}
               {userOrder?.map((order) => (
                 <div
                   key={order?._id}
@@ -145,22 +179,26 @@ export default function UserDashboard({ currentUser }) {
                 >
                   <div className="space-y-">
                     <p className="text-sm font-medium text-muted-foreground">
-                      {order?.products?.map((produt,idx) =><p className="p-1 flex items-center gap-2 shadow-sm my-1" key={idx}> 
-                        <CircleDashed className="size-3" />  {produt?.productId?.name}
-                      </p>)
-                      }
+                      {order?.products?.map((produt, idx) => (
+                        <p
+                          className="p-1 flex items-center gap-2 shadow-sm my-1"
+                          key={idx}
+                        >
+                          <CircleDashed className="size-3" />{" "}
+                          {produt?.productId?.name}
+                        </p>
+                      ))}
                     </p>
                     <p className="text-xs ml-5 text-muted-foreground">
                       {new Date(order?.createdAt).toLocaleDateString("en-US", {
                         day: "numeric",
                         month: "long",
-                        year: "numeric"
-                        })}
+                        year: "numeric",
+                      })}
                     </p>
                   </div>
                   <p className="font-medium">${order?.totalPrice}</p>
                   <div className="text-right space-y-1">
-                    
                     <Badge
                       variant={
                         order?.status === "delivered"
@@ -174,9 +212,14 @@ export default function UserDashboard({ currentUser }) {
                       {order?.status?.replace("_", " ")}
                     </Badge>
                   </div>
-                  {
-                    order?.status === "processing" && <button onClick={()=>handleCancleOrder(order?._id)} className="p-1 px-2.5 mr-4 text-sm font-bold shadow bg-zinc-400 text-white rounded-full border ">Cancle Order</button>
-                  }
+                  {order?.status === "processing" && (
+                    <button
+                      onClick={() => handleCancleOrder(order?._id)}
+                      className="p-1 px-2.5 mr-4 text-sm font-bold shadow bg-zinc-400 text-white rounded-full border "
+                    >
+                      Cancle Order
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -201,7 +244,7 @@ export default function UserDashboard({ currentUser }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recommendedProducts?.slice(0,3).map((product) => (
+              {recommendedProducts?.slice(0, 3).map((product) => (
                 <div
                   key={product?.name}
                   className="flex items-center gap-3 p-3 border rounded-lg"
@@ -227,7 +270,12 @@ export default function UserDashboard({ currentUser }) {
                       </div>
                     </div>
                   </div>
-                  <Link className="text-sky-400 text-sm font-semibold" href={`/products/${product?._id}`}>View product</Link>
+                  <Link
+                    className="text-sky-400 text-sm font-semibold"
+                    href={`/products/${product?._id}`}
+                  >
+                    View product
+                  </Link>
                 </div>
               ))}
             </div>
