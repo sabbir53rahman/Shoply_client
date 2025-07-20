@@ -4,16 +4,22 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShoppingCart, Slice } from "lucide-react";
 import Image from "next/image";
 import ProductCard from "../Product/ProductTem";
-import { useGetFeaturedProductsQuery, useGetLeatestProductsQuery, useGetPaginatedProductsQuery } from "@/redux/features/productSlice/productSlice";
+import {
+  useGetFeaturedProductsQuery,
+  useGetLeatestProductsQuery,
+  useGetPaginatedProductsQuery,
+} from "@/redux/features/productSlice/productSlice";
 import { Skeleton } from "antd";
-import rVegetable from "../../assets/rvegetable.png"
-import healthyFood from "../../assets/healthy.png"
-
+import rVegetable from "../../assets/rvegetable.png";
+import healthyFood from "../../assets/healthy.png";
+import Link from "next/link";
 
 const FeaturedCollection = () => {
-  const {data, isLoading } = useGetFeaturedProductsQuery()
-  const {data : allProducts, isLoading : paginateLoadint } = useGetPaginatedProductsQuery(1)
-  const {data : leatestProducts, isLoading : popularLoading } = useGetLeatestProductsQuery()
+  const { data, isLoading } = useGetFeaturedProductsQuery();
+  const { data: allProducts, isLoading: paginateLoadint } =
+    useGetPaginatedProductsQuery(1);
+  const { data: leatestProducts, isLoading: popularLoading } =
+    useGetLeatestProductsQuery();
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
@@ -38,9 +44,11 @@ const FeaturedCollection = () => {
                   <Skeleton active paragraph={{ rows: 4 }} />
                 </div>
               ))
-            : data?.slice(0, 5).map((product) => (
-                <ProductCard key={product?._id} product={product} />
-          ))}
+            : data
+                ?.slice(0, 5)
+                .map((product) => (
+                  <ProductCard key={product?._id} product={product} />
+                ))}
         </div>
 
         {/*Popular Section Header */}
@@ -56,7 +64,7 @@ const FeaturedCollection = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
-          {leatestProducts?.slice(0,5).map((product) => (
+          {leatestProducts?.slice(0, 5).map((product) => (
             <ProductCard key={product?._id} product={product} />
           ))}
         </div>
@@ -75,17 +83,16 @@ const FeaturedCollection = () => {
                 <br />
                 <span className="text-purple-700">Tasty Grocery Deals!</span>
               </h3>
-
-              <Button className="primary_button">
-                View More
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <Link href="/products">
+                <Button className="primary_button">
+                  View More
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute right-0 bottom-0 w-72 h-72 opacity-20">
-              
-            </div>
+            <div className="absolute right-0 bottom-0 w-72 h-72 opacity-20"></div>
           </div>
 
           {/* Right Banner - Fruit Juice */}
@@ -100,17 +107,16 @@ const FeaturedCollection = () => {
                 <br />
                 from Farm
               </h3>
-
-              <Button className="secondary_button">
-                Shop Now
-                <ShoppingCart className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
-              </Button>
+              <Link href="/products">
+                <Button className="secondary_button">
+                  Shop Now
+                  <ShoppingCart className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
+                </Button>
+              </Link>
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute right-0 bottom-0 w-56 h-56 opacity-30">
-              
-            </div>
+            <div className="absolute right-0 bottom-0 w-56 h-56 opacity-30"></div>
           </div>
         </div>
       </div>
