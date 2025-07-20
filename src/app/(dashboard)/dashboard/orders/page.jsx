@@ -52,6 +52,7 @@ import Link from "next/link";
 
 import Swal from "sweetalert2";
 import AdminRoute from "@/components/AdminRoute";
+import { Label } from "@/components/ui/label";
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,7 +78,7 @@ export default function OrderManagement() {
     e.preventDefault();
     const status = e.target.status.value;
     const cancle = e?.target?.cancle?.value || "empty";
-    console.log(status,cancle)
+    console.log(status, cancle);
 
     try {
       await updateStatus({ orderId, status, cancle }).unwrap();
@@ -87,7 +88,7 @@ export default function OrderManagement() {
         showConfirmButton: false,
         timer: 1500,
       });
-      setCancleReason("")
+      setCancleReason("");
       console.log("updated");
     } catch (error) {
       console.log(error);
@@ -233,100 +234,148 @@ export default function OrderManagement() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent forceMount className="bg-white">
+                        <DialogContent
+                          forceMount
+                          className="bg-white rounded-xl shadow-lg px-6 py-8 max-w-2xl"
+                        >
                           <DialogHeader>
-                            <DialogTitle>
+                            <DialogTitle className="text-2xl font-bold text-gray-900">
                               Order Details - #{order?._id.slice(-5)}
                             </DialogTitle>
-                            <DialogDescription>
+                            <DialogDescription className="text-sm text-muted-foreground">
                               Manage this order and update its status
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-4 text-sm">
+
+                          <div className="space-y-6 mt-6 text-sm text-gray-700">
+                            {/* Customer Info */}
                             <div>
-                              <strong>Customer :</strong>{" "}
-                              {order?.userId?.name || "N/A"}
+                              <Label className="text-base font-semibold">
+                                Customer
+                              </Label>
+                              <p className="mt-1">
+                                {order?.userId?.name || "N/A"}
+                              </p>
                             </div>
-                            <div className="">
-                              <strong>Status : </strong>
+
+                            {/* Status Update */}
+                            <div>
+                              <Label className="text-base font-semibold">
+                                Status
+                              </Label>
                               <form
                                 onSubmit={(e) => handleStatus(e, order?._id)}
-                                className="flex justify-between items-center gap-2 mt-2.5 m-auto w-[90%]"
+                                className="mt-2 grid gap-4 md:grid-cols-3 items-center"
                               >
-                                {/* <AntSelect
-                                    mode=""
-                                    placeholder="Change status"
-                                    value={selectedItems}
-                                    onChange={setSelectedItems}
-                                    style={{ width: '90%', height : '35px' }}
-                                    options={statusOption?.map(item => ({
-                                        value: item.status,
-                                        label: item.status,
-                                    }))}
-                                /> */}
-                                <select
+                                {/* Main Status Selector */}
+                                <Select
                                   defaultValue={order?.status}
-                                  placeholder="update status"
                                   name="status"
-                                  onChange={(e)=> setCancleReason(e.target.value)}
                                   required
-                                  className="w-full border text-gray-800 border-gray-300 rounded-lg px-4 py-2"
+                                  onValueChange={(val) => setCancleReason(val)}
                                 >
-                                  <option value="processing">processing</option>
-                                  <option value="courier">courier</option>
-                                  <option value="delivered">delivered</option>
-                                  <option value="cancelled">cancelled</option>
-                                </select>
-                                {
-                                  cancleReason === "cancelled" && <select
-                                    defaultValue={"Out of stock"}
-                                    placeholder="update status"
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Update status" />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-white">
+                                    <SelectItem value="processing">
+                                      Processing
+                                    </SelectItem>
+                                    <SelectItem value="courier">
+                                      Courier
+                                    </SelectItem>
+                                    <SelectItem value="delivered">
+                                      Delivered
+                                    </SelectItem>
+                                    <SelectItem value="cancelled">
+                                      Cancelled
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+
+                                {/* Cancel Reason Selector */}
+                                {cancleReason === "cancelled" && (
+                                  <Select
                                     name="cancle"
+                                    defaultValue="Out of stock"
                                     required
-                                    className="w-full border text-gray-800 border-gray-300 rounded-lg px-4 py-2"
                                   >
-                                    <option value="Out of stock">Out of Stock</option>
-                                    <option value="Address issues">Address issue</option>
-                                  </select>
-                                }
-                                <input
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue placeholder="Reason for cancellation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Out of stock">
+                                        Out of Stock
+                                      </SelectItem>
+                                      <SelectItem value="Address issues">
+                                        Address Issue
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+
+                                <Button
                                   type="submit"
-                                  className="bg-emerald-600 rounded p-3 py-2 text-white"
-                                  value="update"
-                                />
-                                {/* <button onClick={()=>handleStatus(order?._id)} className='border bg-emerald-600 hover:bg-emerald-700 rounded p-3 text-white' ><Check/></button> */}
+                                  className="w-full text-white bg-emerald-600 hover:bg-emerald-700"
+                                >
+                                  Update
+                                </Button>
                               </form>
                             </div>
+
+                            {/* Email */}
                             <div>
-                              <strong>Email :</strong>{" "}
-                              {order?.userId?.email || "N/A"}
+                              <Label className="text-base font-semibold">
+                                Email
+                              </Label>
+                              <p className="mt-1">
+                                {order?.userId?.email || "N/A"}
+                              </p>
                             </div>
+
+                            {/* Products */}
                             <div>
-                              <strong>Item :</strong>
-                              {order?.products?.map((product, idx) => (
-                                <div
-                                  className="shadow-sm py-2 px-2 flex justify-between w-[90%] mx-auto"
-                                  key={idx}
-                                >
-                                  <Link
-                                    href={`/products/${product?.productId?._id}`}
-                                    className="text-sky-600 hover:text-sky-500"
+                              <Label className="text-base font-semibold mb-1 block">
+                                Items
+                              </Label>
+                              <div className="space-y-2">
+                                {order?.products?.map((product, idx) => (
+                                  <div
+                                    className="border rounded-lg px-4 py-2 flex justify-between items-center bg-muted"
+                                    key={idx}
                                   >
-                                    {product?.productId?.name}
-                                  </Link>
-                                  <p className="text-">
-                                    {product?.quantity} Product.
-                                  </p>
-                                </div>
-                              ))}
+                                    <Link
+                                      href={`/products/${product?.productId?._id}`}
+                                      className="text-sky-600 hover:underline"
+                                    >
+                                      {product?.productId?.name}
+                                    </Link>
+                                    <span className="text-muted-foreground">
+                                      {product?.quantity} pcs
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                            <div>
-                              <strong>Total :</strong> $
-                              {order?.totalPrice?.toFixed(2)}
+
+                            {/* Total */}
+                            <div className="flex justify-between">
+                              <Label className="text-base font-semibold">
+                                Total
+                              </Label>
+                              <p>${order?.totalPrice?.toFixed(2)}</p>
                             </div>
-                            <div>
-                              <strong>Date :</strong>{" "}
-                              {new Date(order?.createdAt).toLocaleDateString()}
+
+                            {/* Date */}
+                            <div className="flex justify-between">
+                              <Label className="text-base font-semibold">
+                                Date
+                              </Label>
+                              <p>
+                                {new Date(
+                                  order?.createdAt
+                                ).toLocaleDateString()}
+                              </p>
                             </div>
                           </div>
                         </DialogContent>
