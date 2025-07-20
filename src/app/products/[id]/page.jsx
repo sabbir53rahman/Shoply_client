@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import ProductDetailsSkeleton from "@/components/Product/ProductDetailsSkeleton";
+import { message } from "antd";
 
 export default function ProductDetailsPage() {
   const user = useSelector((state) => state.user?.user);
@@ -48,6 +49,7 @@ export default function ProductDetailsPage() {
   const { data: product, isLoading, error } = useGetProductQuery(id);
   const userId = user?._id;
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [cartLoading, setCartLoading] = useState(false);
   const [addressData, setAddressData] = useState({
     name: "",
     phone: "",
@@ -73,6 +75,16 @@ export default function ProductDetailsPage() {
   const [addReview] = useAddReviewMutation();
   const [deleteReview] = useDeleteReviewMutation();
 
+  const success = (msg) => {
+    message.success(msg);
+  };
+  const warning = (messageInfo) => {
+    message.warning(messageInfo);
+  };
+  const errorMassage = (messageInfo) => {
+    message.error(messageInfo);
+  };
+
   const handleQuantityChange = (change) => {
     setQuantity((prev) =>
       Math.max(1, Math.min(prev + change, product?.stock || 1))
@@ -88,29 +100,14 @@ export default function ProductDetailsPage() {
 
   const handleAddOrder = async () => {
     if (!userId) {
-      Swal.fire(
-        "Login Required",
-        "Please log in to place an order.",
-        "warning"
-      );
-      return;
+      errorMassage("Please login first to place an order.");
+      return router.push("/auth/login");
     }
-    // if(user?.role === "admin"){
-    //   return Swal.fire({
-    //     position: "top-end",
-    //     title: "Admin can't order!",
-    //     showConfirmButton: false,
-    //     timer: 1500,
-    //   });
-    // }
+    if (user?.role === "admin") {
+      return errorMassage("Admin can't order!");
+    }
     if (!addressData.name) {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Fill all the address feild.",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      warning("Please fill all data.");
     }
 
     const newOrder = {
@@ -125,14 +122,10 @@ export default function ProductDetailsPage() {
     if (paymentMethod === "cash") {
       try {
         await addOrder(newOrder).unwrap();
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Order placed successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        message;
+        router.push("/dashboard");
       } catch (err) {
+        errorMassage("Failed to create order. Please try again.");
         console.error("❌ Failed to create order:", err);
       }
     } else if (paymentMethod === "sslcommerz") {
@@ -211,13 +204,14 @@ export default function ProductDetailsPage() {
   };
 
   const handleAddToCart = async () => {
+    setCartLoading(true);
     if (user?.role === "admin") {
-      return Swal.fire({
-        position: "top-end",
-        title: "Admin can't order!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      setCartLoading(false);
+      return errorMassage("Admin can't add to cart!");
+    }
+    if (user === null) {
+      setCartLoading(false);
+      return errorMassage("Please login first to add to cart.");
     }
     try {
       const cartDetails = {
@@ -225,20 +219,23 @@ export default function ProductDetailsPage() {
         userId: user?._id,
       };
       await addCartDetails(cartDetails).unwrap();
+      success("Product added to cart successfully!");
       Swal.fire({
-        position: "top-end",
         icon: "success",
-        title: "Added to the cart!",
-        showConfirmButton: false,
+        title: "Added to cart!",
         timer: 1500,
+        showConfirmButton: false,
       });
+      setCartLoading(false);
     } catch (error) {
+      errorMassage("Failed to add product to cart.");
       Swal.fire({
-        position: "top-end",
-        title: "Already added!",
-        showConfirmButton: false,
+        icon: "error",
+        title: error.message || "Failed to add to cart",
         timer: 1500,
+        showConfirmButton: false,
       });
+      setCartLoading(false);
     }
   };
 
@@ -410,10 +407,7 @@ export default function ProductDetailsPage() {
                     <CardContent>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button
-                            className="flex-1 text-lg primary_button h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={product.stock === 0}
-                          >
+                          <Button className="flex-1  text-lg primary_button h-12 font-semibold">
                             <ShoppingCart className="w-5 h-5 mr-2" />
                             {product.stock === 0
                               ? "Sold Out"
@@ -590,6 +584,7 @@ export default function ProductDetailsPage() {
                               </div>
 
                               <Button
+                                disabled={cartLoading}
                                 onClick={handleAddOrder}
                                 className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
                               >
@@ -606,8 +601,9 @@ export default function ProductDetailsPage() {
 
                   <button
                     onClick={() => handleAddToCart()}
-                    disabled={product.stock === 0}
-                    className="h-12 border border-gray-200 text-white bg-cyan-950 hover:bg-emerald-700 px-4 flex gap-2 items-center justify-center rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="outline"
+                    size="lg"
+                    className="h-12 border border-gray-200 text-white bg-cyan-950 hover:bg-emerald-700 px-4 flex gap-2 items-center justify-center rounded-lg"
                   >
                     Add To Cart
                     <ShoppingCart className="w-5 h-5" />

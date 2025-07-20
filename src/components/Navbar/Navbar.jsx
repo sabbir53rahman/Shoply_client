@@ -39,20 +39,19 @@ import { useSelector } from "react-redux";
 import { useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice";
 
 const Navbar = () => {
-  const {user,logOut} = useAuth(); 
-  const currentUser = useSelector(state => state?.user?.user);
+  const { user, logOut } = useAuth();
+  const currentUser = useSelector((state) => state?.user?.user);
   // const user =   {
   //   name: "Sabbir Hossain",
   //   email: "sabbir@example.com",
   //   role: "admin",
   // }
   const [cartCount, setCartCount] = useState(3);
-  const [wishlistCount, setWishlistCount] = useState(5)
-  const {data : userCarts} = useGetUserCartQuery(currentUser?._id)
-
+  const [wishlistCount, setWishlistCount] = useState(5);
+  const { data: userCarts } = useGetUserCartQuery(currentUser?._id);
 
   const handleLogout = () => {
-    logOut()
+    logOut();
   };
 
   const navigationLinks = [
@@ -132,17 +131,19 @@ const Navbar = () => {
             {/* Right Side Actions */}
             <div className="flex items-center space-x-4">
               {/* Shopping Cart - Hidden on mobile */}
-              <Link
-                href="/addToCart"
-                className="hidden md:flex relative p-2 text-gray-700 hover:text-emerald-600 transition-colors"
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {userCarts?.length}
-                  </span>
-                )}
-              </Link>
+              {user && (
+                <Link
+                  href="/addToCart"
+                  className="hidden md:flex relative p-2 text-gray-700 hover:text-emerald-600 transition-colors"
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {userCarts?.length}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {/* User Account - Hidden on mobile */}
               <div className="hidden md:block">
@@ -153,20 +154,19 @@ const Navbar = () => {
                         variant="ghost"
                         className="flex items-center space-x-2 p-2"
                       >
-                        {
-                            currentUser?.avater ?
-                            <Image
+                        {currentUser?.avater ? (
+                          <Image
                             src={user?.avatar}
                             alt={user?.name}
                             width={40}
                             height={40}
                             className="rounded-full"
                           />
-                          :
+                        ) : (
                           <div className=" border flex justify-center size-10 items-center rounded-full ">
                             <UserRound className="w-[36px] h-[36px] text-3xl" />
                           </div>
-                          }
+                        )}
                         <span className="hidden lg:block font-medium">
                           {user.name}
                         </span>
@@ -317,20 +317,19 @@ const Navbar = () => {
                     {user ? (
                       <div className="border-t pt-6 space-y-2">
                         <div className="flex items-center space-x-3 px-4 py-3 bg-emerald-50 rounded-lg">
-                          {
-                            currentUser?.avater ?
+                          {currentUser?.avater ? (
                             <Image
-                            src={user?.avatar}
-                            alt={user?.name}
-                            width={40}
-                            height={40}
-                            className="rounded-full"
-                          />
-                          :
-                          <div className="p-0.5 border w-10 h-10 rounded-full ">
-                            <UserRound />
-                          </div>
-                          }
+                              src={user?.avatar}
+                              alt={user?.name}
+                              width={40}
+                              height={40}
+                              className="rounded-full"
+                            />
+                          ) : (
+                            <div className="p-0.5 border w-10 h-10 rounded-full ">
+                              <UserRound />
+                            </div>
+                          )}
                           <div>
                             <p className="font-medium text-gray-900">
                               {user.name}

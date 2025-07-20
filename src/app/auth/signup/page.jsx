@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { addUser } from "@/redux/features/userSlice/userSlice";
 import { useRouter } from "next/navigation";
+import { Toast } from "@/components/ui/message";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -85,22 +86,16 @@ const SignupPage = () => {
         })
       );
 
-      Swal.fire({
-        position: "top-end",
+      Toast.fire({
         icon: "success",
-        title: "Account created successfully.",
-        showConfirmButton: false,
-        timer: 1500,
+        title: "Signed up successfully",
       });
 
       router.push("/");
     } catch (err) {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "User already exists or signup failed.",
-        showConfirmButton: false,
-        timer: 1500,
+      Toast.fire({
+        icon: "success",
+        title: err.message || err.error || "Sign up failed ! try again.",
       });
     } finally {
       setIsLoading(false);
