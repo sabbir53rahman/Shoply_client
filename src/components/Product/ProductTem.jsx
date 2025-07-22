@@ -19,7 +19,6 @@ const ProductCard = ({ product }) => {
   const router = useRouter();
   const [addCartDetails] = useAddCartDetailsMutation();
   const currentUser = useSelector((state) => state?.user?.user);
-  console.log(cartLoading);
 
   const renderStars = () => {
     const stars = [];
