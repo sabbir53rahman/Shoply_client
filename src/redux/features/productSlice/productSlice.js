@@ -141,6 +141,25 @@ export const productApi = apiSlice.injectEndpoints({
       },
       providesTags: ["Product"],
     }),
+
+    getFilteredProducts: builder.query({
+      query: (filters) => {
+        // Clean filters: remove null, undefined, or empty string
+        const cleanFilters = Object.fromEntries(
+          Object.entries(filters).filter(
+            ([_, value]) =>
+              value !== null && value !== undefined && value !== ""
+          )
+        );
+
+        // return `/products/filter?${queryParams}`;
+        return {
+          url: "/products/filteredProducts",
+          params: cleanFilters,
+        };
+      },
+      providesTags: ["Product"],
+    }),
   }),
 });
 
@@ -161,4 +180,5 @@ export const {
   useGetProductsByCategoryQuery,
   useGetProductsByPriceRangeQuery,
   useSearchProductsByNameQuery,
+  useGetFilteredProductsQuery,
 } = productApi;
