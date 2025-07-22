@@ -82,7 +82,6 @@ const categories = [
 
 const Page = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [applyPrice, setApplyPrice] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState("");
@@ -158,12 +157,6 @@ const Page = () => {
     useGetProductsByCategoryQuery(selectedCategory, {
       skip: !selectedCategory,
     });
-
-  const { data: priceData = [], isLoading: isPriceLoading } =
-    useGetProductsByPriceRangeQuery(
-      { min: applyPrice?.min, max: applyPrice?.max },
-      { skip: !applyPrice }
-    );
 
   const totalPages = filteredProducts?.totalPages || 1;
   const currentPage = filteredProducts?.page || 1;
@@ -360,11 +353,9 @@ const Page = () => {
           </div>
         </div>
 
-        {/*search Price Range filter */}
-
         {/* Products */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
-          {isCategoryLoading || isPriceLoading ? (
+          {isCategoryLoading ? (
             Array.from({ length: 8 }).map((_, index) => (
               <Card key={index} className="p-4">
                 <div className="w-full bg-gray-300 rounded-lg h-40"></div>
