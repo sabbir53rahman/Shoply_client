@@ -1,5 +1,4 @@
 "use client";
-import { useEffect } from "react";
 import { Provider } from "react-redux";
 import "./globals.css";
 // import useAuth from "@/Firebase/useAuth";
@@ -21,11 +20,7 @@ const LayoutContent = ({ children }) => {
   // const { isAuthLoading } = useAuth();
   // if (isAuthLoading) return <Spinner />;
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
 
 export default function RootLayout({ children }) {
