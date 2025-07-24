@@ -30,8 +30,9 @@ import {
   Grape,
   Croissant,
   X,
+  ShoppingCart,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 // ✅ category values that actually match your DB
@@ -86,6 +87,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const pathName = usePathname();
 
   const handleSearch = debounce((value) => {
     updateQueryParams({ key: "search", value });
@@ -108,7 +110,7 @@ const Page = () => {
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const minRating = searchParams.get("minRating");
-  const availability = searchParams.get("availability");
+  const stock = searchParams.get("stock");
   const sortBy = searchParams.get("sortBy");
   const sortOrder = searchParams.get("sortOrder");
   const search = searchParams.get("search");
@@ -116,7 +118,6 @@ const Page = () => {
   const limit = searchParams.get("limit") || 10;
 
   const updateQueryParams = ({ key, value }) => {
-    console.log("key:", key, "value:", value);
     const params = new URLSearchParams(searchParams);
 
     if (typeof value === "object" && value !== null) {
@@ -129,6 +130,7 @@ const Page = () => {
       });
     } else if (value) {
       params.set(key, value);
+      setShowFilters(false);
     } else {
       params.delete(key);
     }
@@ -141,7 +143,7 @@ const Page = () => {
     minPrice,
     maxPrice,
     minRating,
-    availability,
+    stock,
     sortBy,
     sortOrder,
     search,
@@ -150,7 +152,6 @@ const Page = () => {
   };
   const { data: filteredProducts } = useGetFilteredProductsQuery(filters);
   console.log(filteredProducts);
-
   const { data: allCategory } = useGetAllCategorysQuery();
 
   const { data: categoryData = [], isLoading: isCategoryLoading } =
@@ -177,143 +178,63 @@ const Page = () => {
         </div>
 
         {/* Category Pills */}
-        <div className="flex flex-wrap flex-col  items-center justify- gap-4 mb-10">
-          <div className="flex justify-between items-center w-full md:w-[80%]">
+        <div className="flex flex-wrap flex-col  items-center justify-between gap-5 mb-10">
+          <div className="flex justify-between items-center w-full md:w-[85%]">
             <Swiper
               spaceBetween={12}
               slidesPerView="auto"
-              className="justify-start w-full"
+              className="mx-auto w-max"
             >
-              {categories?.map((cat) => (
-                <SwiperSlide key={cat.name} className=" !w-auto">
+              <SwiperSlide className="mx-auto !w-auto">
+                <Card
+                  onClick={() => router.push("/products")}
+                  className={`cursor-pointer  p-4 ${
+                    searchParams.size === 0
+                      ? `text-[#ffffff] bg-emerald-600/60`
+                      : `text-[#453f3f] bg-emerald-600/40`
+                  }  flex items-center gap-3 transition-transform  hover:scale-105 border-2 `}
+                >
+                  <ShoppingCart className="w-8 h-8 object-contain text-[#454343]" />
+                  <span className="font-medium">All Products</span>
+                </Card>
+              </SwiperSlide>
+              {allCategory?.map((cat) => (
+                <SwiperSlide key={cat._id} className="mx-auto !w-auto">
                   <Card
                     onClick={() =>
                       updateQueryParams({
                         key: "category",
-                        value: cat?.name.toLowerCase(),
+                        value: cat?.category.toLowerCase(),
                       })
                     }
-                    className={`cursor-pointer p-4 flex items-center gap-3 transition-transform hover:scale-105 border-2 ${
-                      selectedCategory === cat.value
-                        ? `border-transparent bg-gradient-to-r ${cat?.color} text-white`
-                        : `${cat.bgColor} border-gray-200`
-                    }`}
+                    style={{
+                      backgroundColor:
+                        cat?.category === category
+                          ? `${cat?.color}90`
+                          : `${cat?.color}23`,
+                    }}
+                    className={`cursor-pointer  p-4 lg:px-5 ${
+                      cat.category === category
+                        ? `text-[#ffffff] `
+                        : `text-[#453f3f]`
+                    }  flex items-center gap-3 transition-transform  hover:scale-105 border-2 `}
                   >
                     <Image
                       src={cat?.image}
-                      height={40}
-                      width={50}
-                      alt={cat?.name}
+                      height={120}
+                      width={120}
+                      alt={cat?.category}
                       className="w-8 h-8 object-contain"
                     />
-                    <span className="font-medium">{cat?.name}</span>
+                    <span className="font-medium">{cat?.category}</span>
                   </Card>
                 </SwiperSlide>
               ))}
             </Swiper>
-            <div className="flex gap-3 md:gap-8 items-center">
-              <div className="mb- relative">
-                <Button
-                  onClick={() => setShowFilters((prev) => !prev)}
-                  className="flex items-center gap-2 bg-emerald-600 text-white font-medium"
-                >
-                  <Filter size={18} />
-                  <span className="hidden sm:flex">Filter</span>
-                </Button>
-
-                {showFilters && (
-                  <div className="mt-4 p-4 border absolute z-30 top-10 right-10 rounded-lg shadow bg-white/80 backdrop-blur-sm flex flex-col gap-4 w-full sm:w-[300px]">
-                    <X
-                      className=""
-                      onClick={() => setShowFilters((prev) => !prev)}
-                    />
-                    {/* Category */}
-                    <Select
-                      placeholder="Select Category"
-                      onChange={(value) =>
-                        updateQueryParams({ key: "category", value: value })
-                      }
-                      style={{ width: "100%" }}
-                      allowClear
-                    >
-                      {allCategory?.map((cat) => (
-                        <Option key={cat._id} value={cat.category}>
-                          {cat.category}
-                        </Option>
-                      ))}
-                    </Select>
-
-                    {/* Min Rating */}
-                    <Select
-                      placeholder="Minimum Rating"
-                      onChange={(value) =>
-                        updateQueryParams({ key: "minRating", value: value })
-                      }
-                      style={{ width: "100%" }}
-                      allowClear
-                    >
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <Option key={rating} value={rating}>
-                          {rating}+
-                        </Option>
-                      ))}
-                    </Select>
-
-                    {/* Availability */}
-                    <Select
-                      placeholder="Availability"
-                      onChange={(value) =>
-                        updateQueryParams({ key: "availability", value: value })
-                      }
-                      style={{ width: "100%" }}
-                      allowClear
-                    >
-                      <Option value="inStock">In Stock</Option>
-                      <Option value="outOfStock">Out of Stock</Option>
-                    </Select>
-
-                    {/* Sort By */}
-                    <Select
-                      placeholder="Sort By"
-                      onChange={(value) =>
-                        updateQueryParams({ key: "sortBy", value: value })
-                      }
-                      style={{ width: "100%" }}
-                      allowClear
-                    >
-                      <Option value="price">Price</Option>
-                      <Option value="newest">Newest</Option>
-                      <Option value="popularity">Popularity</Option>
-                    </Select>
-
-                    {/* Sort Order */}
-                    <Select
-                      placeholder="Sort Order"
-                      onChange={(value) =>
-                        updateQueryParams({ key: "sortOrder", value: value })
-                      }
-                      style={{ width: "100%" }}
-                      allowClear
-                    >
-                      <Option value="asc">Ascending</Option>
-                      <Option value="desc">Descending</Option>
-                    </Select>
-
-                    {/* Reset Filters */}
-                    <Button
-                      onClick={() => router.push("/products")}
-                      className="bg-emerald-400 text-white !mt-9 font-medium"
-                    >
-                      Reset Filters
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
-          <div className="flex w-full lg:w-[80%] items-center justify-between gap-4">
-            <div className="flex w-full h-max  max-w-xl  border border-gray-300 rounded-lg overflow-hidden items-center">
+          <div className="flex w-full lg:w-[85%] items-center justify-between gap-4">
+            <div className="flex w-full h-max max-w-lg border bg-[#3e849931] border-gray-300 rounded-lg overflow-hidden items-center">
               <input
                 type="text"
                 placeholder="Search..."
@@ -350,6 +271,92 @@ const Page = () => {
                 defaultValue={[20, 1000]}
               />
             </div>
+            <div className="flex gap-3 mx-4 md:gap-8 items-center">
+              <div className="mb- relative">
+                <Button
+                  onClick={() => setShowFilters((prev) => !prev)}
+                  className="flex items-center hover:scale-105 transition-transform gap-2 bg-emerald-600 text-white font-medium"
+                >
+                  <Filter size={18} />
+                  <span className="hidden sm:flex">Filter</span>
+                </Button>
+
+                {showFilters && (
+                  <div className="mt-4 p-2.5 border absolute z-30 top-10 right-10 rounded-lg shadow bg-emerald-200/80 backdrop-blur-sm flex flex-col gap-3 w-full sm:w-[200px]">
+                    <X
+                      className=""
+                      onClick={() => setShowFilters((prev) => !prev)}
+                    />
+
+                    {/* Min Rating */}
+                    <Select
+                      placeholder="Minimum Rating"
+                      onChange={(value) =>
+                        updateQueryParams({ key: "minRating", value: value })
+                      }
+                      style={{ width: "100%" }}
+                      allowClear
+                    >
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <Option key={rating} value={rating}>
+                          {rating}+
+                        </Option>
+                      ))}
+                    </Select>
+
+                    {/* Availability */}
+                    <Select
+                      placeholder="Availability"
+                      onChange={(value) =>
+                        updateQueryParams({ key: "stock", value: value })
+                      }
+                      style={{ width: "100%" }}
+                      allowClear
+                    >
+                      <Option value="inStock">In Stock</Option>
+                      <Option value="outStock">Out of Stock</Option>
+                    </Select>
+
+                    {/* Sort By */}
+                    <Select
+                      placeholder="Sort By"
+                      onChange={(value) =>
+                        updateQueryParams({ key: "sortBy", value: value })
+                      }
+                      style={{ width: "100%" }}
+                      allowClear
+                    >
+                      <Option value="priceHighToLow">Price hight to low</Option>
+                      <Option value="priceLowToHigh">Price low to high</Option>
+                      <Option value="newest">Newest</Option>
+                      <Option value="popularity">Popularity</Option>
+                      <Option value="featured">Featured Item</Option>
+                    </Select>
+
+                    {/* Sort Order */}
+                    <Select
+                      placeholder="Sort Order"
+                      onChange={(value) =>
+                        updateQueryParams({ key: "sortOrder", value: value })
+                      }
+                      style={{ width: "100%" }}
+                      allowClear
+                    >
+                      <Option value="asc">Ascending</Option>
+                      <Option value="desc">Descending</Option>
+                    </Select>
+
+                    {/* Reset Filters */}
+                    <Button
+                      onClick={() => router.push("/products")}
+                      className="bg-emerald-400 text-white !mt-4 font-medium"
+                    >
+                      Reset Filters
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -367,7 +374,7 @@ const Page = () => {
               <ProductCard key={product?._id} product={product} />
             ))
           ) : (
-            <div className="col-span-full text-center text-gray-500">
+            <div className="col-span-full text-center py-10 text-gray-500">
               No products found.
             </div>
           )}

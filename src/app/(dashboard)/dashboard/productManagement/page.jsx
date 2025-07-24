@@ -4,7 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Package, Upload } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Package,
+  Upload,
+  Camera,
+} from "lucide-react";
 
 import {
   useGetAllProductsQuery,
@@ -42,29 +50,45 @@ import {
 } from "@/components/ui/dialog";
 import Swal from "sweetalert2";
 import Link from "next/link";
-import { Select } from "antd";
+import { ColorPicker, Select } from "antd";
 import AdminRoute from "@/components/AdminRoute";
+import { Toast } from "@/components/ui/message";
+import axios from "axios";
+
+const image_hosting_key = process.env.NEXT_PUBLIC_IMAGE_HOSTING_KEY;
+const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 export default function ProductManagement({ onAddProduct }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editData, setEditData] = useState({
     name: "",
     category: "",
     price: "",
-    stock : ""
+    stock: "",
   });
-  const [ currentPage, setCurrentPage ] = useState(1);
-  const { data: products = [], isLoading, isError } = useGetPaginatedProductsQuery(currentPage);
-  const [ deleteProduct ] = useDeleteProductMutation();
-  const [ updateProduct ] = useUpdateProductMutation();
-  const [ addCategory ] = useAddCategoryMutation();
-  const [ updateIsFeatured ] = useUpdateIsFeaturedMutation()
+  const [color, setColor] = useState("#1677ff");
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useGetPaginatedProductsQuery(currentPage);
+  const [deleteProduct] = useDeleteProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
+  const [addCategory] = useAddCategoryMutation();
+  const [updateIsFeatured] = useUpdateIsFeaturedMutation();
 
   const { totalPages } = products;
 
   const handlePageChange = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
+    if (
+      pageNumber >= 1 &&
+      pageNumber <= totalPages &&
+      pageNumber !== currentPage
+    ) {
       setCurrentPage(pageNumber);
     }
   };
@@ -87,7 +111,7 @@ export default function ProductManagement({ onAddProduct }) {
     if (selectedProduct) {
       await updateProduct({ id: selectedProduct?._id, updatedData: editData });
       setSelectedProduct(null);
-      return <DialogClose></DialogClose>
+      return <DialogClose></DialogClose>;
     }
   };
 
@@ -112,7 +136,14 @@ export default function ProductManagement({ onAddProduct }) {
       return;
     }
 
-    const headers = ["name", "description", "category", "price", "stock", "tags"];
+    const headers = [
+      "name",
+      "description",
+      "category",
+      "price",
+      "stock",
+      "tags",
+    ];
     const rows = products.map((p) => [
       p.name,
       p.description || "",
@@ -137,42 +168,60 @@ export default function ProductManagement({ onAddProduct }) {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleAddCategory = (e) =>{
+  const handleAddCategory = async (e) => {
     e.preventDefault();
-    const newCategory = {category : e.target.category.value} ;
-    addCategory(newCategory)
-    Swal.fire({
-      position: "top-end",
-      icon: "success",
-      title: "New Category created successfully.",
-      showConfirmButton: false,
-      timer: 1500,
+    setDisabled(true);
+    const imageFile = { image: e.target.photo.files[0] };
+    const res = await axios.post(image_hosting_api, imageFile, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
-    e.target.reset()
-  }
 
-  const handleUpdateFeatured =async ({isFeature,productId})=>{
-    console.log(isFeature,productId)
     try {
-      await updateIsFeatured({isFeature : isFeature, productId : productId}).unwrap();
-      Swal.fire({
-      position: "top-end",
-      icon: "success",
-      title: "Feature updated!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+      const newCategory = {
+        category: e.target.category.value,
+        image: res?.data?.data?.display_url,
+        color: color,
+      };
 
+      if (res.data.success === true) {
+        await addCategory(newCategory).unwrap();
+        Toast.fire({
+          icon: "success",
+          title: "New category created successfully",
+        });
+        e.target.reset();
+        setOpen(false);
+      }
     } catch (error) {
-      Swal.fire({
-      position: "top-end",
-      icon: "error",
-      title: "Can't update feature.",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+      setDisabled(false);
+      Toast.fire({
+        icon: "error",
+        title: "Can't make category .",
+      });
+      setOpen(false);
     }
-  }
+  };
+
+  const handleUpdateFeatured = async ({ isFeature, productId }) => {
+    console.log(isFeature, productId);
+    try {
+      await updateIsFeatured({
+        isFeature: isFeature,
+        productId: productId,
+      }).unwrap();
+      Toast.fire({
+        icon: "success",
+        title: "Feature updated!",
+      });
+    } catch (error) {
+      Toast.fire({
+        icon: "success",
+        title: "Can't update feature!",
+      });
+    }
+  };
 
   return (
     <AdminRoute role={"admin"}>
@@ -195,31 +244,84 @@ export default function ProductManagement({ onAddProduct }) {
               <Plus className="w-4 h-4 mr-2" />
               Add Product
             </Button> */}
-            <Link href='/dashboard/addProduct' className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600" >
+            <Link
+              href="/dashboard/addProduct"
+              className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600"
+            >
               <Plus className="w-4 h-4 mr-2 " />
               Add Product
             </Link>
 
-            <Dialog >
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4 mr-2" /> Add category
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-white ">
-                  <DialogHeader>
-                    <DialogTitle>Add Category.</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleAddCategory} className="space-y-3 flex flex-col w-full">
-                    <p className="text-[13px] ml-2">{"Add New Category :"}</p>
-                    <input type="text" className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none" name="category" placeholder="Category" />
-                    <input type="submit" className="text-white bg-teal-700 font-bold px-5 py-1.5 rounded " value="Add Category " />
-                  </form>
-                </DialogContent>
-              </Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  onClick={() => setOpen(true)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> Add category
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                modal={false}
+                onInteractOutside={(e) => e.preventDefault()}
+                className="bg-white "
+              >
+                <DialogHeader>
+                  <DialogTitle>Add Category.</DialogTitle>
+                </DialogHeader>
+                <form
+                  onSubmit={handleAddCategory}
+                  className="space flex flex-col w-full"
+                >
+                  <p className="text-[13px] ml-2">{"Add New Category :"}</p>
+                  <input
+                    type="text"
+                    className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none"
+                    name="category"
+                    placeholder="Category"
+                  />
+                  <div className="flex justify-center my-4 gap-4 items-center">
+                    <div className="w-full">
+                      <label className="block text-gray-700 text-sm  mb-2">
+                        Category Image
+                      </label>
+                      <div className="relative">
+                        <input
+                          name="photo"
+                          type="file"
+                          required
+                          className="w-full px-4 py-1 border-2 border-dashed border-gray-300 rounded-xl focus:border-green-500 focus:outline-none transition-colors group-hover:border-gray-400 file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700"
+                        />
+                        <Camera className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="">
+                      <p className="text-sm">BG color.</p>
+                      <div className="flex border mt-2 rounded px-3 pr-6 items-center gap-3">
+                        <input
+                          type="color"
+                          name="color"
+                          value={color}
+                          onChange={(e) => setColor(e.target.value)}
+                          className="w-9 h-9  rounded cursor-pointer shadow"
+                        />
+                        <span className="font-medium">{color}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <input
+                    disabled={disabled}
+                    type="submit"
+                    className={`text-white cursor-pointer ${
+                      disabled ? "bg-gray-400" : "bg-teal-700"
+                    } font-bold mt-8 px-5 py-1.5 rounded `}
+                    value="Add Category "
+                  />
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -245,7 +347,9 @@ export default function ProductManagement({ onAddProduct }) {
             </div>
 
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading products...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading products...
+              </p>
             ) : isError ? (
               <p className="text-sm text-red-500">Failed to load products.</p>
             ) : (
@@ -267,7 +371,9 @@ export default function ProductManagement({ onAddProduct }) {
                         {product.name}
                       </TableCell>
                       <TableCell>{product.category}</TableCell>
-                      <TableCell>${parseFloat(product.price).toFixed(2)}</TableCell>
+                      <TableCell>
+                        ${parseFloat(product.price).toFixed(2)}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           variant={product.stock > 0 ? "default" : "secondary"}
@@ -276,18 +382,36 @@ export default function ProductManagement({ onAddProduct }) {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {!product?.isFeatured && <button onClick={()=>handleUpdateFeatured({isFeature : true, productId : product?._id})} className="py-1 border border-fuchsia-200 px-2.5 rounded bg">
-                          Make Featured
-                        </button>
-                        }
-                        {product?.isFeatured && <button onClick={()=>handleUpdateFeatured({isFeature : false, productId : product?._id})} className="py-1 border text-white bg-emerald-400 border-fuchsia-200 px-2.5 rounded bg">
-                          Remove Featured
-                        </button>
-                        }
+                        {!product?.isFeatured && (
+                          <button
+                            onClick={() =>
+                              handleUpdateFeatured({
+                                isFeature: true,
+                                productId: product?._id,
+                              })
+                            }
+                            className="py-1 border border-fuchsia-200 px-2.5 rounded bg"
+                          >
+                            Make Featured
+                          </button>
+                        )}
+                        {product?.isFeatured && (
+                          <button
+                            onClick={() =>
+                              handleUpdateFeatured({
+                                isFeature: false,
+                                productId: product?._id,
+                              })
+                            }
+                            className="py-1 border text-white bg-emerald-400 border-fuchsia-200 px-2.5 rounded bg"
+                          >
+                            Remove Featured
+                          </button>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Dialog >
+                          <Dialog>
                             <DialogTrigger asChild>
                               <Button
                                 variant="outline"
@@ -305,14 +429,18 @@ export default function ProductManagement({ onAddProduct }) {
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-3">
-                                <p className="text-[13px] ml-2">{"Product's Name :"}</p>
+                                <p className="text-[13px] ml-2">
+                                  {"Product's Name :"}
+                                </p>
                                 <Input
                                   name="name"
                                   value={editData.name}
                                   onChange={handleEditChange}
                                   placeholder="Name"
                                 />
-                                <p className="text-[13px] ml-2">{"Category :"}</p>
+                                <p className="text-[13px] ml-2">
+                                  {"Category :"}
+                                </p>
                                 <Input
                                   name="category"
                                   value={editData.category}
@@ -372,7 +500,9 @@ export default function ProductManagement({ onAddProduct }) {
                 key={page}
                 onClick={() => handlePageChange(page)}
                 className={`px-3 py-1 rounded ${
-                  currentPage === page ? 'bg-emerald-600 text-white' : 'bg-gray-200'
+                  currentPage === page
+                    ? "bg-emerald-600 text-white"
+                    : "bg-gray-200"
                 }`}
               >
                 {page}
