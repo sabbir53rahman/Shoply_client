@@ -14,8 +14,6 @@ import { useEffect, useState } from "react";
 import { Skeleton, Select, Slider, Switch } from "antd";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-const { Option } = Select;
 import { debounce } from "lodash";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -31,7 +29,7 @@ import {
   Croissant,
   X,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams,  } from "next/navigation";
 import Image from "next/image";
 
 // ✅ category values that actually match your DB
@@ -79,6 +77,7 @@ const categories = [
     bgColor: "bg-orange-50",
   },
 ];
+const { Option } = Select;
 
 const Page = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
