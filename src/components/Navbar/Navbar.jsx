@@ -57,7 +57,7 @@ const Navbar = () => {
   const navigationLinks = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/products" },
-    { name: "Categories", href: "/categories" },
+    // { name: "Categories", href: "/categories" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -339,13 +339,15 @@ const Navbar = () => {
                             </p>
                           </div>
                         </div>
-                        <Link
-                          href="/dashboard/my-orders"
-                          className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
-                        >
-                          <Package className="w-5 h-5 mr-3" />
-                          My Orders
-                        </Link>
+                        {currentUser?.role === "user" && (
+                          <Link
+                            href="/dashboard/my-orders"
+                            className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
+                          >
+                            <Package className="w-5 h-5 mr-3" />
+                            My Orders
+                          </Link>
+                        )}
                         <button
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"
