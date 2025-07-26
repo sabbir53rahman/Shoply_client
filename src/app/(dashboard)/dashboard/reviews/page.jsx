@@ -36,6 +36,7 @@ import {
 import AdminRoute from "@/components/AdminRoute";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import { success } from "@/components/ui/message";
 
 export default function ReviewsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,8 +49,6 @@ export default function ReviewsManagement() {
   } = useGetPaginatedReviewsQuery({ page: currentPage, search: searchTerm });
   const user = useSelector((state) => state?.user?.user);
   const [deleteReview] = useDeleteReviewMutation();
-
-  console.log(reviews);
 
   const totalPages = reviews.totalPages || 1;
 
@@ -78,12 +77,7 @@ export default function ReviewsManagement() {
         userId: user._id,
         role: user.role,
       }).unwrap();
-      Swal.fire({
-        icon: "success",
-        title: "Review deleted.",
-        timer: 1200,
-        showConfirmButton: false,
-      });
+      success("Review deleted successfully");
       refetch();
     } catch (err) {
       console.log("Failed delete:", err);

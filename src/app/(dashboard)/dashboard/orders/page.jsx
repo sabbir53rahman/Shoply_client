@@ -67,22 +67,7 @@ export default function OrderManagement() {
   } = useGetPaginatedOrdersQuery({ page: currentPage, search: searchTerm });
   const [updateStatus] = useUpdateStatusMutation();
 
-  console.log(orders);
-
   const totalPages = orders?.totalPages || 1;
-
-  // const filteredOrders = orders?.filter((order) => {
-  //   const idMatch = order?._id
-  //     ?.toLowerCase()
-  //     .includes(searchTerm.toLowerCase());
-  //   const customerMatch = order?.userId?.name
-  //     ?.toLowerCase()
-  //     .includes(searchTerm.toLowerCase());
-  //   const matchesSearch = idMatch || customerMatch;
-  //   const matchesStatus =
-  //     statusFilter === "all" || order?.status === statusFilter;
-  //   return matchesSearch && matchesStatus;
-  // });
 
   const handleStatus = async (e, orderId) => {
     e.preventDefault();
@@ -142,9 +127,17 @@ export default function OrderManagement() {
   };
 
   if (isLoading)
-    return <div className="p-6 text-muted-foreground">Loading orders...</div>;
+    return (
+      <div className="p-6 w-full h-screen text-muted-foreground">
+        Loading orders...
+      </div>
+    );
   if (isError)
-    return <div className="p-6 text-destructive">Failed to load orders.</div>;
+    return (
+      <div className="p-6 w-full h-screen text-destructive">
+        Failed to load orders.
+      </div>
+    );
 
   return (
     <AdminRoute role={"admin"}>

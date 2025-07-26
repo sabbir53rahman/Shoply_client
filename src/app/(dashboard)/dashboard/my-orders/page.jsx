@@ -101,9 +101,23 @@ export default function Page() {
   };
 
   if (isLoading)
-    return <div className="p-6 text-muted-foreground">Loading orders...</div>;
+    return (
+      <div
+        className="p-6 w-full h-screen
+     text-muted-foreground"
+      >
+        Loading orders...
+      </div>
+    );
   if (isError)
-    return <div className="p-6 text-destructive">Failed to load orders.</div>;
+    return (
+      <div
+        className="p-6 w-full h-screen
+     text-destructive"
+      >
+        Failed to load orders.
+      </div>
+    );
 
   return (
     <AdminRoute role={"user"}>
@@ -128,30 +142,6 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <div className="flex items-center gap-4 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] ">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="courier">Sent to Courier</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
-
             <Table>
               <TableHeader>
                 <TableRow>

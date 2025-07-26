@@ -61,7 +61,7 @@ const CategorySection = () => {
   const { data: allCategory } = useGetAllCategorysQuery();
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm border-t border-white/20 py-8 sm:py-12 overflow-visible">
+    <div className="bg-white/95 backdrop-blur-sm border-t border-white/20 py-8 sm:py-12 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 sm:mb-8">
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
@@ -78,7 +78,7 @@ const CategorySection = () => {
             spaceBetween={16}
             slidesPerView={2}
             autoplay={{
-              delay: 3000,
+              delay: 1500,
               disableOnInteraction: false,
             }}
             loop={true}
