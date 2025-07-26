@@ -47,10 +47,16 @@ import { useSelector } from "react-redux";
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
-  const currentUser = useSelector(state => state?.user?.user)
+  const currentUser = useSelector((state) => state?.user?.user);
   const [statusFilter, setStatusFilter] = useState("all");
-  const { data: orders = [], isLoading, isError } = useGetUserOrderDetailsQuery(currentUser?._id);
-console.log(orders)
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+  } = useGetUserOrderDetailsQuery(currentUser?._id);
+
+  console.log(orders);
+
   const filteredOrders = orders?.filter((order) => {
     const idMatch = order?._id
       ?.toLowerCase()
@@ -118,11 +124,11 @@ console.log(orders)
               All Orders Details
             </CardTitle>
             <CardDescription>
-                Your all orders detials and update their status
+              Your all orders detials and update their status
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 mb-4">
+            {/* <div className="flex items-center gap-4 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -144,7 +150,7 @@ console.log(orders)
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             <Table>
               <TableHeader>
@@ -165,7 +171,6 @@ console.log(orders)
                     <TableCell>{order?.products?.length} products</TableCell>
                     <TableCell className="font-medium">
                       ${order?.totalPrice?.toFixed(2)}
-                      
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -183,9 +188,11 @@ console.log(orders)
                 ))}
               </TableBody>
             </Table>
-            {
-                !orders?.length  && <p className="text-lg font-semibold py-8 text-center text-emerald-600 mx-auto">You do not have any order.</p> 
-            }
+            {!orders?.length && (
+              <p className="text-lg font-semibold py-8 text-center text-emerald-600 mx-auto">
+                You do not have any order.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
