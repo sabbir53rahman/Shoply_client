@@ -12,6 +12,7 @@ import {
   Package,
   Upload,
   Camera,
+  X,
 } from "lucide-react";
 
 import {
@@ -48,7 +49,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Swal from "sweetalert2";
 import Link from "next/link";
 import { ColorPicker, Select } from "antd";
 import AdminRoute from "@/components/AdminRoute";
@@ -75,7 +75,8 @@ export default function ProductManagement({ onAddProduct }) {
     data: products = [],
     isLoading,
     isError,
-  } = useGetPaginatedProductsQuery(currentPage);
+  } = useGetPaginatedProductsQuery({ page: currentPage, search: searchTerm });
+  console.log(products);
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [addCategory] = useAddCategoryMutation();
@@ -123,12 +124,6 @@ export default function ProductManagement({ onAddProduct }) {
       await deleteProduct(id);
     }
   };
-
-  const filteredProducts = products?.products?.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleBulkUpload = () => {
     if (!products.length) {
@@ -338,11 +333,20 @@ export default function ProductManagement({ onAddProduct }) {
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search products..."
+                  placeholder="Search orders..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 pr-8" // ডান পাশে স্পেস যাতে cross টা বসে
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-2 top-2.5 text-muted-foreground hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -359,24 +363,24 @@ export default function ProductManagement({ onAddProduct }) {
                     <TableHead>Product</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Stock</TableHead>
                     <TableHead>Featured</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product) => (
-                    <TableRow key={product._id}>
+                  {products?.products?.map((product) => (
+                    <TableRow key={product?._id}>
                       <TableCell className="font-medium">
-                        {product.name}
+                        {product?.name}
                       </TableCell>
-                      <TableCell>{product.category}</TableCell>
+                      <TableCell>{product?.category}</TableCell>
                       <TableCell>
-                        ${parseFloat(product.price).toFixed(2)}
+                        ${parseFloat(product?.price).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={product.stock > 0 ? "default" : "secondary"}
+                          variant={product?.stock > 0 ? "default" : "secondary"}
                         >
                           {product?.stock > 0 ? product?.stock : "out of stock"}
                         </Badge>
@@ -461,7 +465,10 @@ export default function ProductManagement({ onAddProduct }) {
                                   onChange={handleEditChange}
                                   placeholder="Stock"
                                 />
-                                <Button onClick={handleEditSubmit}>
+                                <Button
+                                  className="bg-emerald-600 text-white hover:bg-emerald-700"
+                                  onClick={handleEditSubmit}
+                                >
                                   Save Changes
                                 </Button>
                               </div>

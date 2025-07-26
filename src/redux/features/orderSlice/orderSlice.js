@@ -11,7 +11,7 @@ export const orderApi = apiSlice.injectEndpoints({
         body: query,
         credentials: "include",
       }),
-      invalidatesTags: ["Order","Cart"],
+      invalidatesTags: ["Order", "Cart"],
     }),
 
     // Get all orders
@@ -72,24 +72,35 @@ export const orderApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    updateStatus : builder.mutation({
-        query : ({orderId,status,cancle})=>{
-            return {
-                url : `/orders/updateStatus/${orderId}`,
-                method : "PATCH",
-                body : {status : status,cancle : cancle },
-            };
-        },
-        invalidatesTags : ['Order']
+    updateStatus: builder.mutation({
+      query: ({ orderId, status, cancle }) => {
+        return {
+          url: `/orders/updateStatus/${orderId}`,
+          method: "PATCH",
+          body: { status: status, cancle: cancle },
+        };
+      },
+      invalidatesTags: ["Order"],
     }),
 
-     getCanclePercentage: builder.query({
+    getCanclePercentage: builder.query({
       query: () => ({
         url: "/orders/canclePercentage",
         credentials: "include",
       }),
     }),
 
+    getPaginatedOrders: builder.query({
+      query: ({ page, search }) => {
+        return {
+          url: `/orders/paginated?page=${page}&search=${encodeURIComponent(
+            search || ""
+          )}`,
+          credentials: "include",
+        };
+      },
+      providesTags: ["Order"],
+    }),
   }),
 });
 
@@ -103,6 +114,6 @@ export const {
   useGetRecentOrdersQuery,
   useUpdateStatusMutation,
   useGetUserOrderDetailsQuery,
-  useGetCanclePercentageQuery
-
+  useGetCanclePercentageQuery,
+  useGetPaginatedOrdersQuery,
 } = orderApi;
