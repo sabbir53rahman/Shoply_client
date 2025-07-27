@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ export default function ProductDetailsPage() {
   const { id } = useParams();
   const { data: product, isLoading, error } = useGetProductQuery(id);
   const userId = user?._id;
+  const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [cartLoading, setCartLoading] = useState(false);
   const [addressData, setAddressData] = useState({
