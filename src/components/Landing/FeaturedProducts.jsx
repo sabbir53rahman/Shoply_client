@@ -50,11 +50,19 @@ const FeaturedCollection = () => {
                   <ProductCard key={product?._id} product={product} />
                 ))}
         </div>
+        <div className="flex w-full mb-14 justify-center items-center">
+          <Link href="/products?sortBy=featured">
+            <Button className="primary_button  !py- rounded-2xl !px-">
+              Featured Products
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
 
         {/*Popular Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Leatest Products
+            Latest Products
           </h2>
           <p className="text-gray-600 text-lg mb-6">
             Discover our handpicked premium products

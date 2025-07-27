@@ -20,9 +20,11 @@ import {
   XCircle,
   ShoppingCart,
   Check,
+  X,
 } from "lucide-react";
 import {
   useGetAllOrdersQuery,
+  useGetPaginatedOrdersQuery,
   useUpdateStatusMutation,
 } from "@/redux/features/orderSlice/orderSlice";
 import {
@@ -50,29 +52,22 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 
-import Swal from "sweetalert2";
 import AdminRoute from "@/components/AdminRoute";
 import { Label } from "@/components/ui/label";
+import { errorMessage, success } from "@/components/ui/message";
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cancleReason, setCancleReason] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const { data: orders = [], isLoading, isError } = useGetAllOrdersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+  } = useGetPaginatedOrdersQuery({ page: currentPage, search: searchTerm });
   const [updateStatus] = useUpdateStatusMutation();
 
-  const filteredOrders = orders?.filter((order) => {
-    const idMatch = order?._id
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const customerMatch = order?.userId?.name
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesSearch = idMatch || customerMatch;
-    const matchesStatus =
-      statusFilter === "all" || order?.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const totalPages = orders?.totalPages || 1;
 
   const handleStatus = async (e, orderId) => {
     e.preventDefault();
@@ -82,22 +77,12 @@ export default function OrderManagement() {
 
     try {
       await updateStatus({ orderId, status, cancle }).unwrap();
-      Swal.fire({
-        position: "top-start",
-        title: `Status updated as ${status}`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      success(`Status updated to ${status}`);
       setCancleReason("");
       console.log("updated");
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        position: "top-start",
-        title: `Can't update status.`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      errorMessage("Failed to update status");
     }
   };
 
@@ -131,10 +116,28 @@ export default function OrderManagement() {
     }
   };
 
+  const handlePageChange = (pageNumber) => {
+    if (
+      pageNumber >= 1 &&
+      pageNumber <= totalPages &&
+      pageNumber !== currentPage
+    ) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
   if (isLoading)
-    return <div className="p-6 text-muted-foreground">Loading orders...</div>;
+    return (
+      <div className="p-6 w-full h-screen text-muted-foreground">
+        Loading orders...
+      </div>
+    );
   if (isError)
-    return <div className="p-6 text-destructive">Failed to load orders.</div>;
+    return (
+      <div className="p-6 w-full h-screen text-destructive">
+        Failed to load orders.
+      </div>
+    );
 
   return (
     <AdminRoute role={"admin"}>
@@ -166,21 +169,18 @@ export default function OrderManagement() {
                   placeholder="Search orders..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 pr-8" // ডান পাশে স্পেস যাতে cross টা বসে
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-2 top-2.5 text-muted-foreground hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] ">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="courier">Sent to Courier</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <Table>
@@ -196,7 +196,7 @@ export default function OrderManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrders?.map((order) => (
+                {orders?.orders?.map((order) => (
                   <TableRow key={order?._id}>
                     <TableCell className="font-medium">
                       #{order?._id.slice(-5)}
@@ -204,10 +204,10 @@ export default function OrderManagement() {
                     <TableCell>
                       <div>
                         <p className="font-medium">
-                          {order?.userId?.name || "N/A"}
+                          {order?.user?.name || "N/A"}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {order?.userId?.email || "N/A"}
+                          {order?.user?.email || "N/A"}
                         </p>
                       </div>
                     </TableCell>
@@ -254,7 +254,7 @@ export default function OrderManagement() {
                                 Customer
                               </Label>
                               <p className="mt-1">
-                                {order?.userId?.name || "N/A"}
+                                {order?.user?.name || "N/A"}
                               </p>
                             </div>
 
@@ -329,7 +329,7 @@ export default function OrderManagement() {
                                 Email
                               </Label>
                               <p className="mt-1">
-                                {order?.userId?.email || "N/A"}
+                                {order?.user?.email || "N/A"}
                               </p>
                             </div>
 
@@ -345,10 +345,10 @@ export default function OrderManagement() {
                                     key={idx}
                                   >
                                     <Link
-                                      href={`/products/${product?.productId?._id}`}
+                                      href={`/products/${product?.productData?._id}`}
                                       className="text-sky-600 hover:underline"
                                     >
-                                      {product?.productId?.name}
+                                      {product?.productData?.name}
                                     </Link>
                                     <span className="text-muted-foreground">
                                       {product?.quantity} pcs
@@ -387,6 +387,40 @@ export default function OrderManagement() {
             </Table>
           </CardContent>
         </Card>
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => {
+            const page = index + 1;
+            return (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === page
+                    ? "bg-emerald-600 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </AdminRoute>
   );

@@ -22,7 +22,7 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { addUser } from "@/redux/features/userSlice/userSlice";
 import { useRouter } from "next/navigation";
-import { Toast } from "@/components/ui/message";
+import { Toast, warning } from "@/components/ui/message";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -53,20 +53,12 @@ const SignupPage = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Passwords do not match!",
-      });
+      warning("Passwords do not match.");
       return;
     }
 
     if (!formData.agreeToTerms) {
-      Swal.fire({
-        icon: "warning",
-        title: "Hold on!",
-        text: "You must agree to the terms and conditions.",
-      });
+      warning("You must agree to the terms and conditions.");
       return;
     }
 

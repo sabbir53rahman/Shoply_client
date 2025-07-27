@@ -8,6 +8,7 @@ import {
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import Image from "next/image";
+import { success } from "@/components/ui/message";
 
 export default function ShoppingCart() {
   const currentUser = useSelector((state) => state?.user?.user);
@@ -17,6 +18,7 @@ export default function ShoppingCart() {
   const removeItem = async (id) => {
     try {
       await deleteCart(id);
+      success("Product removed from cart successfully!");
     } catch (error) {
       Swal.fire({
         position: "top-end",

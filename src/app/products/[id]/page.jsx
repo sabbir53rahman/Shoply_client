@@ -220,21 +220,9 @@ export default function ProductDetailsPage() {
       };
       await addCartDetails(cartDetails).unwrap();
       success("Product added to cart successfully!");
-      Swal.fire({
-        icon: "success",
-        title: "Added to cart!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
       setCartLoading(false);
     } catch (error) {
-      errorMassage("Failed to add product to cart.");
-      Swal.fire({
-        icon: "error",
-        title: error.message || "Failed to add to cart",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      errorMassage(error?.message || "Failed to add product to cart.");
       setCartLoading(false);
     }
   };

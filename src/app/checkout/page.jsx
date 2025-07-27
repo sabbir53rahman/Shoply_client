@@ -40,8 +40,6 @@ export default function CheckoutPage() {
     houseNumber: "",
   });
 
-  console.log(cartItems);
-
   const handleInputChange = (field, value) => {
     setAddressData((prev) => ({
       ...prev,
@@ -62,14 +60,14 @@ export default function CheckoutPage() {
   const handleAddOrder = async () => {
     if (!currentUser?._id) {
       console.error("You must be logged in to place an order.");
-      return;
+      return errorMassage("You must be logged in to place an order.");
     }
     // if(!addressData.name || !addressData.phone ||!addressData.street ||!addressData.thana ||!addressData.district || !addressData.houseNumber){
     if (!addressData.name) {
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "Fill all the address feild.",
+        title: "Fill all the address field.",
         showConfirmButton: false,
         timer: 1500,
       });

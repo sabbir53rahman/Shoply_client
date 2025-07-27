@@ -27,27 +27,42 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, Star, Trash2, Eye } from "lucide-react";
-import { useDeleteReviewMutation, useGetAllReviewsQuery } from "@/redux/features/reviewSlice/reviewSlice";
+import { Search, Star, Trash2, Eye, X } from "lucide-react";
+import {
+  useDeleteReviewMutation,
+  useGetPaginatedReviewsQuery,
+  useGetProductReviewsQuery,
+} from "@/redux/features/reviewSlice/reviewSlice";
 import AdminRoute from "@/components/AdminRoute";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import { success } from "@/components/ui/message";
 
 export default function ReviewsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: reviews = [], isLoading, isError,refetch } = useGetAllReviewsQuery();
-  const user = useSelector(state => state?.user?.user)
-  const [deleteReview] = useDeleteReviewMutation()
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: reviews = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetPaginatedReviewsQuery({ page: currentPage, search: searchTerm });
+  const user = useSelector((state) => state?.user?.user);
+  const [deleteReview] = useDeleteReviewMutation();
 
-  const filteredReviews = reviews?.filter(
-    (review) =>
-      review?.productId?.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      review?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const totalPages = reviews.totalPages || 1;
 
-  const handleDeleteReview = async (reviewId) => { 
+  const handlePageChange = (pageNumber) => {
+    if (
+      pageNumber >= 1 &&
+      pageNumber <= totalPages &&
+      pageNumber !== currentPage
+    ) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
     const confirm = await Swal.fire({
       title: "Delete this review?",
       icon: "warning",
@@ -62,12 +77,7 @@ export default function ReviewsManagement() {
         userId: user._id,
         role: user.role,
       }).unwrap();
-      Swal.fire({
-        icon: "success",
-        title: "Review deleted.",
-        timer: 1200,
-        showConfirmButton: false,
-      });
+      success("Review deleted successfully");
       refetch();
     } catch (err) {
       console.log("Failed delete:", err);
@@ -89,9 +99,13 @@ export default function ReviewsManagement() {
   );
 
   if (isLoading) return <p className="p-6">Loading reviews...</p>;
-  if (isError)
-    return <p className="p-6 text-red-500">Failed to fetch reviews</p>;
-
+  if (isError) {
+    return (
+      <p className="p-6 w-full h-screen text-red-500">
+        Failed to fetch reviews
+      </p>
+    );
+  }
   return (
     <AdminRoute role={"admin"}>
       <div className="p-6 space-y-6">
@@ -119,11 +133,20 @@ export default function ReviewsManagement() {
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search reviews..."
+                  placeholder="Search orders..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 pr-8"
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-2 top-2.5 text-muted-foreground hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -139,12 +162,12 @@ export default function ReviewsManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredReviews?.map((review) => (
+                {reviews?.reviews?.map((review) => (
                   <TableRow key={review?._id}>
                     <TableCell className="font-medium">
-                      {review?.productId?.name}
+                      {review?.product?.name}
                     </TableCell>
-                    <TableCell>{review?.userId?.name}</TableCell>
+                    <TableCell>{review?.user?.name}</TableCell>
                     <TableCell>{renderStars(review?.rating)}</TableCell>
                     <TableCell className="max-w-xs">
                       <p className="truncate">{review?.comment}</p>
@@ -171,13 +194,13 @@ export default function ReviewsManagement() {
                               <div>
                                 <h4 className="font-medium mb-2">Product</h4>
                                 <p className="text-sm text-muted-foreground">
-                                  {review?.productId?.name}
+                                  {review?.product?.name}
                                 </p>
                               </div>
                               <div>
                                 <h4 className="font-medium mb-2">Customer</h4>
                                 <p className="text-sm text-muted-foreground">
-                                  {review?.userId?.name}
+                                  {review?.user?.name}
                                 </p>
                               </div>
                               <div>
@@ -201,7 +224,10 @@ export default function ReviewsManagement() {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <button onClick={()=> handleDeleteReview(review?._id)} className="flex gap-2 px-3 py-1.5 rounded-lg bg-emerald-50">
+                        <button
+                          onClick={() => handleDeleteReview(review?._id)}
+                          className="flex gap-2 px-3 py-1.5 rounded-lg bg-emerald-50"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -212,6 +238,40 @@ export default function ReviewsManagement() {
             </Table>
           </CardContent>
         </Card>
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => {
+            const page = index + 1;
+            return (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === page
+                    ? "bg-emerald-600 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </AdminRoute>
   );

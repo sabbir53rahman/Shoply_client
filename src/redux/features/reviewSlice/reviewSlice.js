@@ -56,6 +56,18 @@ export const reviewApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Review"],
     }),
+
+    getPaginatedReviews: builder.query({
+      query: ({ page, search }) => {
+        return {
+          url: `/reviews/paginated?page=${page}&search=${encodeURIComponent(
+            search || ""
+          )}`,
+          credentials: "include",
+        };
+      },
+      providesTags: ["User"],
+    }),
   }),
 });
 
@@ -65,4 +77,5 @@ export const {
   useGetAllReviewsQuery,
   useGetUsersAllReviewsQuery,
   useDeleteReviewMutation,
+  useGetPaginatedReviewsQuery,
 } = reviewApi;

@@ -14,9 +14,12 @@ export const productApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Product"],
     }),
     getPaginatedProducts: builder.query({
-      query: ({ page = 1, min = 0, max = Number.MAX_SAFE_INTEGER } = {}) => {
+      query: ({ page, search }) => {
         return {
-          url: `/products/paginated?page=${page}&min=${min}&max=${max}`,
+          url: `/products/paginated?page=${page}&search=${encodeURIComponent(
+            search || ""
+          )}`,
+          credentials: "include",
         };
       },
       providesTags: ["Product"],
