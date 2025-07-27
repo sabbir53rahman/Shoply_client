@@ -11,7 +11,7 @@ export const orderApi = apiSlice.injectEndpoints({
         body: query,
         credentials: "include",
       }),
-      invalidatesTags: ["Order", "Cart"],
+      invalidatesTags: ["Order", "Cart", "Product"],
     }),
 
     // Get all orders

@@ -58,7 +58,7 @@ const categories = [
 ];
 
 const CategorySection = () => {
-  const { data: allCategory } = useGetAllCategorysQuery();
+  const { data: allCategory, isLoading } = useGetAllCategorysQuery();
 
   return (
     <div className="bg-white/95 backdrop-blur-sm border-t border-white/20 py-8 sm:py-12 overflow-hidden">
@@ -71,6 +71,23 @@ const CategorySection = () => {
             Discover our wide range of premium products
           </p>
         </div>
+
+        {isLoading && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {Array(6)
+              .fill(0)
+              .map((_, idx) => (
+                <div
+                  key={idx}
+                  className="animate-pulse bg-white shadow rounded-xl p-4 flex flex-col items-center"
+                >
+                  <div className="w-12 h-12 bg-gray-200 rounded-xl mb-3" />
+                  <div className="w-24 h-4 bg-gray-200 rounded mb-1" />
+                  <div className="w-16 h-3 bg-gray-200 rounded" />
+                </div>
+              ))}
+          </div>
+        )}
 
         <div className="px-4 sm:px-6 lg:px-8">
           <Swiper
@@ -116,7 +133,7 @@ const CategorySection = () => {
                         {/* <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-black" /> */}
                       </div>
                       <div className="text-center">
-                        <h4 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base group-hover:text-gray-800 transition-colors">
+                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base group-hover:text-gray-800 transition-colors">
                           {category.category}
                         </h4>
                         {/* <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 transition-colors">

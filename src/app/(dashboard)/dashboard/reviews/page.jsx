@@ -37,6 +37,7 @@ import AdminRoute from "@/components/AdminRoute";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { success } from "@/components/ui/message";
+import ProductTableSkeleton from "@/components/ui/tableSkelton";
 
 export default function ReviewsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,7 +99,6 @@ export default function ReviewsManagement() {
     </div>
   );
 
-  if (isLoading) return <p className="p-6">Loading reviews...</p>;
   if (isError) {
     return (
       <p className="p-6 w-full h-screen text-red-500">
@@ -162,6 +162,7 @@ export default function ReviewsManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {isLoading && <ProductTableSkeleton />}
                 {reviews?.reviews?.map((review) => (
                   <TableRow key={review?._id}>
                     <TableCell className="font-medium">
