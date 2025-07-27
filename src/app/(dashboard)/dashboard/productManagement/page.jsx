@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Slider, Pagination } from "antd";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,50 +18,47 @@ import {
 } from "lucide-react";
 
 import {
-  useGetAllProductsQuery,
   useDeleteProductMutation,
   useUpdateProductMutation,
   useAddCategoryMutation,
-  useGetAllCategorysQuery,
-  useGetPaginatedProductsQuery,
   useUpdateIsFeaturedMutation,
+  useGetProductsByPriceRangeQuery,
 } from "@/redux/features/productSlice/productSlice";
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Link from "next/link";
-import { ColorPicker, Select } from "antd";
+
 import AdminRoute from "@/components/AdminRoute";
 import { Toast } from "@/components/ui/message";
 import axios from "axios";
-import ProductTableSkeleton from "@/components/ui/tableSkelton";
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 
 const image_hosting_key = process.env.NEXT_PUBLIC_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
-export default function ProductManagement({ onAddProduct }) {
+const PRODUCTS_PER_PAGE = 10;
+
+export default function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -72,35 +71,56 @@ export default function ProductManagement({ onAddProduct }) {
   });
   const [color, setColor] = useState("#1677ff");
   const [currentPage, setCurrentPage] = useState(1);
+  const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  // Fetch all products filtered by price range and search term (assuming this query supports search)
+  // If not, you can filter search manually
   const {
-    data: products = [],
+    data: filteredData = [],
     isLoading,
     isError,
-  } = useGetPaginatedProductsQuery({ page: currentPage, search: searchTerm });
-  console.log(products);
+  } = useGetProductsByPriceRangeQuery({
+    min: priceRange[0],
+    max: priceRange[1],
+    search: searchTerm.trim(),
+  });
+
+  // Extract products array safely
+  const products = filteredData.products || filteredData || [];
+
+  // Pagination calculation
+  const totalProducts = products.length;
+  const totalPages = Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
+
+  // Products to display on current page
+  const currentProducts = products.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [addCategory] = useAddCategoryMutation();
   const [updateIsFeatured] = useUpdateIsFeaturedMutation();
 
-  const { totalPages } = products;
+  // Reset to page 1 when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [priceRange, searchTerm]);
 
-  const handlePageChange = (pageNumber) => {
-    if (
-      pageNumber >= 1 &&
-      pageNumber <= totalPages &&
-      pageNumber !== currentPage
-    ) {
-      setCurrentPage(pageNumber);
-    }
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handleEditOpen = (product) => {
+    setEditModalOpen(true);
     setSelectedProduct(product);
     setEditData({
       name: product.name,
       category: product.category,
       price: product.price,
+      stock: product.stock,
     });
   };
 
@@ -110,19 +130,28 @@ export default function ProductManagement({ onAddProduct }) {
   };
 
   const handleEditSubmit = async () => {
-    if (selectedProduct) {
-      await updateProduct({ id: selectedProduct?._id, updatedData: editData });
+    if (!selectedProduct) return;
+    try {
+      await updateProduct({
+        id: selectedProduct._id,
+        updatedData: editData,
+      }).unwrap();
+      setEditModalOpen(false);
       setSelectedProduct(null);
-      return <DialogClose></DialogClose>;
+      Toast.fire({ icon: "success", title: "Product updated successfully" });
+    } catch {
+      Toast.fire({ icon: "error", title: "Failed to update product" });
     }
   };
 
   const handleDelete = async (id) => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-    if (confirm) {
-      await deleteProduct(id);
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+    try {
+      await deleteProduct(id).unwrap();
+      Toast.fire({ icon: "success", title: "Product deleted successfully" });
+    } catch {
+      Toast.fire({ icon: "error", title: "Failed to delete product" });
     }
   };
 
@@ -131,7 +160,6 @@ export default function ProductManagement({ onAddProduct }) {
       alert("No products found to export.");
       return;
     }
-
     const headers = [
       "name",
       "description",
@@ -148,7 +176,6 @@ export default function ProductManagement({ onAddProduct }) {
       p.stock || 0,
       Array.isArray(p.tags) ? p.tags.join(",") : p.tags || "",
     ]);
-
     const csvContent = [headers, ...rows]
       .map((row) =>
         row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
@@ -167,119 +194,121 @@ export default function ProductManagement({ onAddProduct }) {
   const handleAddCategory = async (e) => {
     e.preventDefault();
     setDisabled(true);
-    const imageFile = { image: e.target.photo.files[0] };
-    const res = await axios.post(image_hosting_api, imageFile, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+
+    const imageFile = e.target.photo.files[0];
+    const formData = new FormData();
+    formData.append("image", imageFile);
 
     try {
-      const newCategory = {
-        category: e.target.category.value,
-        image: res?.data?.data?.display_url,
-        color: color,
-      };
+      const res = await axios.post(image_hosting_api, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      if (res.data.success === true) {
+      if (res.data.success) {
+        const newCategory = {
+          category: e.target.category.value,
+          image: res.data.data.display_url,
+          color,
+        };
+
         await addCategory(newCategory).unwrap();
+
         Toast.fire({
           icon: "success",
           title: "New category created successfully",
         });
         e.target.reset();
         setOpen(false);
+      } else {
+        throw new Error("Image upload failed");
       }
-    } catch (error) {
+    } catch {
+      Toast.fire({ icon: "error", title: "Can't create category." });
+    } finally {
       setDisabled(false);
-      Toast.fire({
-        icon: "error",
-        title: "Can't make category .",
-      });
-      setOpen(false);
     }
   };
 
   const handleUpdateFeatured = async ({ isFeature, productId }) => {
-    console.log(isFeature, productId);
     try {
-      await updateIsFeatured({
-        isFeature: isFeature,
-        productId: productId,
-      }).unwrap();
-      Toast.fire({
-        icon: "success",
-        title: "Feature updated!",
-      });
-    } catch (error) {
-      Toast.fire({
-        icon: "success",
-        title: "Can't update feature!",
-      });
+      await updateIsFeatured({ isFeature, productId }).unwrap();
+      Toast.fire({ icon: "success", title: "Feature updated!" });
+    } catch {
+      Toast.fire({ icon: "error", title: "Can't update feature!" });
     }
   };
 
   return (
-    <AdminRoute role={"admin"}>
+    <AdminRoute role="admin">
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        {/* Filter and buttons */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Product Management
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your product inventory and listings
-            </p>
+            <h4 className="font-medium mb-1">Filter by Price Range</h4>
+            <Slider
+              range
+              min={0}
+              max={2000}
+              value={priceRange}
+              onChange={(val) => setPriceRange(val)}
+              tooltip={{ formatter: (v) => `$${v}` }}
+            />
+            <div className="text-sm text-muted-foreground">
+              Price range: ${priceRange[0]} — ${priceRange[1]}
+            </div>
           </div>
+
           <div className="flex flex-col lg:flex-row gap-2">
             <Button variant="outline" onClick={handleBulkUpload}>
               <Upload className="w-4 h-4 mr-2" />
               Download CSV Template
             </Button>
-            {/* <Button onClick={onAddProduct}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Product
-            </Button> */}
+
             <Link
               href="/dashboard/addProduct"
               className="flex text-white justify-center items-center gap-2.5 px-4 py-1.5 rounded bg-emerald-600"
             >
-              <Plus className="w-4 h-4 mr-2 " />
+              <Plus className="w-4 h-4 mr-2" />
               Add Product
             </Link>
 
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button
-                  onClick={() => setOpen(true)}
                   variant="outline"
                   size="sm"
+                  onClick={() => setOpen(true)}
                 >
                   <Plus className="w-4 h-4 mr-2" /> Add category
                 </Button>
               </DialogTrigger>
+
               <DialogContent
                 modal={false}
                 onInteractOutside={(e) => e.preventDefault()}
-                className="bg-white "
+                className="bg-white"
               >
                 <DialogHeader>
                   <DialogTitle>Add Category.</DialogTitle>
                 </DialogHeader>
+
                 <form
                   onSubmit={handleAddCategory}
-                  className="space flex flex-col w-full"
+                  className="flex flex-col w-full space-y-4"
                 >
-                  <p className="text-[13px] ml-2">{"Add New Category :"}</p>
+                  <p className="text-[13px] ml-2">Add New Category :</p>
+
                   <input
                     type="text"
                     className="w-full rounded border py-1.5 px-3 border-gray-200 outline-none"
                     name="category"
                     placeholder="Category"
+                    required
                   />
+
                   <div className="flex justify-center my-4 gap-4 items-center">
                     <div className="w-full">
-                      <label className="block text-gray-700 text-sm  mb-2">
+                      <label className="block text-gray-700 text-sm mb-2">
                         Category Image
                       </label>
                       <div className="relative">
@@ -292,7 +321,8 @@ export default function ProductManagement({ onAddProduct }) {
                         <Camera className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       </div>
                     </div>
-                    <div className="">
+
+                    <div>
                       <p className="text-sm">BG color.</p>
                       <div className="flex border mt-2 rounded px-3 pr-6 items-center gap-3">
                         <input
@@ -300,7 +330,7 @@ export default function ProductManagement({ onAddProduct }) {
                           name="color"
                           value={color}
                           onChange={(e) => setColor(e.target.value)}
-                          className="w-9 h-9  rounded cursor-pointer shadow"
+                          className="w-9 h-9 rounded cursor-pointer shadow"
                         />
                         <span className="font-medium">{color}</span>
                       </div>
@@ -312,8 +342,8 @@ export default function ProductManagement({ onAddProduct }) {
                     type="submit"
                     className={`text-white cursor-pointer ${
                       disabled ? "bg-gray-400" : "bg-teal-700"
-                    } font-bold mt-8 px-5 py-1.5 rounded `}
-                    value="Add Category "
+                    } font-bold mt-8 px-5 py-1.5 rounded`}
+                    value="Add Category"
                   />
                 </form>
               </DialogContent>
@@ -321,6 +351,7 @@ export default function ProductManagement({ onAddProduct }) {
           </div>
         </div>
 
+        {/* Products Table */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -329,12 +360,14 @@ export default function ProductManagement({ onAddProduct }) {
             </CardTitle>
             <CardDescription>Manage your product catalog</CardDescription>
           </CardHeader>
+
           <CardContent>
+            {/* Search */}
             <div className="flex items-center gap-4 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search orders..."
+                  placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-8 pr-8"
@@ -351,10 +384,17 @@ export default function ProductManagement({ onAddProduct }) {
               </div>
             </div>
 
+            {/* Loading / Error */}
             {isLoading ? (
-              <ProductTableSkeleton />
+              <p className="text-sm text-muted-foreground">
+                Loading products...
+              </p>
             ) : isError ? (
               <p className="text-sm text-red-500">Failed to load products.</p>
+            ) : products.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No matching products
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -368,45 +408,44 @@ export default function ProductManagement({ onAddProduct }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products?.products?.map((product) => (
-                    <TableRow key={product?._id}>
+                  {currentProducts.map((product) => (
+                    <TableRow key={product._id}>
                       <TableCell className="font-medium">
-                        {product?.name}
+                        {product.name}
                       </TableCell>
-                      <TableCell>{product?.category}</TableCell>
+                      <TableCell>{product.category}</TableCell>
                       <TableCell>
-                        ${parseFloat(product?.price).toFixed(2)}
+                        ${parseFloat(product.price).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={product?.stock > 0 ? "default" : "secondary"}
+                          variant={product.stock > 0 ? "default" : "secondary"}
                         >
-                          {product?.stock > 0 ? product?.stock : "out of stock"}
+                          {product.stock > 0 ? product.stock : "out of stock"}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {!product?.isFeatured && (
+                        {!product.isFeatured ? (
                           <button
                             onClick={() =>
                               handleUpdateFeatured({
                                 isFeature: true,
-                                productId: product?._id,
+                                productId: product._id,
                               })
                             }
-                            className="py-1 border border-fuchsia-200 px-2.5 rounded bg"
+                            className="py-1 border border-fuchsia-200 px-2.5 rounded"
                           >
                             Make Featured
                           </button>
-                        )}
-                        {product?.isFeatured && (
+                        ) : (
                           <button
                             onClick={() =>
                               handleUpdateFeatured({
                                 isFeature: false,
-                                productId: product?._id,
+                                productId: product._id,
                               })
                             }
-                            className="py-1 border text-white bg-emerald-400 border-fuchsia-200 px-2.5 rounded bg"
+                            className="py-1 border text-white bg-emerald-400 border-fuchsia-200 px-2.5 rounded"
                           >
                             Remove Featured
                           </button>
@@ -414,7 +453,10 @@ export default function ProductManagement({ onAddProduct }) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Dialog>
+                          <Dialog
+                            open={editModalOpen}
+                            onOpenChange={setEditModalOpen}
+                          >
                             <DialogTrigger asChild>
                               <Button
                                 variant="outline"
@@ -424,45 +466,47 @@ export default function ProductManagement({ onAddProduct }) {
                                 <Edit className="w-4 h-4" />
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="bg-white">
+
+                            <DialogContent className="bg-white max-w-md">
                               <DialogHeader>
                                 <DialogTitle>Edit Product</DialogTitle>
-                                <DialogDescription>
-                                  Update product details
-                                </DialogDescription>
                               </DialogHeader>
-                              <div className="space-y-3">
-                                <p className="text-[13px] ml-2">
-                                  {"Product's Name :"}
-                                </p>
+                              <div className="grid gap-4">
+                                <label className="text-sm font-medium">
+                                  Product Name
+                                </label>
                                 <Input
                                   name="name"
+                                  placeholder="Product Name"
                                   value={editData.name}
                                   onChange={handleEditChange}
-                                  placeholder="Name"
                                 />
-                                <p className="text-[13px] ml-2">
-                                  {"Category :"}
-                                </p>
+                                <label className="text-sm font-medium">
+                                  Category
+                                </label>
                                 <Input
                                   name="category"
+                                  placeholder="Category"
                                   value={editData.category}
                                   onChange={handleEditChange}
-                                  placeholder="Category"
                                 />
-                                <p className="text-[13px] ml-2">{"Price :"}</p>
+                                <label className="text-sm font-medium">
+                                  Price
+                                </label>
                                 <Input
                                   name="price"
+                                  placeholder="Price"
                                   value={editData.price}
                                   onChange={handleEditChange}
-                                  placeholder="Price"
                                 />
-                                <p className="text-[13px] ml-2">{"Stock :"}</p>
+                                <label className="text-sm font-medium">
+                                  Stock
+                                </label>
                                 <Input
                                   name="stock"
-                                  value={editData?.stock}
-                                  onChange={handleEditChange}
                                   placeholder="Stock"
+                                  value={editData.stock}
+                                  onChange={handleEditChange}
                                 />
                                 <Button
                                   className="bg-emerald-600 text-white hover:bg-emerald-700"
@@ -488,42 +532,21 @@ export default function ProductManagement({ onAddProduct }) {
                 </TableBody>
               </Table>
             )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex justify-center">
+                <Pagination
+                  current={currentPage}
+                  pageSize={PRODUCTS_PER_PAGE}
+                  total={totalProducts}
+                  onChange={handlePageChange}
+                  showSizeChanger={false}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
-        <div className="flex justify-center items-center gap-2 mt-6">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Prev
-          </button>
-
-          {[...Array(totalPages)].map((_, index) => {
-            const page = index + 1;
-            return (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === page
-                    ? "bg-emerald-600 text-white"
-                    : "bg-gray-200"
-                }`}
-              >
-                {page}
-              </button>
-            );
-          })}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
       </div>
     </AdminRoute>
   );
