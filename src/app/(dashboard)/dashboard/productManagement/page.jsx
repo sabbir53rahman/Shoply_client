@@ -54,6 +54,7 @@ import { ColorPicker, Select } from "antd";
 import AdminRoute from "@/components/AdminRoute";
 import { Toast } from "@/components/ui/message";
 import axios from "axios";
+import ProductTableSkeleton from "@/components/ui/tableSkelton";
 
 const image_hosting_key = process.env.NEXT_PUBLIC_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
@@ -336,7 +337,7 @@ export default function ProductManagement({ onAddProduct }) {
                   placeholder="Search orders..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8 pr-8" // ডান পাশে স্পেস যাতে cross টা বসে
+                  className="pl-8 pr-8"
                 />
                 {searchTerm && (
                   <button
@@ -351,9 +352,7 @@ export default function ProductManagement({ onAddProduct }) {
             </div>
 
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">
-                Loading products...
-              </p>
+              <ProductTableSkeleton />
             ) : isError ? (
               <p className="text-sm text-red-500">Failed to load products.</p>
             ) : (

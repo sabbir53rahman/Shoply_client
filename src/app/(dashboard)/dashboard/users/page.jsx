@@ -52,6 +52,7 @@ import {
 import Swal from "sweetalert2";
 import AdminRoute from "@/components/AdminRoute";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
+import ProductTableSkeleton from "@/components/ui/tableSkelton";
 
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -225,9 +226,7 @@ export default function UsersManagement() {
               </TableHeader>
               <TableBody>
                 {userLoading ? (
-                  <div className="flex justify-center h-60">
-                    <Loading3QuartersOutlined></Loading3QuartersOutlined>
-                  </div>
+                  <ProductTableSkeleton />
                 ) : (
                   allUsers?.users?.map((user) => (
                     <TableRow key={user._id}>
