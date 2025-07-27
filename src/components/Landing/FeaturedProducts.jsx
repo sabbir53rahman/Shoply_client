@@ -52,7 +52,7 @@ const FeaturedCollection = () => {
         </div>
         <div className="flex w-full mb-14 justify-center items-center">
           <Link href="/products?sortBy=featured">
-            <Button className="primary_button  !py- rounded-2xl !px-">
+            <Button className="primary_button  !py- rounded-sm bg-black/70 px-8 !px-">
               Featured Products
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
