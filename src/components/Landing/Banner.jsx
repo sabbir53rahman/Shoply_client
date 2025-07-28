@@ -107,11 +107,11 @@ const HeroBannerSlider = () => {
       >
         {featuredProducts.map((product, idx) => {
           const colors = product.colors || {
-            primary: "from-green-700 to-emerald-900", // Background gradients
-            secondary: "from-amber-700 to-yellow-600", // Accent gradients
-            accent: "amber-500", // For buttons or icons
-            badge: "from-emerald-500 to-lime-500", // For featured badges
-            text: "green-50", // Light text for dark backgrounds
+            primary: "from-green-600 to-lime-500", // Fresh green gradient for main background
+            secondary: "from-lime-400 to-yellow-300", // Bright and appetizing secondary gradient
+            accent: "orange-500", // Warm and tasty accent for buttons/icons
+            badge: "from-emerald-400 to-green-500", // Rich greens for badges (like "New", "Best Seller")
+            text: "green-50", // Light text for contrast on dark greens
           };
 
           const badge = product.badge || "Featured";
@@ -160,18 +160,32 @@ const HeroBannerSlider = () => {
                   <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center h-full py-12 lg:py-0">
                     {/* Content Section */}
                     <div className="space-y-8 animate-fade-in-up order-2 lg:order-1">
-                      {/* Colorful badge */}
-                      <div
-                        className={`inline-flex items-center gap-3 bg-gradient-to-r ${colors.badge} backdrop-blur-sm px-5 py-3 rounded-full colorful-shadow border border-white/30`}
-                      >
-                        <Leaf
-                          className={`w-4 h-4 text-${colors.text} animate-pulse`}
-                        />
-                        <span
-                          className={`text-${colors.text} font-semibold text-sm tracking-wide`}
+                      <div className="flex items-center gap-[20px]">
+                        {/* Colorful badge */}
+                        <div
+                          className={`inline-flex items-center gap-3 bg-gradient-to-r ${colors.badge} backdrop-blur-sm px-5 py-3 rounded-full colorful-shadow border border-white/30`}
                         >
-                          {badge}
-                        </span>
+                          <Leaf
+                            className={`w-4 h-4 text-${colors.text} animate-pulse`}
+                          />
+                          <span
+                            className={`text-${colors.text} font-semibold text-sm tracking-wide`}
+                          >
+                            {badge}
+                          </span>
+                        </div>
+
+                        {/* Colorful category */}
+                        <div
+                          className={`inline-flex items-center gap-2 bg-gradient-to-r from-white/40 to-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/40`}
+                        >
+                          <div
+                            className={`w-4 h-4 bg-${colors.accent} rounded-full animate-pulse`}
+                          ></div>
+                          <span className="capitalize text-gray-700 font-medium tracking-wide">
+                            {product.category}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Colorful title */}
@@ -185,18 +199,6 @@ const HeroBannerSlider = () => {
                           {product.name.split(" ").slice(1).join(" ")}
                         </span>
                       </h1>
-
-                      {/* Colorful category */}
-                      <div
-                        className={`inline-flex items-center gap-2 bg-gradient-to-r from-white/40 to-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/40`}
-                      >
-                        <div
-                          className={`w-2 h-2 bg-${colors.accent} rounded-full animate-pulse`}
-                        ></div>
-                        <span className="capitalize text-gray-700 font-medium tracking-wide">
-                          {product.category}
-                        </span>
-                      </div>
 
                       {/* Description */}
                       <p className="text-lg text-gray-700 max-w-lg leading-relaxed font-light">
