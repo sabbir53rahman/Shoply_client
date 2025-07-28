@@ -2,7 +2,7 @@
 
 const ProductTableSkeleton = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 lg:w-full">
       {Array(8)
         .fill(0)
         .map((_, idx) => (

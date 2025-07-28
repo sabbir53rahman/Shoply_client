@@ -21,9 +21,13 @@ import { useGetUserCartQuery } from "@/redux/features/cartSlice/cartSlice";
 import { useSelector } from "react-redux";
 import PrivateRoute from "@/components/PrivateRoute";
 import { useRouter } from "next/navigation";
+import { warning, success, errorMessage } from "@/components/ui/message";
+import { set } from "lodash";
+import AdminRoute from "@/components/AdminRoute";
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [disabled, setDisabled] = useState(false);
   const currentUser = useSelector((state) => state?.user?.user);
   const { data: userCartItem = [], isLoading } = useGetUserCartQuery(
     currentUser?._id
@@ -58,19 +62,22 @@ export default function CheckoutPage() {
   }, [userCartItem]);
 
   const handleAddOrder = async () => {
+    setDisabled(true);
     if (!currentUser?._id) {
-      console.error("You must be logged in to place an order.");
-      return errorMassage("You must be logged in to place an order.");
+      errorMessage("You must be logged in to place an order.");
+      return router.push("/auth/login");
     }
-    // if(!addressData.name || !addressData.phone ||!addressData.street ||!addressData.thana ||!addressData.district || !addressData.houseNumber){
-    if (!addressData.name) {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Fill all the address field.",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+
+    if (
+      !addressData.name ||
+      !addressData.phone ||
+      !addressData.street ||
+      !addressData.thana ||
+      !addressData.district ||
+      !addressData.houseNumber
+    ) {
+      setDisabled(false);
+      return warning("Please fill in all required fields.");
     }
 
     const products = cartItems.map((item) => ({
@@ -86,21 +93,18 @@ export default function CheckoutPage() {
       paymentMethod,
       totalPrice: subtotal,
     };
-    console.log(newOrder, addressData);
 
     if (paymentMethod === "cash") {
       try {
         await addOrder(newOrder).unwrap();
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Order placed successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        success("Order placed successfully!");
+        setCartItems([]);
+        setDisabled(false);
         router.push("/dashboard");
       } catch (err) {
-        console.error("❌ Failed to create order:", err);
+        console.log("Error placing order:", err);
+        setDisabled(false);
+        errorMessage(err?.data?.message || "Failed to place order.");
       }
     } else if (paymentMethod === "sslcommerz") {
       const res = await fetch("/api/ssl-request", {
@@ -110,15 +114,18 @@ export default function CheckoutPage() {
       });
 
       const data = await res.json();
+      setDisabled(false);
       if (data?.GatewayPageURL) {
         window.location.replace(data.GatewayPageURL);
       } else {
         console.error("❌ SSLCommerz initiation failed");
+        errorMessage("Failed to initiate payment. Please try again.");
+        setDisabled(false);
       }
     }
   };
 
-  const handleQuantityChange = (productId, change) => {
+  const handleQuantityChange = (productId, change, stocks) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item._id === productId
@@ -140,7 +147,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <PrivateRoute>
+    <AdminRoute role={"admin,user"}>
       <div className="">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 min-h-screen py-8">
@@ -330,9 +337,13 @@ export default function CheckoutPage() {
                   </div>
 
                   <Button
-                    disabled={isLoading || !cartItems}
+                    disabled={disabled || isLoading || !cartItems}
                     onClick={handleAddOrder}
-                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 mt-2"
+                    className={`w-full ${
+                      disabled || isLoading || !cartItems
+                        ? "bg-gray-500"
+                        : "bg-emerald-700 hover:bg-emerald-800"
+                    } text-white py-3 mt-2`}
                   >
                     {paymentMethod === "sslcommerz"
                       ? "Pay Now (SSLCommerz)"
@@ -397,37 +408,56 @@ export default function CheckoutPage() {
                         <Image
                           src={item?.productId?.image || "/placeholder.svg"}
                           alt={item?.productId?.name}
-                          height={50}
-                          width={60}
+                          height={150}
+                          width={160}
                           className="w-20 h-20 object-cover rounded-md bg-gray-100"
                         />
                       </div>
                       <div className="flex-1 space-y-0.5">
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="font-semibold">
                           {item?.productId?.name}
                         </h3>
-                        <p className="font-semibold my-3 ">
-                          price : ${item?.productId?.price?.toFixed(2)}
-                        </p>
-                        <div className="flex items-center gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 items-center">
+                          <p className="font-semibold text-sm my-3 ">
+                            price : ${item?.productId?.price?.toFixed(2)}
+                          </p>
+                          <p className="font-semibold text-sm my-3 ">
+                            stock : {item?.productId?.stock}
+                          </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center text-sm gap-4">
                           <span className="">Quantity : </span>
                           <div className="flex items-center border justify-center w- rounded-lg">
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleQuantityChange(item._id, -1)}
+                              onClick={() =>
+                                handleQuantityChange(
+                                  item._id,
+                                  -1,
+                                  item?.productId?.stock
+                                )
+                              }
                               disabled={item?.quantity <= 1}
                               className="h-6 w-6 p-0"
                             >
                               <Minus className="w-4 h-4" />
                             </Button>
                             <span className="w-12 text-center font-medium">
-                              {item?.quantity}
+                              {item?.productId?.stock === 0
+                                ? 0
+                                : item?.quantity}
                             </span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleQuantityChange(item._id, 1)}
+                              onClick={() =>
+                                handleQuantityChange(
+                                  item._id,
+                                  1,
+                                  item?.productId?.stock
+                                )
+                              }
                               disabled={item?.quantity >= item.productId?.stock}
                               className="h-6 w-6 p-0"
                             >
@@ -444,6 +474,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
-    </PrivateRoute>
+    </AdminRoute>
   );
 }

@@ -6,6 +6,7 @@ import { store } from "@/redux/app/store";
 import { Loader2 } from "lucide-react";
 import Footer from "@/components/Footer/Footer";
 import Navbar from "@/components/Navbar/Navbar";
+import useAuth from "@/Firebase/useAuth";
 
 const Spinner = () => (
   <div className="min-h-screen bg-black flex flex-col justify-center items-center gap-6">
@@ -19,6 +20,9 @@ const Spinner = () => (
 const LayoutContent = ({ children }) => {
   // const { isAuthLoading } = useAuth();
   // if (isAuthLoading) return <Spinner />;
+  const { user } = useAuth();
+  if (user) {
+  }
 
   return <>{children}</>;
 };

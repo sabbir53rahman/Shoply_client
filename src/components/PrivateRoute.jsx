@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import useAuth from "@/Firebase/useAuth";
 
 const PrivateRoute = ({ children }) => {
-  const user = useSelector((state) => state?.user?.user);
+  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-console.log(user)
+
   useEffect(() => {
-    // If user is null or undefined, redirect to login
+    if (typeof window === "undefined") return;
+
     if (!user) {
-      router.push("/auth/login");
+      router.replace("/auth/login"); // ✅ use replace instead of push
     } else {
       setLoading(false);
     }
-  }, [user, router]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -31,7 +33,7 @@ console.log(user)
     );
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export default PrivateRoute;

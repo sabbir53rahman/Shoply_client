@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Skeleton, Select, Slider, Switch } from "antd";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,6 +67,16 @@ const AllFilteredProducts = () => {
 
     router.push(`?${params.toString()}`);
   };
+
+  const debouncedChange = useCallback(
+    debounce(([min, max]) => {
+      updateQueryParams({
+        key: "price",
+        value: { minPrice: min, maxPrice: max },
+      });
+    }, 500), // 500ms delay
+    [] // Empty dependency array so it's created once
+  );
 
   const filters = {
     category,
@@ -192,12 +202,13 @@ const AllFilteredProducts = () => {
             <div className="w-ful">
               <p className="text-sm font-semibold">Price range.</p>
               <Slider
-                onChange={([min, max]) => {
-                  updateQueryParams({
-                    key: "price",
-                    value: { minPrice: min, maxPrice: max },
-                  });
-                }}
+                // onChange={([min, max]) => {
+                //   updateQueryParams({
+                //     key: "price",
+                //     value: { minPrice: min, maxPrice: max },
+                //   });
+                // }}
+                onChange={debouncedChange}
                 className="min-w-32 md:min-w-48 max-w-60"
                 range
                 max={1000}
