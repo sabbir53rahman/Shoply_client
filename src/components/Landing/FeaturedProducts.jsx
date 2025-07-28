@@ -22,7 +22,7 @@ const FeaturedCollection = () => {
     useGetLeatestProductsQuery();
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-8 md:py-14 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/*Featured Section Header */}
         <div className="text-center mb-12">
@@ -32,7 +32,15 @@ const FeaturedCollection = () => {
           <p className="text-gray-600 text-lg mb-6">
             Discover our handpicked premium products
           </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+          <div className="flex w-full mb-14 justify-center items-center">
+            <Link href="/products?sortBy=featured">
+              <Button className="primary_button text-emerald-50 !py- rounded-3xl  px-8 !px-">
+                Explore More
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+          {/* <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div> */}
         </div>
 
         {/* Products Grid */}
@@ -50,14 +58,6 @@ const FeaturedCollection = () => {
                   <ProductCard key={product?._id} product={product} />
                 ))}
         </div>
-        <div className="flex w-full mb-14 justify-center items-center">
-          <Link href="/products?sortBy=featured">
-            <Button className="primary_button  !py- rounded-sm bg-black/70 px-8 !px-">
-              Featured Products
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        </div>
 
         {/*Popular Section Header */}
         <div className="text-center mb-12">
@@ -67,7 +67,15 @@ const FeaturedCollection = () => {
           <p className="text-gray-600 text-lg mb-6">
             Discover our handpicked premium products
           </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+          <div className="flex w-full mb-14 justify-center items-center">
+            <Link href="/products?sortBy=newest">
+              <Button className="primary_button text-emerald-50 !py- rounded-3xl  px-8 !px-">
+                Explore More
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+          {/* <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div> */}
         </div>
 
         {/* Products Grid */}

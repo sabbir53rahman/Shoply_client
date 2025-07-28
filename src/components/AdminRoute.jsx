@@ -1,22 +1,37 @@
-"use client"
+"use client";
 import { Spin } from "antd";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import useAuth from "@/Firebase/useAuth";
 
-const AdminRoute = ({role,children}) => {
+const AdminRoute = ({ role, children }) => {
+  const currentUser = useSelector((state) => state?.user?.user);
+  const [loading, setLoading] = useState(true);
+  //   const { user } = useAuth();
+  const router = useRouter();
+  console.log("Current User:", currentUser);
 
-    const currentUser = useSelector(state => state?.user?.user)
-    const isMatched = role.includes(currentUser?.role)
-    
-    if(isMatched === true){
-        return <div className="w-full ">
-            { children }
-        </div>
+  useEffect(() => {
+    if (currentUser) {
+      setLoading(false);
     }
+  }, [currentUser]);
 
-    return <div className="w-full flex h-screen justify-center items-center">
-        {/* <h1 className="text-3xl">You are not valid.</h1> */}
-        <Spin size="large"></Spin>
-    </div>
+  if (loading) {
+    return (
+      <div className="w-full flex h-screen justify-center items-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const isMatched = role.includes(currentUser?.role);
+  if (!isMatched) {
+    return router.push("/auth/login");
+  }
+
+  return <div className="w-full">{children}</div>;
 };
 
 export default AdminRoute;

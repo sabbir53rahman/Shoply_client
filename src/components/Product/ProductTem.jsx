@@ -127,7 +127,7 @@ const ProductCard = ({ product }) => {
           </div>
 
           {/* Product Image with Loading State */}
-          <div className="absolute inset-0 py-5 px-4">
+          <div className="absolute inset-0 py-4 px-4">
             {!imageLoaded && (
               <div className="absolute inset-8 bg-gray-200 animate-pulse rounded-2xl" />
             )}
@@ -153,7 +153,7 @@ const ProductCard = ({ product }) => {
         <div className="p-4 pb-0">
           {/* Category */}
           {product.category && (
-            <div className="mb-2">
+            <div className="mb-1.5">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-full">
                 {product.category}
               </span>
@@ -161,12 +161,12 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* Product Name */}
-          <h3 className="font-bold text-gray-900 text-lg line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-gray-700 transition-colors duration-300">
+          <h3 className="font-bold text-gray-900 text-lg line-clamp-2 leading-tight  group-hover:text-gray-700 transition-colors duration-300">
             {product.name}
           </h3>
         </div>
         {/* Product Info */}
-        <div className="p-3 pb-4 pt-0">
+        <div className="p-3  pt-0">
           <div className="flex py-2 justify-between flex-row-reverse items-center">
             {/* Rating */}
             <div className="flex items-center gap-2 mb-2">
@@ -177,7 +177,7 @@ const ProductCard = ({ product }) => {
             </div>
 
             {/* Price */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {product.salePrice ? (
                   <>
@@ -189,7 +189,7 @@ const ProductCard = ({ product }) => {
                     </span>
                   </>
                 ) : (
-                  <span className="text-2xl font-bold text-gray-900">
+                  <span className="text-[23px] font-bold text-gray-900">
                     ${product.price?.toFixed(2)}
                   </span>
                 )}
@@ -204,7 +204,7 @@ const ProductCard = ({ product }) => {
 
           {/* Stock Indicator */}
           {product.inStock && product.stock && (
-            <div className="mb-5">
+            <div className="mb-3">
               <div className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-green-700 font-medium">
