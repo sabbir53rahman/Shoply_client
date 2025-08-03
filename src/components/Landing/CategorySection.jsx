@@ -136,9 +136,6 @@ const CategorySection = () => {
                         <h4 className="font-semibold text-gray-900 text-sm sm:text-base group-hover:text-gray-800 transition-colors">
                           {category.category}
                         </h4>
-                        {/* <p className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
-                          {category?.count}
-                        </p> */}
                       </div>
                     </div>
                   </Link>

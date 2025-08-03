@@ -179,13 +179,13 @@ export default function UserDashboard({ currentUser }) {
                 >
                   <div className="space-y-">
                     <p className="text-sm font-medium text-muted-foreground">
-                      {order?.products?.map((produt, idx) => (
+                      {order?.products?.map((product, idx) => (
                         <p
                           className="p-1 flex items-center gap-2 shadow-sm my-1"
                           key={idx}
                         >
                           <CircleDashed className="size-3" />{" "}
-                          {produt?.productId?.name}
+                          {product?.productId?.name}
                         </p>
                       ))}
                     </p>
