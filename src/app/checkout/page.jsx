@@ -82,7 +82,7 @@ export default function CheckoutPage() {
 
     const products = cartItems.map((item) => ({
       productId: item?.productId?._id,
-      quantity: item.quantity || 1,
+      quantity: item.quantity,
       price: item?.productId?.price,
     }));
 
@@ -142,7 +142,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.productId?.price || 0) * (item.quantity || 1),
+    (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
     0
   );
 

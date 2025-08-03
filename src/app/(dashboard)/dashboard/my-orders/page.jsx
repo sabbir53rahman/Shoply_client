@@ -44,11 +44,23 @@ import {
 
 import AdminRoute from "@/components/AdminRoute";
 import { useSelector } from "react-redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { success } from "@/components/ui/message";
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
   const currentUser = useSelector((state) => state?.user?.user);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [updateStatus] = useUpdateStatusMutation();
   const {
     data: orders = [],
     isLoading,
@@ -119,6 +131,27 @@ export default function Page() {
       </div>
     );
 
+  const handleCancleOrder = async (id) => {
+    Swal.fire({
+      title: "Are you sure you want to cancel this order?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await updateStatus({
+          orderId: id,
+          status: "cancelled",
+          cancle: "Customer request",
+        }).unwrap();
+        success("Order cancelled successfully!");
+      }
+    });
+  };
+
   return (
     <AdminRoute role={"user"}>
       <div className="p-6 space-y-6">
@@ -150,6 +183,7 @@ export default function Page() {
                   <TableHead>Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,6 +207,98 @@ export default function Page() {
                     </TableCell>
                     <TableCell>
                       {new Date(order?.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent
+                          forceMount
+                          className="bg-white rounded-xl shadow-lg px-6 py-8 max-w-2xl"
+                        >
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold text-gray-900">
+                              Order Details - #{order?._id.slice(-5)}
+                            </DialogTitle>
+                            <DialogDescription className="text-sm text-muted-foreground">
+                              Manage this order and update its status
+                            </DialogDescription>
+                          </DialogHeader>
+
+                          <div className="space-y-6 mt-6 text-sm text-gray-700">
+                            {/* Status Update */}
+                            <div>
+                              <Label className="text-base mx-3 font-semibold">
+                                Status
+                              </Label>
+                              {order?.status === "processing" ? (
+                                <button
+                                  onClick={() => handleCancleOrder(order?._id)}
+                                  className="p-1 my-3 px-2.5 mr-4 block text-sm font-bold shadow bg-emerald-500 text-white rounded-full border "
+                                >
+                                  Cancel Order
+                                </button>
+                              ) : (
+                                <Badge
+                                  variant={getStatusVariant(order?.status)}
+                                  className="flex my-3 items-center gap-1 w-fit"
+                                >
+                                  {getStatusIcon(order?.status)}
+                                  {order.status?.replace("_", " ")}
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Products */}
+                            <div>
+                              <Label className="text-base font-semibold mb-1 block">
+                                Items
+                              </Label>
+                              <div className="space-y-2">
+                                {order?.products?.map((product, idx) => (
+                                  <div
+                                    className="border rounded-lg px-4 py-2 flex justify-between items-center bg-muted"
+                                    key={idx}
+                                  >
+                                    <Link
+                                      href={`/products/${product?.productId?._id}`}
+                                      className="text-sky-600 hover:underline"
+                                    >
+                                      {product?.productId?.name}
+                                    </Link>
+                                    <span className="text-muted-foreground">
+                                      {product?.quantity} pcs
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Total */}
+                            <div className="flex justify-between">
+                              <Label className="text-base font-semibold">
+                                Total
+                              </Label>
+                              <p>${order?.totalPrice?.toFixed(2)}</p>
+                            </div>
+
+                            {/* Date */}
+                            <div className="flex justify-between">
+                              <Label className="text-base font-semibold">
+                                Date
+                              </Label>
+                              <p>
+                                {new Date(
+                                  order?.createdAt
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Slider, Pagination } from "antd";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { debounce } from "lodash";
 
 const image_hosting_key = process.env.NEXT_PUBLIC_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
@@ -111,6 +112,18 @@ export default function ProductManagement() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const debouncedFilterChange = useCallback(
+    debounce((val) => {
+      onFilterChange(val); // example callback for API call or query update
+    }, 500),
+    []
+  );
+
+  const handleChange = (val) => {
+    setPriceRange(val);
+    debouncedFilterChange(val); // debounce এ কল হচ্ছে
   };
 
   const handleEditOpen = (product) => {
@@ -250,7 +263,7 @@ export default function ProductManagement() {
               min={0}
               max={2000}
               value={priceRange}
-              onChange={(val) => setPriceRange(val)}
+              onChange={handleChange}
               tooltip={{ formatter: (v) => `$${v}` }}
             />
             <div className="text-sm text-muted-foreground">
