@@ -109,19 +109,11 @@ const HeroBannerSlider = () => {
       >
         {featuredProducts.map((product, idx) => {
           const colors = product.colors || {
-<<<<<<< HEAD
-            primary: "from-green-600 to-lime-500", // Fresh green gradient for main background
-            secondary: "from-lime-400 to-yellow-300", // Bright and appetizing secondary gradient
-            accent: "orange-500", // Warm and tasty accent for buttons/icons
-            badge: "from-emerald-400 to-green-500", // Rich greens for badges (like "New", "Best Seller")
-            text: "green-50", // Light text for contrast on dark greens
-=======
             primary: "from-black to-emerald-0", // Background gradients
             secondary: "from-amber-0 to-yellow-0", // Accent gradients
             accent: "amber-0", // For buttons or icons
             badge: "from-emerald-0 to-lime-0", // For featured badges
             text: "green-30", // Light text for dark backgrounds
->>>>>>> tasin
           };
 
           const badge = product.badge || "Featured";
@@ -210,8 +202,6 @@ const HeroBannerSlider = () => {
                         </span>
                       </h1>
 
-<<<<<<< HEAD
-=======
                       {/* Colorful category */}
                       <div
                         className={`inline-flex items-center gap-2 bg-gradient-to-r from-white/40 to-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/40`}
@@ -225,7 +215,6 @@ const HeroBannerSlider = () => {
                         </span>
                       </div>
 
->>>>>>> tasin
                       {/* Description */}
                       <p className="text-lg text-gray-700 max-w-lg leading-relaxed font-light">
                         {product.description}
