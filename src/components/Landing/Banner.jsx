@@ -31,6 +31,8 @@ const HeroBannerSlider = () => {
     isError,
   } = useGetFeaturedProductsQuery();
 
+  console.log(featuredProducts)
+
   if (isError) return <p>Failed to load featured products.</p>;
   if (isLoading)
     return (
@@ -107,11 +109,11 @@ const HeroBannerSlider = () => {
       >
         {featuredProducts.map((product, idx) => {
           const colors = product.colors || {
-            primary: "from-green-700 to-emerald-900", // Background gradients
-            secondary: "from-amber-700 to-yellow-600", // Accent gradients
-            accent: "amber-500", // For buttons or icons
-            badge: "from-emerald-500 to-lime-500", // For featured badges
-            text: "green-50", // Light text for dark backgrounds
+            primary: "from-black to-emerald-0", // Background gradients
+            secondary: "from-amber-0 to-yellow-0", // Accent gradients
+            accent: "amber-0", // For buttons or icons
+            badge: "from-emerald-0 to-lime-0", // For featured badges
+            text: "green-30", // Light text for dark backgrounds
           };
 
           const badge = product.badge || "Featured";
@@ -123,10 +125,10 @@ const HeroBannerSlider = () => {
               <div className="relative w-full h-full flex items-center overflow-hidden">
                 {/* Colorful gradient background */}
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${colors.primary}`}
+                  className={`absolute inset-0 bg-gradient-to-br `}
                 >
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${colors.secondary} opacity-95`}
+                    className={`absolute inset-0 bg-gradient-to-br bg-black/15 opacity-95`}
                   />
 
                   {/* Floating colorful elements */}
@@ -177,7 +179,7 @@ const HeroBannerSlider = () => {
                       {/* Colorful title */}
                       <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
                         <span
-                          className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}
+                          className={` `}
                         >
                           {product.name.split(" ")[0]}
                         </span>{" "}
@@ -195,6 +197,7 @@ const HeroBannerSlider = () => {
                         ></div>
                         <span className="capitalize text-gray-700 font-medium tracking-wide">
                           {product.category}
+                          {colors.accent}
                         </span>
                       </div>
 
@@ -274,28 +277,28 @@ const HeroBannerSlider = () => {
                     <div className="relative flex justify-center lg:justify-end order-1 lg:order-2 animate-fade-in-right">
                       <div className="relative group">
                         {/* Glowing Background Accent */}
-                        <div className="absolute -inset-8 bg-gradient-to-r from-[#FFD700] to-[#B8860B] rounded-3xl blur-2xl opacity-20"></div>
+                        <div className="absolute -inset-8 bg-gradient-to-r from-[#ffd90022] to-[#b8870b07] rounded-3xl blur-2xl opacity-20"></div>
 
                         {/* Main Product Card */}
-                        <div className="relative w-80 h-80 sm:w-96 sm:h-96 lg:w-[28rem] lg:h-[28rem] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.2)] transition-all duration-500 group-hover:scale-105">
+                        <div className="relative w-80 h-80 sm:w-96 sm:h-96 lg:w-[28rem] lg:h-[28rem] bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.2)] transition-all duration-500 group-hover:scale-105">
                           <Image
                             src={product.image || "/placeholder.svg"}
                             alt={product.name}
                             fill
-                            className="object-cover p-8 sm:p-12 transition-transform duration-500 ease-out group-hover:scale-110"
+                            className="object-cover p-8 sm:p-12 rounded transition-transform duration-500 ease-out group-hover:scale-110"
                             priority={idx === 0}
                           />
 
                           {/* Decorative Dots */}
-                          <div className="absolute top-4 right-4 w-3 h-3 bg-[#FFD700] rounded-full animate-pulse"></div>
+                          <div className="absolute top-4 right-4 w-3 h-3 bg-[#ffd90009] rounded-full animate-pulse"></div>
                           <div
-                            className="absolute bottom-4 left-4 w-2 h-2 bg-[#B8860B] rounded-full animate-pulse"
+                            className="absolute bottom-4 left-4 w-2 h-2 bg-[#b8870b0e] rounded-full animate-pulse"
                             style={{ animationDelay: "1s" }}
                           ></div>
                         </div>
 
                         {/* Accent Shadow Elements */}
-                        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-[#FFD700] to-[#B8860B] rounded-full -z-10 opacity-30 blur-xl"></div>
+                        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-[#ffd9000e] to-[#b8870b11] rounded-full -z-10 opacity-30 blur-xl"></div>
                         <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-white/20 to-[#FFD700]/20 rounded-full -z-10 blur-lg"></div>
                       </div>
                     </div>
@@ -310,14 +313,14 @@ const HeroBannerSlider = () => {
       {/* Navigation Arrows */}
       <button
         onClick={() => swiperRef.current?.swiper?.slidePrev()}
-        className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 rounded-full p-4 colorful-shadow border border-white/60 transition-all duration-300 hover:scale-110 z-30 group"
+        className="absolute shadow-md left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 rounded-full p-4 colorful-shadow-md border border-white/60 transition-all duration-300 hover:scale-110 z-30 group"
       >
         <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
       </button>
 
       <button
         onClick={() => swiperRef.current?.swiper?.slideNext()}
-        className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 rounded-full p-4 colorful-shadow border border-white/60 transition-all duration-300 hover:scale-110 z-30 group"
+        className="absolute shadow-md right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-700 rounded-full p-4 colorful-shadow border border-white/60 transition-all duration-300 hover:scale-110 z-30 group"
       >
         <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
       </button>
