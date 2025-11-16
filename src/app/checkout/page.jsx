@@ -177,7 +177,7 @@ export default function CheckoutPage() {
                         />
                         <label htmlFor="cash">Cash on Delivery</label>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className=" hidden items-center gap-3">
                         <input
                           type="radio"
                           id="sslcommerz"

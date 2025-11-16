@@ -106,6 +106,7 @@
 body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
+  scroll-behavior: smooth;
 }
 
 .font-450{

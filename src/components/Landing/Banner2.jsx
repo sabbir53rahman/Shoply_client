@@ -5,6 +5,7 @@ import React from 'react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import vagetable from "@/assets/vagetable.jpg";
+import Link from 'next/link';
 
 const Banner2 = () => {
   return (
@@ -34,16 +35,19 @@ const Banner2 = () => {
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl">
-                  Shop Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
+                <Link href={`/products`}>
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl">
+                    Shop Now
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                  
+                {/* <Button
                   variant="outline"
                   className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-xl"
                 >
                   Our Story
-                </Button>
+                </Button> */}
               </div>
             </div>
 
