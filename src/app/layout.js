@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import Footer from "@/components/Footer/Footer";
 import Navbar from "@/components/Navbar/Navbar";
 import useAuth from "@/Firebase/useAuth";
+import SmoothScroll from "@/components/ui/SmothScroll";
 
 const Spinner = () => (
   <div className="min-h-screen bg-black flex flex-col justify-center items-center gap-6">
@@ -32,7 +33,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Provider store={store}>
-          <LayoutContent>{children}</LayoutContent>
+          <SmoothScroll>
+            <LayoutContent>{children}</LayoutContent>
+          </SmoothScroll>
         </Provider>
       </body>
     </html>
