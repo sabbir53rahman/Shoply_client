@@ -22,6 +22,7 @@ import Footer from "@/components/Footer/Footer";
 import team1 from "../../assets/team1.jpg";
 import team2 from "../../assets/team2.jpg"
 import team3 from "../../assets/team3.jpg"
+import Link from "next/link";
 
 const AboutPage = () => {
   const stats = [
@@ -132,16 +133,13 @@ const AboutPage = () => {
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl">
-                  Shop Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-xl"
-                >
-                  Our Story
-                </Button>
+                <Link href={`/products`}>
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl">
+                    Shop Now
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                  
               </div>
             </div>
 
