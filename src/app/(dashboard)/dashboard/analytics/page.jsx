@@ -182,9 +182,9 @@ export default function Analytics() {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-20 bg-muted rounded-full h-2">
-                      <div className="bg-red-500 h-2 rounded-full" style={{ width: `${reason.percentage}%` }} />
+                      <div className="bg-red-500 h-2 rounded-full" style={{ width: `${Math.trunc(reason.percentage)}%` }} />
                     </div>
-                    <span className="text-sm text-muted-foreground w-8">{reason.percentage}%</span>
+                    <span className="text-sm text-muted-foreground w-8">{Math.trunc(reason.percentage)}%</span>
                   </div>
                 </div>
               ))}
